@@ -345,26 +345,38 @@ def create_sentence_promo(itemName, wikiTextRaw, wikiTextRawCopy):
                                wikiTextRawCopy)
 
     if sentencePromo:
-        game = re.findall("''\[\[.*?\]\]''", sentencePromo[0])[0]
-        game = _lf(game.replace("''", ""))
+        if "[[Steam]]" in sentencePromo:
+            spt_s = S.SENTENCE_PROMOTIONAL_STEAM
+        else:
+            spt_s = ""
 
-        date = re.findall("before .*?,.*?\d{4}", sentencePromo[0])
-        date = re.sub("before ", "", date[0])
+        try:
+            date = re.findall("before .*?,.*?\d{4}", sentencePromo[0])
+            date = re.sub("before ", "", date[0])
 
-        dateDay = re.sub("[a-z] ", "",
-                         re.findall("[a-z] \d[\d|,]",
-                                    date)[0]).replace(",", "")
+            dateDay = re.sub("[a-z] ", "",
+                             re.findall("[a-z] \d[\d|,]",
+                                        date)[0]).replace(",", "")
 
-        dateMonth = re.sub(" \d", "",
+            dateMonth = re.sub(" \d", "",
                                re.findall("[A-z].*?\d", date)[0])
 
-        dateMonth = S.DICTIONARY_MONTHS[dateMonth]
+            dateMonth = S.DICTIONARY_MONTHS[dateMonth]
 
-        dateYear = re.sub(", ", "",
+            dateYear = re.sub(", ", "",
                               re.findall(", \d{4}", date)[0])
-        date = S.DATE.format(dateDay, dateMonth, dateYear)
+            dateFMT = "{{{{Date fmt|{}|{}|{}}}}}".format(dateMonth, dateDay, dateYear)
+            spt_d = SENTENCE_PROMOTIONAL_DATE.format(dateFMT)
+        except:
+            spt_d = ""
 
-        spt = S.SENTENCE_PROMOTIONAL.format(itemName, game, date)
+        try:
+            game = re.findall("''\[\[.*?\]\]''", sentencePromo[0])[0]
+            game = _lf(game.replace("''", ""))
+        except IndexError:
+            return wikiTextRaw
+            
+        spt = S.SENTENCE_PROMOTIONAL.format(itemName, spt_s, spt_d)
 
         return wikiTextRaw.replace(sentencePromo[0], spt)
     else:

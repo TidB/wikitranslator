@@ -1,7 +1,6 @@
 #STANDARD
 ADDEDTOGAME = "* (ARTIKEL) {{{{item name|{0}}}}} wurde dem Spiel hinzugefügt."
 ALLCLASSESBOX = "[[Classes/{0}|Allen Klassen]]"
-DATE = "{0}. {1} {2}"
 DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{0}}}}}}}}}"
 ITEMLOOK = "Es handelt sich dabei um"
 LEVEL = "{0} Level {1}"
@@ -24,7 +23,9 @@ SENTENCE_COMMUNITY = "(ARTIKEL) {{{{item name|{0}}}}} wurde im [[Steam Workshop/
 SENTENCE_COMMUNITY_LINK = "[{0} veröffentlicht]"
 SENTENCE_COMMUNITY_NAME = ' unter dem Namen "{0}"'
 
-SENTENCE_PROMOTIONAL = "(ARTIKEL) {{{{item name|{0}}}}} bekamen Spieler in der Qualität [[Quality/de#Echte Items|Echt]], die ''[[{1}/de|{1}]]'' auf [[Steam/de|Steam]] vor dem {2} kauften. "
+SENTENCE_PROMOTIONAL = "(ARTIKEL) {{{{item name|{0}}}}} bekamen Spieler in der Qualität [[Quality/de#Echte Items|Echt]], die ''[[{1}/de|{1}]]''{2}{3} kauften. "
+SENTENCE_PROMOTIONAL_STEAM = " auf [[Steam/de|Steam]]"
+SENTENCE_PROMOTIONAL_DATE = " vor dem {0}"
 
 SENTENCE_SET = " Es wurde dem Spiel mit dem {{{{Update link|{0}}}}}-Update hinzugefügt."
 SENTENCE_SET_INCLUDES = "Das Set enthält die folgenden Gegenstände:"

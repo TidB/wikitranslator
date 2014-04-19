@@ -24,7 +24,8 @@ def run_cw(wikiTextRaw, iso):
                                        itemName,
                                        wikiTextRaw,
                                        wikiTextRawCopy,
-                                       wikiTextType)
+                                       wikiTextType,
+                                       iso)
 
     wikiTextRaw = create_sentence_community(itemName, wikiTextRaw, wikiTextRawCopy)
     wikiTextRaw = create_sentence_promo(itemName, wikiTextRaw, wikiTextRawCopy)
@@ -66,8 +67,19 @@ def run_st(wikiTextRaw, iso):
 
     wikiTextRaw = add_displaytitle(itemName, wikiTextRaw)
     wikiTextRaw = create_sentence_1_set(classLink, classList, itemName, wikiTextRaw)
+    wikiTextRaw = translate_categories(wikiTextRaw)
     wikiTextRaw = translate_headlines(wikiTextRaw)
 
+    match = re.search("(The|This) set (contains|includes) the following items:", wikiTextRaw).group()
+    wikiTextRaw = re.sub(match,
+                         S.SENTENCE_SET_INCLUDES,
+                         wikiTextRaw)
+
+    part = wikiTextRaw[wikiTextRaw.index(S.SENTENCE_SET_INCLUDES):]
+    for link in re.finditer("\* ?\[\[.*?\]\]", part):
+        link = link.group()
+        wikiTextRaw = wikiTextRaw.replace(link, _lf_to_t(link))
+        
     return wikiTextRaw
 
 
@@ -82,6 +94,9 @@ def _lf(link):
 
 def _lf_ext(link):
     return re.sub("\|.*", "", link)
+
+def _lf_to_t(link):
+    return link.replace("[[", "{{item link|").replace("]]", "}}")
 
 
 def add_displaytitle(itemName, wikiTextRaw):
@@ -241,7 +256,8 @@ def translate_update_history(itemName, wikiTextRaw):
 
 def create_sentence_1_cw(classLink, classList,
                          itemName, wikiTextRaw,
-                         wikiTextRawCopy, wikiTextType):
+                         wikiTextRawCopy, wikiTextType,
+                         iso):
 
     wikiTextTypeFormat = wikiTextType.upper()
     
@@ -285,6 +301,7 @@ def create_sentence_1_set(classLink, classList, itemName, wikiTextRaw):
     sentence1_1 = re.findall(".*?'''" + itemName + "'''.*? for .*?\.", wikiTextRaw)[0]
     sentence1_1Trans = S.SENTENCE_1_ALL.format(itemName,
                                                S.NOUNMARKER_INDEFINITE_SET,
+                                               "",
                                                "",
                                                S.SENTENCE_1_SET,
                                                classList)

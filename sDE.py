@@ -1,181 +1,182 @@
-# -*- coding: utf-8 -*-
-
 #STANDARD
-ADDEDTOGAME = u"* (ARTIKEL) {{{{item name|{0}}}}} wurde dem Spiel hinzugefügt."
-ALLCLASSESBOX = u"[[Classes/{0}|Allen Klassen]]"
+ADDEDTOGAME = "* (ARTIKEL) {{{{item name|{0}}}}} wurde dem Spiel hinzugefügt."
+ALLCLASSESBOX = "[[Classes/{0}|Allen Klassen]]"
 DATE = "{0}. {1} {2}"
-DISPLAYTITLE = u"{{{{DISPLAYTITLE: {{{{item name|{0}}}}}}}}}"
-ITEMLOOK = u"Es handelt sich dabei um"
-LEVEL = u"{0} Level {1}"
-NOT_CRAFTABLE = u"Nicht zum Herstellen verwendbar"
-NOT_CRAFTABLE_TRADABLE = u"Nicht handelbar oder zum Herstellen verwendbar"
-NOT_TRADABLE = u"Nicht handelbar"
-NOUNMARKER_INDEFINITE_COSMETIC = u"ein"
-NOUNMARKER_INDEFINITE_SET = u"ein"
-NOUNMARKER_INDEFINITE_WEAPON = u"eine"
-RESTRICTED_HALLOWEEN_FULLMOON = u"Feiertagsbeschränkung: Halloween / Vollmond"
+DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{0}}}}}}}}}"
+ITEMLOOK = "Es handelt sich dabei um"
+LEVEL = "{0} Level {1}"
+NOUNMARKER_INDEFINITE_COSMETIC = "ein"
+NOUNMARKER_INDEFINITE_SET = "ein"
+NOUNMARKER_INDEFINITE_WEAPON = "eine"
 
-SENTENCE_1_ALL = u"(ARTIKEL) '''{{{{item name|{0}}}}}''' ist {1}{2}{3} {4} für {5}."
-SENTENCE_1_COMMUNITY_COSMETIC = u" [[Steam Workshop/de|von der Community erstellter]]"
-SENTENCE_1_COMMUNITY_WEAPON = u" [[Steam Workshop/de|von der Community erstellte]]"
-SENTENCE_1_PROMO_COSMETIC = u" [[Cosmetic items/de|kosmetischer]] [[Promotional items/de|Werbegegenstand]]"
-SENTENCE_1_PROMO_WEAPON = u" [[Promotional items/de|Werbe]]-"
-SENTENCE_1_COSMETIC = u"[[Cosmetic items/de|kosmetischer Gegenstand]]"
-SENTENCE_1_SET = u"[[Item sets/de|Gegenstandsset]]"
-SENTENCE_1_CLASSES_ALL = u"alle [[Classes/de|Klassen]]"
-SENTENCE_1_CLASSES_ONE = u"den [[{0}/de|{0}]]"
-SENTENCE_1_CLASSES_MORE = u" und den [[{0}/de|{0}]]."
+SENTENCE_1_ALL = "(ARTIKEL) '''{{{{item name|{0}}}}}''' ist {1}{2}{3} {4} für {5}."
+SENTENCE_1_COMMUNITY_COSMETIC = " [[Steam Workshop/de|von der Community erstellter]]"
+SENTENCE_1_COMMUNITY_WEAPON = " [[Steam Workshop/de|von der Community erstellte]]"
+SENTENCE_1_PROMO_COSMETIC = " [[Cosmetic items/de|kosmetischer]] [[Promotional items/de|Werbegegenstand]]"
+SENTENCE_1_PROMO_WEAPON = " [[Promotional items/de|Werbe]]-"
+SENTENCE_1_COSMETIC = "[[Cosmetic items/de|kosmetischer Gegenstand]]"
+SENTENCE_1_SET = "[[Item sets/de|Gegenstandsset]]"
+SENTENCE_1_CLASSES_ALL = "alle [[Classes/de|Klassen]]"
+SENTENCE_1_CLASSES_ONE = "den [[{0}/de|{0}]]"
+SENTENCE_1_CLASSES_MORE = " und den [[{0}/de|{0}]]."
 
-SENTENCE_COMMUNITY = u"(ARTIKEL) {{{{item name|{0}}}}} wurde im [[Steam Workshop/de|Steam Workshop]]{1} {2}."
-SENTENCE_COMMUNITY_NAME = u' unter dem Namen "{0}"'
-SENTENCE_COMMUNITY_LINK = u"[{0} veröffentlicht]"
-SENTENCE_PROMOTIONAL = u"(ARTIKEL) {{{{item name|{0}}}}} bekamen Spieler in der Qualität [[Quality/de#Echte Items|Echt]], die ''[[{1}/de|{1}]]'' auf [[Steam/de|Steam]] vor dem {2} kauften. "
-SENTENCE_SET = u" Es wurde dem Spiel mit dem {{{{Update link|{0}}}}}-Update hinzugefügt."
-SENTENCE_THUMBNAIL = u"|Steam Workshop-Vorschaubild (ARTIKEL) {{{{item name|{0}}}}}."
+SENTENCE_COMMUNITY = "(ARTIKEL) {{{{item name|{0}}}}} wurde im [[Steam Workshop/de|Steam Workshop]]{1} {2}."
+SENTENCE_COMMUNITY_LINK = "[{0} veröffentlicht]"
+SENTENCE_COMMUNITY_NAME = ' unter dem Namen "{0}"'
 
-#WEAPON
-SENTENCE_1_PRIMARY = u"[[Weapon/de#{0}primary|Primärwaffe]]"
-SENTENCE_1_SECONDARY = u"[[Weapon/de#{0}secondary|Sekundärwaffe]]"
-SENTENCE_1_MELEE = u"[[Weapon/de#{0}melee|Nahkampfwaffe]]"
+SENTENCE_PROMOTIONAL = "(ARTIKEL) {{{{item name|{0}}}}} bekamen Spieler in der Qualität [[Quality/de#Echte Items|Echt]], die ''[[{1}/de|{1}]]'' auf [[Steam/de|Steam]] vor dem {2} kauften. "
+
+SENTENCE_SET = " Es wurde dem Spiel mit dem {{{{Update link|{0}}}}}-Update hinzugefügt."
+SENTENCE_SET_INCLUDES = "Das Set enthält die folgenden Gegenstände:"
+
+NOT_CRAFTABLE = "Nicht zum Herstellen verwendbar"
+NOT_CRAFTABLE_TRADABLE = "Nicht handelbar oder zum Herstellen verwendbar"
+NOT_TRADABLE = "Nicht handelbar"
+RESTRICTED_HALLOWEEN_FULLMOON = "Feiertagsbeschränkung: Halloween / Vollmond"
+SENTENCE_THUMBNAIL = "|Steam Workshop-Vorschaubild (ARTIKEL) {{{{item name|{0}}}}}."
+
+SENTENCE_1_PRIMARY = "[[Weapon/de#{0}primary|Primärwaffe]]"
+SENTENCE_1_SECONDARY = "[[Weapon/de#{0}secondary|Sekundärwaffe]]"
+SENTENCE_1_MELEE = "[[Weapon/de#{0}melee|Nahkampfwaffe]]"
 
 #HEADLINES
 DICTIONARY_HEADLINES = {
-    "as a crafting ingredient" : u"Als Handwerkszutat",
-    "blueprint" : u"Blaupause",
-    "bugs" : u"Fehler",
-    "crafting" : u"Herstellen",
-    "damage and function times" : u"Schaden und Funktionszeiten",
-    "external links" : u"Externe Links",
-    "gallery" : u"Galerie",
-    "item set" : u"Gegenstandsset",
-    "painted variants" : u"Angemalte Varianten",
-    "references" : u"Referenzen",
-    "related achievements" : u"Zugehörige Errungenschaften",
-    "see also" : u"Siehe auch",
-    "strange variant" : u"Seltsame Varianten",
-    "styles" : u"Stile",
-    "trivia" : u"Sonstiges",
-    "unused content" : u"Ungenutzter Inhalt",
-    "update history" : u"Update-Verlauf",
+    "as a crafting ingredient" : "Als Handwerkszutat",
+    "blueprint" : "Blaupause",
+    "bugs" : "Fehler",
+    "crafting" : "Herstellen",
+    "damage and function times" : "Schaden und Funktionszeiten",
+    "external links" : "Externe Links",
+    "gallery" : "Galerie",
+    "item set" : "Gegenstandsset",
+    "painted variants" : "Angemalte Varianten",
+    "references" : "Referenzen",
+    "related achievements" : "Zugehörige Errungenschaften",
+    "see also" : "Siehe auch",
+    "strange variant" : "Seltsame Varianten",
+    "styles" : "Stile",
+    "trivia" : "Sonstiges",
+    "unused content" : "Ungenutzter Inhalt",
+    "update history" : "Update-Verlauf",
     }
 
 #ITEM LEVELS
 DICTIONARY_LEVEL_C = {
-    'Apparel' : u'Bekleidung',
-    'Armband' : u'Armband',
-    'Aura of Incorruptibility' : u'Unbestechlichkeitsnimbus',
-    'Backpack' : u'Rucksack',
-    'Badge' : u'Abzeichen',
-    'Balloon' : u'Ballon',
-    'Bandages' : u'Bandagen',
-    'Bandana' : u'Kopftuch',
-    'Bandolier' : u'Patronengürtel',
-    'Barbeque' : u'Grill',
-    'Beach Towel' : u'Strandtuch',
-    'Bells' : u'Glöckchen',
-    'Bird Head' : u'Vogelkopf',
-    'Blueprints' : u'Blaupausen',
-    'Bones' : u'Knochen',
-    'Bongos' : u'Bongos',
-    'Boots' : u'Stiefel',
-    'Botkiller' : u'Botkiller',
-    'Cape' : u'Umhang',
-    'Championship Belt' : u'Meisterschaftsgürtel',
-    'Cigar' : u'Zigarre',
-    'Coat' : u'Mantel',
-    'Coffin' : u'Sarg',
-    'Community Medal' : u'Community-Medaille',
-    'Conscience' : u'Gewissen',
-    'Cooler' : u'Kühlbox',
-    'Cosmetic Armor' : u'Kosmetische Rüstung',
-    'Cosmetic Augmentation' : u'Kosmetische Verbesserung',
-    'Cosmetic Axe' : u'Kosmetische Axt',
-    'Cosmetic Knife' : u'Kosmetisches Messer',
-    'Costume Piece' : u'Kostümteil',
-    'Decorative Bombs' : u'Deko-Bomben',
-    'Duck' : u'Ente',
-    'Electronic Device' : u'Elektronisches Gerät',
-    'Eye Stalks' : u'Stielaugen',
-    'Facial Hair' : u'Gesichtbehaarung',
-    'Flair!' : u'Flair!',
-    'Flip-Flops' : u'Flip-Flops',
-    'Fueltank' : u'Treibstofftank',
-    'Func_Medal' : u'Func_Medal',
-    'Futuristic Sound Device' : u'Futuristisches Tongerät',
-    'Ghost' : u'Geist',
-    'Glasses' : u'Brille',
-    'Glove' : u'Handschuh',
-    'Gloves' : u'Handschuhe',
-    'Golf Clubs' : u'Golfschläger',
-    'Hair' : u'Haare',
-    'Hat' : u'Hut',
-    'Headgear' : u'Kopfbedeckung',
-    'Headset' : u'Headset',
-    'Helmet' : u'Helm',
-    'Holiday Hat' : u'Feiertagshut',
-    'Hooves' : u'Hufe',
-    'Kilt' : u'Schottenrock',
-    'Lantern' : u'Laterne',
-    'Lunchbox' : u'Brotdose',
-    'Mascot' : u'Maskottchen',
-    'Mask' : u'Maske',
-    'Medal' : u'Medaille',
-    'Medallion' : u'Medaillon',
-    'Mystical Lamp' : u'Mystische Lampe',
-    'Necklace' : u'Halskette',
-    'Photograph' : u'Foto',
-    'Pin' : u'Anstecknadel',
-    'Pipe' : u'Pfeife',
-    'Pocket Buddy' : u'Taschenbegleiter',
-    'Pocket Square' : u'Einstecktuch',
-    'Poncho' : u'Poncho',
-    'Puffy Shirt' : u'Aufgebauschtes Hemd',
-    'Pyrovision Goggles' : u'Pyrovision-Brille',
-    'Refreshment' : u'Erfrischung',
-    'Ring' : u'Ring',
-    'Robot' : u'Roboter',
-    'Safety Apparatus' : u'Sicherheitsvorkehrung',
-    'Satchel' : u'Umhängetasche',
-    'Scarf' : u'Schal',
-    'Science Project' : u'Forschungsprojekt',
-    'Shield' : u'Schild',
-    'Shirt' : u'Hemd',
-    'Shoes' : u'Schuhe',
-    'Skateboard' : u'Skateboard',
-    'Sled' : u'Schlitten',
-    'Snow Globe' : u'Schneekugel',
-    'Spikes' : u'Stacheln',
-    'Spirit Animal' : u'Tiergeist',
-    'Spooky Companion' : u'Unheimlicher Begleiter',
-    'Spurs' : u'Sporen',
-    'Squirrel' : u'Eichhörnchen',
-    'Stethoscope' : u'Stethoskop',
-    'Stocking' : u'Strumpf',
-    'Supplies' : u'Proviant',
-    'Tattoos' : u'Tattoos',
-    'Tentacles' : u'Tentakel',
-    'Tournament Medal' : u'Turniermedaille',
-    'Towel' : u'Tuch',
-    'Treasure' : u'Schatz',
-    'Tuxedo' : u'Smoking',
-    'UndeadPet' : u'Untotes Haustier',
-    'Uniform' : u'Uniform',
-    "Veteran's Beret" : u'Veteranenbarett',
-    'Wings' : u'Flügel',
+    'Apparel' : 'Bekleidung',
+    'Armband' : 'Armband',
+    'Aura of Incorruptibility' : 'Unbestechlichkeitsnimbus',
+    'Backpack' : 'Rucksack',
+    'Badge' : 'Abzeichen',
+    'Balloon' : 'Ballon',
+    'Bandages' : 'Bandagen',
+    'Bandana' : 'Kopftuch',
+    'Bandolier' : 'Patronengürtel',
+    'Barbeque' : 'Grill',
+    'Beach Towel' : 'Strandtuch',
+    'Bells' : 'Glöckchen',
+    'Bird Head' : 'Vogelkopf',
+    'Blueprints' : 'Blaupausen',
+    'Bones' : 'Knochen',
+    'Bongos' : 'Bongos',
+    'Boots' : 'Stiefel',
+    'Botkiller' : 'Botkiller',
+    'Cape' : 'Umhang',
+    'Championship Belt' : 'Meisterschaftsgürtel',
+    'Cigar' : 'Zigarre',
+    'Coat' : 'Mantel',
+    'Coffin' : 'Sarg',
+    'Community Medal' : 'Community-Medaille',
+    'Conscience' : 'Gewissen',
+    'Cooler' : 'Kühlbox',
+    'Cosmetic Armor' : 'Kosmetische Rüstung',
+    'Cosmetic Augmentation' : 'Kosmetische Verbesserung',
+    'Cosmetic Axe' : 'Kosmetische Axt',
+    'Cosmetic Knife' : 'Kosmetisches Messer',
+    'Costume Piece' : 'Kostümteil',
+    'Decorative Bombs' : 'Deko-Bomben',
+    'Duck' : 'Ente',
+    'Electronic Device' : 'Elektronisches Gerät',
+    'Eye Stalks' : 'Stielaugen',
+    'Facial Hair' : 'Gesichtbehaarung',
+    'Flair!' : 'Flair!',
+    'Flip-Flops' : 'Flip-Flops',
+    'Fueltank' : 'Treibstofftank',
+    'Func_Medal' : 'Func_Medal',
+    'Futuristic Sound Device' : 'Futuristisches Tongerät',
+    'Ghost' : 'Geist',
+    'Glasses' : 'Brille',
+    'Glove' : 'Handschuh',
+    'Gloves' : 'Handschuhe',
+    'Golf Clubs' : 'Golfschläger',
+    'Hair' : 'Haare',
+    'Hat' : 'Hut',
+    'Headgear' : 'Kopfbedeckung',
+    'Headset' : 'Headset',
+    'Helmet' : 'Helm',
+    'Holiday Hat' : 'Feiertagshut',
+    'Hooves' : 'Hufe',
+    'Kilt' : 'Schottenrock',
+    'Lantern' : 'Laterne',
+    'Lunchbox' : 'Brotdose',
+    'Mascot' : 'Maskottchen',
+    'Mask' : 'Maske',
+    'Medal' : 'Medaille',
+    'Medallion' : 'Medaillon',
+    'Mystical Lamp' : 'Mystische Lampe',
+    'Necklace' : 'Halskette',
+    'Photograph' : 'Foto',
+    'Pin' : 'Anstecknadel',
+    'Pipe' : 'Pfeife',
+    'Pocket Buddy' : 'Taschenbegleiter',
+    'Pocket Square' : 'Einstecktuch',
+    'Poncho' : 'Poncho',
+    'Puffy Shirt' : 'Aufgebauschtes Hemd',
+    'Pyrovision Goggles' : 'Pyrovision-Brille',
+    'Refreshment' : 'Erfrischung',
+    'Ring' : 'Ring',
+    'Robot' : 'Roboter',
+    'Safety Apparatus' : 'Sicherheitsvorkehrung',
+    'Satchel' : 'Umhängetasche',
+    'Scarf' : 'Schal',
+    'Science Project' : 'Forschungsprojekt',
+    'Shield' : 'Schild',
+    'Shirt' : 'Hemd',
+    'Shoes' : 'Schuhe',
+    'Skateboard' : 'Skateboard',
+    'Sled' : 'Schlitten',
+    'Snow Globe' : 'Schneekugel',
+    'Spikes' : 'Stacheln',
+    'Spirit Animal' : 'Tiergeist',
+    'Spooky Companion' : 'Unheimlicher Begleiter',
+    'Spurs' : 'Sporen',
+    'Squirrel' : 'Eichhörnchen',
+    'Stethoscope' : 'Stethoskop',
+    'Stocking' : 'Strumpf',
+    'Supplies' : 'Proviant',
+    'Tattoos' : 'Tattoos',
+    'Tentacles' : 'Tentakel',
+    'Tournament Medal' : 'Turniermedaille',
+    'Towel' : 'Tuch',
+    'Treasure' : 'Schatz',
+    'Tuxedo' : 'Smoking',
+    'Undead Pet' : 'Untotes Haustier',
+    'Uniform' : 'Uniform',
+    "Veteran's Beret" : 'Veteranenbarett',
+    'Wings' : 'Flügel',
     }
 
 #MONTHS
 DICTIONARY_MONTHS = {
-    'January' : u'Januar',
-    'February' : u'Februar',
-    'March' : u'März',
-    'April' : u'April',
-    'May' : u'Mai',
-    'June' : u'Juni',
-    'July' : u'Juli',
-    'August' : u'August',
-    'September' : u'September',
-    'October' : u'Oktober',
-    'November' : u'November',
-    'December' : u'Dezember',
+    'January' : 'Januar',
+    'February' : 'Februar',
+    'March' : 'März',
+    'April' : 'April',
+    'May' : 'Mai',
+    'June' : 'Juni',
+    'July' : 'Juli',
+    'August' : 'August',
+    'September' : 'September',
+    'October' : 'Oktober',
+    'November' : 'November',
+    'December' : 'Dezember',
     }

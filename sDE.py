@@ -19,7 +19,7 @@ SENTENCE_1_CLASSES_ALL = "alle [[Classes/de|Klassen]]"
 SENTENCE_1_CLASSES_ONE = "den [[{0}/de|{0}]]"
 SENTENCE_1_CLASSES_MORE = " und den [[{0}/de|{0}]]."
 
-SENTENCE_COMMUNITY = "(ARTIKEL) {{{{item name|{0}}}}} wurde im [[Steam Workshop/de|Steam Workshop]]{1} {2}."
+SENTENCE_COMMUNITY = "(ARTIKEL) {{{{item name|{0}}}}} wurde im Steam Workshop{1} {2}."
 SENTENCE_COMMUNITY_LINK = "[{0} veröffentlicht]"
 SENTENCE_COMMUNITY_NAME = ' unter dem Namen "{0}"'
 

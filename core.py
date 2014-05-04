@@ -40,13 +40,13 @@ def run_cw(wikiTextRaw, iso):
                          S.SENTENCE_THUMBNAIL.format(itemName),
                          wikiTextRaw)
     wikiTextRaw = re.sub("\| ?item-flags += +Not Tradable or Usable in Crafting",
-                         "| item-flags   =" + S.NOT_CRAFTABLE_TRADABLE,
+                         "| item-flags   = " + S.NOT_CRAFTABLE_TRADABLE,
                          wikiTextRaw)
     wikiTextRaw = re.sub("\| ?item-flags += +Not Tradable",
-                         "| item-flags   =" + S.NOT_TRADABLE,
+                         "| item-flags   = " + S.NOT_TRADABLE,
                          wikiTextRaw)
     wikiTextRaw = re.sub("\| ?item-flags += +Not Usable in Crafting",
-                         "| item-flags   =" + S.NOT_CRAFTABLE,
+                         "| item-flags   = " + S.NOT_CRAFTABLE,
                          wikiTextRaw)
     wikiTextRaw = re.sub("\| ?att-1-negative += +Holiday Restriction: Halloween / Full Moon",
                          "| att-1-negative   = " + S.RESTRICTED_HALLOWEEN_FULLMOON,
@@ -351,9 +351,8 @@ def create_sentence_promo(itemName, wikiTextRaw, wikiTextRawCopy):
             spt_s = ""
 
         try:
-            date = re.findall("before .*?,.*?\d{4}", sentencePromo[0])
+            date = re.findall("before .*?,.*?20\d\d", sentencePromo[0])
             date = re.sub("before ", "", date[0])
-
             dateDay = re.sub("[a-z] ", "",
                              re.findall("[a-z] \d[\d|,]",
                                         date)[0]).replace(",", "")
@@ -361,22 +360,20 @@ def create_sentence_promo(itemName, wikiTextRaw, wikiTextRawCopy):
             dateMonth = re.sub(" \d", "",
                                re.findall("[A-z].*?\d", date)[0])
 
-            dateMonth = S.DICTIONARY_MONTHS[dateMonth]
-
             dateYear = re.sub(", ", "",
                               re.findall(", \d{4}", date)[0])
+            
             dateFMT = "{{{{Date fmt|{}|{}|{}}}}}".format(dateMonth, dateDay, dateYear)
-            spt_d = SENTENCE_PROMOTIONAL_DATE.format(dateFMT)
+            spt_d = S.SENTENCE_PROMOTIONAL_DATE.format(dateFMT)
         except:
             spt_d = ""
-
         try:
             game = re.findall("''\[\[.*?\]\]''", sentencePromo[0])[0]
             game = _lf(game.replace("''", ""))
         except IndexError:
             return wikiTextRaw
             
-        spt = S.SENTENCE_PROMOTIONAL.format(itemName, spt_s, spt_d)
+        spt = S.SENTENCE_PROMOTIONAL.format(itemName, game, spt_s, spt_d)
 
         return wikiTextRaw.replace(sentencePromo[0], spt)
     else:

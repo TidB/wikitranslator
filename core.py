@@ -2,6 +2,14 @@ import re
 
 import sDE
 
+GUI_METHODS = ("add_displaytitle",
+               "transform_decimal",
+               "translate_categories",
+               "translate_classlink",
+               "translate_headlines",
+               "translate_levels",
+               "translate_update_history")
+
 # ===
 # Run
 # ===

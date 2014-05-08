@@ -3,10 +3,15 @@ import re
 import sDE
 
 GUI_METHODS = ("add_displaytitle",
+               "create_sentence_1_cw",
+               "create_sentence_1_set",
+               "create_sentence_community",
+               "create_sentence_promo",
                "transform_decimal",
                "translate_categories",
                "translate_classlink",
                "translate_headlines",
+               "translate_item_flags",
                "translate_levels",
                "translate_update_history")
 
@@ -43,21 +48,10 @@ def run_cw(wikiTextRaw, iso):
     wikiTextRaw = translate_categories(wikiTextRaw)
     wikiTextRaw = translate_classlinks(classLink, iso, wikiTextRaw)
     wikiTextRaw = translate_levels(wikiTextRaw)
+    wikiTextRaw = translate_item_flags(wikiTextRaw)
 
     wikiTextRaw = re.sub("\|.*?Steam Workshop.*?thumbnail.*?\.",
                          S.SENTENCE_THUMBNAIL.format(itemName),
-                         wikiTextRaw)
-    wikiTextRaw = re.sub("\| ?item-flags += +Not Tradable or Usable in Crafting",
-                         "| item-flags   = " + S.NOT_CRAFTABLE_TRADABLE,
-                         wikiTextRaw)
-    wikiTextRaw = re.sub("\| ?item-flags += +Not Tradable",
-                         "| item-flags   = " + S.NOT_TRADABLE,
-                         wikiTextRaw)
-    wikiTextRaw = re.sub("\| ?item-flags += +Not Usable in Crafting",
-                         "| item-flags   = " + S.NOT_CRAFTABLE,
-                         wikiTextRaw)
-    wikiTextRaw = re.sub("\| ?att-1-negative += +Holiday Restriction: Halloween / Full Moon",
-                         "| att-1-negative   = " + S.RESTRICTED_HALLOWEEN_FULLMOON,
                          wikiTextRaw)
 
     return wikiTextRaw
@@ -87,7 +81,7 @@ def run_st(wikiTextRaw, iso):
     for link in re.finditer("\* ?\[\[.*?\]\]", part):
         link = link.group()
         wikiTextRaw = wikiTextRaw.replace(link, _lf_to_t(link))
-        
+
     return wikiTextRaw
 
 
@@ -102,6 +96,7 @@ def _lf(link):
 
 def _lf_ext(link):
     return re.sub("\|.*", "", link)
+
 
 def _lf_to_t(link):
     return link.replace("[[", "{{item link|").replace("]]", "}}")
@@ -234,6 +229,27 @@ def translate_headlines(wikiTextRaw):
     return wikiTextRaw
 
 
+def translate_item_flags(wikiTextRaw):
+    try:
+        itemFlag = re.search("\|.*?item-flags.*", wikiTextRaw).group()
+        print(itemFlag)
+        iF = re.sub("\|.*?= +", "", itemFlag)
+        iFn = "| item-flags   = " + S.DICTIONARY_FLAGS[iF.lower()]
+        wikiTextRaw = wikiTextRaw.replace(itemFlag, iFn)
+    except (AttributeError, KeyError):
+        pass
+
+    try:
+        itemAtt = re.search("\|.*?att-1-negative.*", wikiTextRaw).group()
+        iA = re.sub("\|.*?= +", "", itemAtt)
+        iAn = "| att-1-negative   = " + S.DICTIONARY_ATTS[iA.lower()]
+        wikiTextRaw = wikiTextRaw.replace(itemAtt, iAn)
+    except (AttributeError, KeyError):
+        pass
+
+    return wikiTextRaw
+
+
 def translate_levels(wikiTextRaw):
     level = re.findall("Level \d+-?\d*? [A-z ]+", wikiTextRaw)[0]
     levelNew = level.replace("Level ", "")
@@ -268,18 +284,18 @@ def create_sentence_1_cw(classLink, classList,
                          iso):
 
     wikiTextTypeFormat = wikiTextType.upper()
-    
+
     if wikiTextType == "weapon":
         slot = get_weapon_slot(wikiTextRaw)
         S.SENTENCE_1_WEAPON = eval("S.SENTENCE_1_" +
                                    slot.upper()).format(_lf(classLink).lower())
-        
+
     typeLink = eval("S.SENTENCE_1_" + wikiTextTypeFormat)
     if get_item_community(wikiTextRawCopy):
         com = eval("S.SENTENCE_1_COMMUNITY_" + wikiTextTypeFormat)
     else:
         com = ""
-        
+
     if get_item_promo(wikiTextRawCopy):
         promo = eval("S.SENTENCE_1_PROMO_" + wikiTextTypeFormat)
         if wikiTextType == "cosmetic" and iso.lower() == "de":
@@ -370,7 +386,7 @@ def create_sentence_promo(itemName, wikiTextRaw, wikiTextRawCopy):
 
             dateYear = re.sub(", ", "",
                               re.findall(", \d{4}", date)[0])
-            
+
             dateFMT = "{{{{Date fmt|{}|{}|{}}}}}".format(dateMonth, dateDay, dateYear)
             spt_d = S.SENTENCE_PROMOTIONAL_DATE.format(dateFMT)
         except:
@@ -380,7 +396,7 @@ def create_sentence_promo(itemName, wikiTextRaw, wikiTextRawCopy):
             game = _lf(game.replace("''", ""))
         except IndexError:
             return wikiTextRaw
-            
+
         spt = S.SENTENCE_PROMOTIONAL.format(itemName, game, spt_s, spt_d)
 
         return wikiTextRaw.replace(sentencePromo[0], spt)

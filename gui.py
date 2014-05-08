@@ -1,7 +1,10 @@
+import pickle
 from tkinter import *
 from tkinter import ttk
 
 import core
+
+CONFIG = "config.pkl"
 
 def translate():
     if textOutput.get("1.0", "end").strip() != "":
@@ -10,7 +13,11 @@ def translate():
             icon='warning',
             title='Overwrite?'
             )
-        if overwrite == "cancel":
+        if overwrite == "yes":
+            pass # Delete text; insert new text
+        elif overwrite == "no":
+            pass # Keep text; Insert new text at the end
+        else:
             return
 
     try:
@@ -20,9 +27,9 @@ def translate():
         wikiTextList = wikiText.split("\n!\n")
 
     #listboxMethods.curselection
-        
+
     textOutput.insert("1.0", wikiText)
-    
+
 
 def open_file():
     file = filedialog.askopenfilename()
@@ -33,23 +40,28 @@ def save_file():
     return file
 
 def settings_dialog():
-    separator = "!" # Pseudo
-    iso = "de" # Pseudo
+    separator = open_config(0)
+    iso = open_config(1)
     settingWindow = Toplevel(root)
     settingWindow.resizable(FALSE, FALSE)
     settingFrame = ttk.Frame(settingWindow, padding="3 3 12 12")
-    
+
     labelSeparator = Label(settingFrame, text="Standard separation character")
     entrySeparator = Entry(settingFrame, text=separator, exportselection=0)
+    entrySeparator.delete(0, END)
     entrySeparator.insert(0, separator)
-    buttonSeparator = Button(settingFrame, text="Save")
+    buttonSeparator = Button(settingFrame, text="Save",
+                             command=lambda: save_config(0, entrySeparator.get()))
 
     labelLanguage = Label(settingFrame, text="Language (ISO code)")
     entryLanguage = Entry(settingFrame, text=iso, exportselection=0)
+    entryLanguage.delete(0, END)
     entryLanguage.insert(0, iso)
-    buttonLanguage = Button(settingFrame, text="Save")
+    buttonLanguage = Button(settingFrame, text="Save",
+                            command=lambda: save_config(1, entryLanguage.get()))
 
-    buttonClose = Button(settingFrame, text="Close", command=lambda: settingWindow.destroy())
+    buttonClose = Button(settingFrame, text="Close",
+                         command=lambda: settingWindow.destroy())
 
     settingFrame.grid(column=0, row=0)
     labelSeparator.grid(column=0, row=0)
@@ -63,8 +75,43 @@ def settings_dialog():
 def help_dialog():
     pass
 
-def save_preset():
-    pass
+def save_config(index, item):
+    try:
+        file = open(CONFIG, "rb")
+        configFile = pickle.load(file)
+    except:
+        print("configFile couldn't be loaded. Creating...")
+        config_exc()
+        return
+
+    try:
+        configFile[index] = item
+    except IndexError:
+        print("Invalid configFile. Recreating...")
+        config_exc()
+        return
+
+    file = open(CONFIG, "wb")
+    pickle.dump(configFile, file)
+    file.close()
+    print("Saved config")
+
+
+def open_config(index):
+    try:
+        file = open(CONFIG, "rb")
+        return pickle.load(file)[index]
+    except:
+        print("Reading configFile failed. Recreating...")
+        config_exc()
+
+def config_exc():
+    file = open(CONFIG, "wb")
+    configFile = ["!", "de", ()]
+    pickle.dump(configFile, file)
+    file.close()
+    print("Recreating done")
+    
 
 root = Tk()
 root.title("WikiTranslator v2")
@@ -93,7 +140,10 @@ listboxMethods = Listbox(mainframe,
                          selectmode=MULTIPLE,
                          exportselection=0)
 progressbar = ttk.Progressbar(mainframe, orient=HORIZONTAL, length=140)
-buttonSavePreset = ttk.Button(mainframe, text="Save preset", command=save_preset)
+buttonSavePreset = ttk.Button(mainframe, text="Save preset",
+                              command=lambda: save_config(2,
+                                                          (comboboxPreset.get(),
+                                                           listboxMethods.curselection())))
 buttonTranslate = ttk.Button(mainframe, text="Translate", command=translate, width=40)
 
 textInput.grid(column=0, row=1, rowspan=2, sticky=(N,S,E,W))

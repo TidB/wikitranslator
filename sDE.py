@@ -40,6 +40,22 @@ SENTENCE_1_PRIMARY = "[[Weapon/de#{0}primary|Primärwaffe]]"
 SENTENCE_1_SECONDARY = "[[Weapon/de#{0}secondary|Sekundärwaffe]]"
 SENTENCE_1_MELEE = "[[Weapon/de#{0}melee|Nahkampfwaffe]]"
 
+#FLAGS
+DICTIONARY_FLAGS = {
+    "not usable in crafting" : "Nicht zum Herstellen verwendbar",
+    "not tradable" : "Nicht handelbar",
+    "not tradable or usable in crafting" : "Nicht handelbar oder zum Herstellen verwendbar",
+    }
+
+#ATTRIBUTES
+DICTIONARY_ATTS = {
+    "holiday restriction: tf birthday" : "Feiertagsbeschränkung: TF Geburtstag",
+    "holiday restriction: winter" : "Feiertagsbeschränkung: Winter",
+    "holiday restriction: halloween" : "Feiertagsbeschränkung: Halloween",
+    "holiday restriction: halloween / full moon" : "Feiertagsbeschränkung: Halloween / Vollmond",
+    "holiday restriction: halloween / full moon / valentine's day" : "Feiertagsbeschränkung: Halloween / Vollmond / Valentinstag",
+    }
+
 #HEADLINES
 DICTIONARY_HEADLINES = {
     "as a crafting ingredient" : "Als Handwerkszutat",

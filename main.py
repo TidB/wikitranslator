@@ -20,10 +20,6 @@ while True:
     elif text.lower() == "x":
         break
 
-    if text is None:
-        print("No input")
-        continue
-
     wikiTextType = core.get_wikitext_type(text)
     if wikiTextType in ["cosmetic", "hat", "misc", "weapon"]:
         wikiTextTranslated = core.run_cw(text, iso)

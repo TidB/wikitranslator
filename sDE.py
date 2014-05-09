@@ -2,7 +2,7 @@
 ADDEDTOGAME = "* (ARTIKEL) {{{{item name|{0}}}}} wurde dem Spiel hinzugefügt."
 ALLCLASSESBOX = "[[Classes/{0}|Allen Klassen]]"
 DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{0}}}}}}}}}"
-ITEMLOOK = "Es handelt sich dabei um"
+ITEMLOOK = " Es handelt sich dabei um"
 LEVEL = "{0} Level {1}"
 NOUNMARKER_INDEFINITE_COSMETIC = "ein"
 NOUNMARKER_INDEFINITE_SET = "ein"
@@ -49,6 +49,7 @@ DICTIONARY_FLAGS = {
 
 #ATTRIBUTES
 DICTIONARY_ATTS = {
+    "achievement item: not tradable" : "Errungenschaftsgegenstand: Nicht handelbar",
     "holiday restriction: tf birthday" : "Feiertagsbeschränkung: TF Geburtstag",
     "holiday restriction: winter" : "Feiertagsbeschränkung: Winter",
     "holiday restriction: halloween" : "Feiertagsbeschränkung: Halloween",
@@ -66,6 +67,7 @@ DICTIONARY_HEADLINES = {
     "external links" : "Externe Links",
     "gallery" : "Galerie",
     "item set" : "Gegenstandsset",
+    "notes" : "Anmerkungen",
     "painted variants" : "Angemalte Varianten",
     "references" : "Referenzen",
     "related achievements" : "Zugehörige Errungenschaften",

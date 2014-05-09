@@ -2,7 +2,9 @@ import re
 
 import sDE
 
-GUI_METHODS = ("add_displaytitle",
+
+GUI_METHODS = ("_lf_to_t",
+               "add_displaytitle",
                "create_sentence_1_cw",
                "create_sentence_1_set",
                "create_sentence_community",
@@ -24,24 +26,18 @@ def run_cw(wikiTextRaw, iso):
     global S
     S = eval("s" + iso.upper())
 
-    wikiTextRawCopy = wikiTextRaw
-
     wikiTextType = get_wikitext_type(wikiTextRaw)
-    itemName, wikiTextRawCopy = get_itemname(wikiTextRaw, wikiTextRawCopy)
+    itemName = get_itemname(wikiTextRaw)
     classLink, classLinkCounter = get_using_classes(wikiTextRaw)
-    print(classLink)
-    classList = create_class_list(classLink, classLinkCounter)
-
     wikiTextRaw = create_sentence_1_cw(classLink,
-                                       classList,
+                                       classLinkCounter,
                                        itemName,
                                        wikiTextRaw,
-                                       wikiTextRawCopy,
                                        wikiTextType,
                                        iso)
 
-    wikiTextRaw = create_sentence_community(itemName, wikiTextRaw, wikiTextRawCopy)
-    wikiTextRaw = create_sentence_promo(itemName, wikiTextRaw, wikiTextRawCopy)
+    wikiTextRaw = create_sentence_community(itemName, wikiTextRaw)
+    wikiTextRaw = create_sentence_promo(itemName, wikiTextRaw)
 
     wikiTextRaw = translate_headlines(wikiTextRaw)
     wikiTextRaw = translate_update_history(itemName, wikiTextRaw)
@@ -65,10 +61,9 @@ def run_st(wikiTextRaw, iso):
 
     itemName, wikiTextRawCopy = get_itemname(wikiTextRaw, wikiTextRawCopy)
     classLink, classLinkCounter = get_using_classes(wikiTextRaw)
-    classList = create_class_list(classLink, classLinkCounter)
 
     wikiTextRaw = add_displaytitle(itemName, wikiTextRaw)
-    wikiTextRaw = create_sentence_1_set(classLink, classList, itemName, wikiTextRaw)
+    wikiTextRaw = create_sentence_1_set(classLink, classLinkCounter, itemName, wikiTextRaw)
     wikiTextRaw = translate_categories(wikiTextRaw)
     wikiTextRaw = translate_headlines(wikiTextRaw)
 
@@ -113,8 +108,8 @@ def create_class_list(classLink, classLinkCounter):
         classList = S.SENTENCE_1_CLASSES_ONE.format(_lf(classLink))
     elif classLinkCounter > 1:
         classList = S.SENTENCE_1_CLASSES_ONE.format(_lf(classLink[0]))
-        last = classLink.pop()
-        for c in classLink[1:]:
+        last = classLink[-1]
+        for c in classLink[1:-2]:
             classList = (classList +
                          ", " +
                          S.SENTENCE_1_CLASSES_ONE.format(_lf(c)))
@@ -126,12 +121,12 @@ def create_class_list(classLink, classLinkCounter):
     return classList
 
 
-def get_itemname(wikiTextRaw, wikiTextRawCopy):
-    wikiTextRawCopy = re.sub("{{[Qq]uotation.*?}}", "", wikiTextRawCopy)
-    itemName = re.findall("'''.*?'''.*?[is|are].*?a", wikiTextRawCopy)
+def get_itemname(wikiTextRaw):
+    itemName = re.findall("'''.*?'''.*?[is|are].*?a",
+                          re.sub("{{[Qq]uotation.*?}}", "", wikiTextRaw))
     itemName = re.sub(" [is|are].*?a", "", re.sub("'''", "", itemName[0]))
 
-    return itemName, wikiTextRawCopy
+    return itemName
 
 
 def get_item_promo(wikiTextRaw):
@@ -139,9 +134,9 @@ def get_item_promo(wikiTextRaw):
                            wikiTextRaw))
 
 
-def get_item_community(wikiTextRawCopy):
+def get_item_community(wikiTextRaw):
     return bool(re.findall('.*?contributed.*?"*.*"*\.',
-                           wikiTextRawCopy))
+                           wikiTextRaw))
 
 
 def get_using_classes(wikiTextRaw):
@@ -155,7 +150,7 @@ def get_using_classes(wikiTextRaw):
 
     if classLinkCounter > 1:
         classLink = classLink.split(", ")
-
+        
     return classLink, classLinkCounter
 
 
@@ -278,10 +273,12 @@ def translate_update_history(itemName, wikiTextRaw):
 # ==================
 
 
-def create_sentence_1_cw(classLink, classList,
+def create_sentence_1_cw(classLink, classLinkCounter,
                          itemName, wikiTextRaw,
-                         wikiTextRawCopy, wikiTextType,
-                         iso):
+                         wikiTextType, iso):
+
+    sentence1 = re.findall(".*?'''" + itemName + "'''.*? for .*?\.",
+                           wikiTextRaw)[0]
 
     wikiTextTypeFormat = wikiTextType.upper()
 
@@ -290,24 +287,23 @@ def create_sentence_1_cw(classLink, classList,
         S.SENTENCE_1_WEAPON = eval("S.SENTENCE_1_" +
                                    slot.upper()).format(_lf(classLink).lower())
 
-    typeLink = eval("S.SENTENCE_1_" + wikiTextTypeFormat)
-    if get_item_community(wikiTextRawCopy):
+    nounMarkerIndefinite = eval("S.NOUNMARKER_INDEFINITE_" + wikiTextTypeFormat)
+
+    if get_item_community(wikiTextRaw):
         com = eval("S.SENTENCE_1_COMMUNITY_" + wikiTextTypeFormat)
     else:
         com = ""
 
-    if get_item_promo(wikiTextRawCopy):
+    typeLink = eval("S.SENTENCE_1_" + wikiTextTypeFormat)
+    if get_item_promo(wikiTextRaw):
         promo = eval("S.SENTENCE_1_PROMO_" + wikiTextTypeFormat)
         if wikiTextType == "cosmetic" and iso.lower() == "de":
             typeLink = ""
     else:
         promo = ""
 
-    nounMarkerIndefinite = eval("S.NOUNMARKER_INDEFINITE_" + wikiTextTypeFormat)
-
-    sentence1 = re.findall(".*?'''" + itemName + "'''.*? for .*?\.",
-                           wikiTextRawCopy)[0]
-
+    classList = create_class_list(classLink, classLinkCounter)
+    
     sentence1Trans = S.SENTENCE_1_ALL.format(itemName,
                                              nounMarkerIndefinite,
                                              com,
@@ -315,14 +311,14 @@ def create_sentence_1_cw(classLink, classList,
                                              typeLink,
                                              classList)
 
-    wikiTextRawCopy = wikiTextRawCopy.replace(sentence1, "")
     wikiTextRaw = wikiTextRaw.replace(sentence1, (sentence1Trans + S.ITEMLOOK))
 
     return wikiTextRaw
 
 
-def create_sentence_1_set(classLink, classList, itemName, wikiTextRaw):
+def create_sentence_1_set(classLink, classLinkCounter, itemName, wikiTextRaw):
     sentence1_1 = re.findall(".*?'''" + itemName + "'''.*? for .*?\.", wikiTextRaw)[0]
+    classList = create_class_list(classLink, classLinkCounter)
     sentence1_1Trans = S.SENTENCE_1_ALL.format(itemName,
                                                S.NOUNMARKER_INDEFINITE_SET,
                                                "",
@@ -338,9 +334,9 @@ def create_sentence_1_set(classLink, classList, itemName, wikiTextRaw):
                                sentence1_1Trans + sentence1_2Trans)
 
 
-def create_sentence_community(itemName, wikiTextRaw, wikiTextRawCopy):
+def create_sentence_community(itemName, wikiTextRaw):
     sentenceCommunity = re.findall(".*?contributed.*?\[\[Steam Workshop\]\].*?\.",
-                                   wikiTextRawCopy)
+                                   wikiTextRaw)
 
     if sentenceCommunity:
         link = re.findall("\[http.*?contribute.*?\]", sentenceCommunity[0])
@@ -364,9 +360,9 @@ def create_sentence_community(itemName, wikiTextRaw, wikiTextRawCopy):
         return wikiTextRaw
 
 
-def create_sentence_promo(itemName, wikiTextRaw, wikiTextRawCopy):
+def create_sentence_promo(itemName, wikiTextRaw):
     sentencePromo = re.findall(".*?\[\[Genuine\]\].*?quality.*?\.",
-                               wikiTextRawCopy)
+                               wikiTextRaw)
 
     if sentencePromo:
         if "[[Steam]]" in sentencePromo:

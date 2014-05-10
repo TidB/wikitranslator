@@ -3,19 +3,33 @@ import re
 import sDE
 
 
-GUI_METHODS = ("_lf_to_t",
-               "add_displaytitle",
+GUI_METHODS = ("add_displaytitle",
                "create_sentence_1_cw",
                "create_sentence_1_set",
                "create_sentence_community",
                "create_sentence_promo",
                "transform_decimal",
                "translate_categories",
-               "translate_classlink",
+               "translate_classlinks",
                "translate_headlines",
                "translate_item_flags",
                "translate_levels",
                "translate_update_history")
+
+
+GUI_METHODS_NOARGS = ("transform_decimal",
+                      "translate_categories",
+                      "translate_headlines",
+                      "translate_item_flags",
+                      "translate_levels")
+
+# ===
+# ISO
+# ===
+
+def set_iso(iso):
+    global S
+    S = eval("s" + iso.upper())
 
 # ===
 # Run
@@ -23,9 +37,6 @@ GUI_METHODS = ("_lf_to_t",
 
 
 def run_cw(wikiTextRaw, iso):
-    global S
-    S = eval("s" + iso.upper())
-
     wikiTextType = get_wikitext_type(wikiTextRaw)
     itemName = get_itemname(wikiTextRaw)
     classLink, classLinkCounter = get_using_classes(wikiTextRaw)
@@ -54,12 +65,7 @@ def run_cw(wikiTextRaw, iso):
 
 
 def run_st(wikiTextRaw, iso):
-    global S
-    S = eval("s" + iso.upper())
-
-    wikiTextRawCopy = wikiTextRaw
-
-    itemName, wikiTextRawCopy = get_itemname(wikiTextRaw, wikiTextRawCopy)
+    itemName = get_itemname(wikiTextRaw, wikiTextRawCopy)
     classLink, classLinkCounter = get_using_classes(wikiTextRaw)
 
     wikiTextRaw = add_displaytitle(itemName, wikiTextRaw)

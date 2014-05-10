@@ -5,11 +5,14 @@ A Python script for the semi-automated translation of articles at the Team Fortr
 
 With this script, it's possible to half the time of translation.
 
+Comes with a GUI.
+
 To-Do
 -----
-- Support for translating multiple texts at once
-- Support for exporting translations as files
-- Choosing between translation methods for customized translations
+- Some more features:
+- Automated checking for Wikipedia links
+- Automated checking of quotes
+- Cleaning the code up
 
 
 Wanna learn more?

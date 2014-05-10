@@ -1,6 +1,8 @@
+import inspect
 import pickle
 from tkinter import *
 from tkinter import ttk
+import webbrowser
 
 import core
 
@@ -15,7 +17,40 @@ def config_exc():
 
 
 def help_dialog():
-    pass
+    fontHeadline = font.Font(family='Helvetica', size=18, underline=1)
+    fontLink = font.Font(size=7)
+    helpWindow = Toplevel(root)
+    helpWindow.resizable(FALSE, FALSE)
+    helpFrame = ttk.Frame(helpWindow, padding="3 3 12 12")
+
+    labelHeadline = Label(helpFrame,
+                          text="WikiTranslator v2",
+                          font=fontHeadline)
+    labelGithub = Label(helpFrame, text="WikiTranslator on GitHub")
+    labelGithubLink = Label(helpFrame,
+                            text="(https://github.com/TidB/WikiTranslator)",
+                            font=fontLink)
+    labelTFWiki = Label(helpFrame, text="WikiTranslator on the TF Wiki")
+    labelTFWikiLink = Label(helpFrame,
+                            text="(http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator)",
+                            font=fontLink)
+
+    labelGithubLink.bind("<1>", lambda event: link_to(0))
+    labelTFWikiLink.bind("<1>", lambda event: link_to(1))
+
+    helpFrame.grid(column=0, row=0)
+    labelHeadline.grid(column=0, row=0)
+    labelGithub.grid(column=0, row=1)
+    labelTFWiki.grid(column=0, row=3)
+    labelGithubLink.grid(column=0, row=2)
+    labelTFWikiLink.grid(column=0, row=4)    
+
+
+def link_to(link):
+    if link == 0:
+        webbrowser.open("https://github.com/TidB/WikiTranslator")
+    elif link == 1:
+        webbrowser.open("http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator")
 
 
 def open_config(index):
@@ -30,26 +65,27 @@ def open_config(index):
 
 
 def open_file():
-    fileName = filedialog.askopenfilename()
-    try:
-        file = open(fileName, "r")
-        text = file.readlines()
-        file.close()
-    except:
-        print("Invalid input file")
-        return
-
     if textInput.get("1.0", "end").strip() != "":
         overwrite = messagebox.askyesno(
             message="There is text left in the input box! Do you want to overwrite the text?",
             icon='warning',
             title='Overwrite?'
             )
-        print(overwrite)
         if overwrite == False:
             return
 
-    textInput.insert("1.0", text)
+    fileName = filedialog.askopenfilename()
+    try:
+        file = open(fileName, "r")
+    except:
+        print("Invalid input file")
+        return
+
+    text = "!"
+    while text != "":
+        text = file.readline()
+        textInput.insert(END, text)
+    file.close()
 
 
 def save_changes():
@@ -89,7 +125,7 @@ def save_config(index, item):
 
 def save_file():
     try:
-        file = open("autosave.txt", "w")
+        file = open("autosave.txt", "a")
     except:
         return
     file.write(textOutput.get("1.0", END))
@@ -143,13 +179,40 @@ def translate():
 
     try:
         wikiText = textInput.selection_get()
+        selection = True
     except:
         wikiText = textInput.get("1.0", "end").strip()
+        selection = False
+    finally:
         wikiTextList = wikiText.split("\n!\n")
+        wikiTextListTrans = []
 
-    #listboxMethods.curselection
+    methods = [core.GUI_METHODS[i] for i in listboxMethods.curselection()]
+    iso = open_config(1)
+    core.set_iso(iso)
+    if not selection:
+        for wikiText in wikiTextList:
+            wikiTextRaw = wikiText
+            wikiTextType = core.get_wikitext_type(wikiTextRaw)
+            itemName = core.get_itemname(wikiTextRaw)
+            classLink, classLinkCounter = core.get_using_classes(wikiTextRaw)
+            for method in methods:
+                print("Method: ", method)
+                print("Args: ", inspect.getargspec(eval("core."+method)))
+                args = eval("inspect.getargspec(core."+method+")")
+                wikiTextRaw = eval("core."+method+"("+", ".join(args[0])+")")
+            wikiTextListTrans.append(wikiTextRaw)
+    elif selection:
+        for method in methods:
+            print("Method: ", method)
+            if method in core.GUI_METHODS_NOARGS:
+                wikiTextRaw = eval("core."+method+"(wikiText)")
+        wikiTextListTrans.append(wikiTextRaw)
+
+    wikiTextRaw = "\n!\n".join(wikiTextListTrans)
+    
     textOutput.delete("1.0", END)
-    textOutput.insert("1.0", wikiText)
+    textOutput.insert("1.0", wikiTextRaw)
 
 
 def update_presets(args):
@@ -165,6 +228,9 @@ def update_presets(args):
         listboxMethods.selection_set(core.GUI_METHODS.index(item))
 
 if __name__ == "__main__":
+    open_config(0)
+    presetsSaved = open_config(2)[::2]
+    
     root = Tk()
     root.title("WikiTranslator v2")
     root.protocol('WM_DELETE_WINDOW', save_changes)
@@ -183,9 +249,9 @@ if __name__ == "__main__":
     menu_options.add_command(label='Settings...', command=settings_dialog)
     menu_options.add_command(label='Help', command=help_dialog)
 
-    textInput = Text(mainframe, width=70, height=40, wrap="char", maxundo=100)
-    textOutput = Text(mainframe, width=70, height=40, wrap="char", maxundo=100)
-    comboboxPreset = ttk.Combobox(mainframe, values=presetsSaved)
+    textInput = Text(mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
+    textOutput = Text(mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
+    comboboxPreset = ttk.Combobox(mainframe, values=presetsSaved, exportselection=0)
     listboxMethods = Listbox(mainframe,
                              listvariable=StringVar(value=core.GUI_METHODS),
                              selectmode=MULTIPLE,
@@ -217,8 +283,5 @@ if __name__ == "__main__":
     root.bind("<<ComboboxSelected>>", update_presets)
     root.bind("<Control-Z>", textInput.edit_undo)
     root.bind("<Control-Shift-Z>", textInput.edit_redo)
-
-    open_config(0)
-    presetsSaved = open_config(2)[::2]
 
     root.mainloop()

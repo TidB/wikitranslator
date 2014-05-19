@@ -1,3 +1,6 @@
+#ISO
+ISO = "de"
+
 #STANDARD
 ADDEDTOGAME = "* (ARTIKEL) {{{{item name|{0}}}}} wurde dem Spiel hinzugefügt."
 ALLCLASSESBOX = "[[Classes/{0}|Allen Klassen]]"
@@ -31,10 +34,6 @@ SENTENCE_SET = " Es wurde dem Spiel mit dem {{{{Update link|{0}}}}}-Update hinzu
 SENTENCE_SET_INCLUDES = "Das Set enthält die folgenden Gegenstände:"
 
 NOT_CRAFTABLE = "Nicht zum Herstellen verwendbar"
-NOT_CRAFTABLE_TRADABLE = "Nicht handelbar oder zum Herstellen verwendbar"
-NOT_TRADABLE = "Nicht handelbar"
-RESTRICTED_HALLOWEEN_FULLMOON = "Feiertagsbeschränkung: Halloween / Vollmond"
-SENTENCE_THUMBNAIL = "|Steam Workshop-Vorschaubild (ARTIKEL) {{{{item name|{0}}}}}."
 
 SENTENCE_1_PRIMARY = "[[Weapon/de#{0}primary|Primärwaffe]]"
 SENTENCE_1_SECONDARY = "[[Weapon/de#{0}secondary|Sekundärwaffe]]"

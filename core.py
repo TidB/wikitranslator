@@ -1,27 +1,9 @@
 import re
+from urllib.parse import quote
+import urllib.request
 
 import sDE
 
-
-GUI_METHODS = ("add_displaytitle",
-               "create_sentence_1_cw",
-               "create_sentence_1_set",
-               "create_sentence_community",
-               "create_sentence_promo",
-               "transform_decimal",
-               "translate_categories",
-               "translate_classlinks",
-               "translate_headlines",
-               "translate_item_flags",
-               "translate_levels",
-               "translate_update_history")
-
-
-GUI_METHODS_NOARGS = ("transform_decimal",
-                      "translate_categories",
-                      "translate_headlines",
-                      "translate_item_flags",
-                      "translate_levels")
 
 # ===
 # ISO
@@ -36,7 +18,7 @@ def set_iso(iso):
 # ===
 
 
-def run_cw(wikiTextRaw, iso):
+def run_cw(wikiTextRaw):
     wikiTextType = get_wikitext_type(wikiTextRaw)
     itemName = get_itemname(wikiTextRaw)
     classLink, classLinkCounter = get_using_classes(wikiTextRaw)
@@ -44,8 +26,7 @@ def run_cw(wikiTextRaw, iso):
                                        classLinkCounter,
                                        itemName,
                                        wikiTextRaw,
-                                       wikiTextType,
-                                       iso)
+                                       wikiTextType)
 
     wikiTextRaw = create_sentence_community(itemName, wikiTextRaw)
     wikiTextRaw = create_sentence_promo(itemName, wikiTextRaw)
@@ -53,7 +34,7 @@ def run_cw(wikiTextRaw, iso):
     wikiTextRaw = translate_headlines(wikiTextRaw)
     wikiTextRaw = translate_update_history(itemName, wikiTextRaw)
     wikiTextRaw = translate_categories(wikiTextRaw)
-    wikiTextRaw = translate_classlinks(classLink, iso, wikiTextRaw)
+    wikiTextRaw = translate_classlinks(classLink, wikiTextRaw)
     wikiTextRaw = translate_levels(wikiTextRaw)
     wikiTextRaw = translate_item_flags(wikiTextRaw)
 
@@ -64,7 +45,7 @@ def run_cw(wikiTextRaw, iso):
     return wikiTextRaw
 
 
-def run_st(wikiTextRaw, iso):
+def run_st(wikiTextRaw):
     itemName = get_itemname(wikiTextRaw, wikiTextRawCopy)
     classLink, classLinkCounter = get_using_classes(wikiTextRaw)
 
@@ -101,6 +82,13 @@ def _lf_ext(link):
 
 def _lf_to_t(link):
     return link.replace("[[", "{{item link|").replace("]]", "}}")
+
+
+def _lf_w(link):
+    if "{{" in link:
+        return re.sub("[^{w]\|.*?", "", link.replace("{{w|", ""))
+    elif "[[" in link:
+        return re.sub("[^[w]:.*?", "", link.replace("[[w:", ""))
 
 
 def add_displaytitle(itemName, wikiTextRaw):
@@ -194,22 +182,22 @@ def translate_categories(wikiTextRaw):
     categories = re.findall("\[\[Category:.*?\]\]", wikiTextRaw)
 
     for c in categories:
-        cn = c.replace("]]", "/de]]")
+        cn = c.replace("]]", "/{}]]".format(S.ISO))
         wikiTextRaw = wikiTextRaw.replace(c, cn)
 
     return wikiTextRaw
 
 
-def translate_classlinks(classLink, iso, wikiTextRaw):
+def translate_classlinks(classLink, wikiTextRaw):
     if type(classLink) is list:
         for link in classLink:
-            linkIso = link.replace("]]", "/{}|{}]]".format(iso, _lf_ext(_lf(link))))
+            linkIso = link.replace("]]", "/{}|{}]]".format(S.ISO, _lf_ext(_lf(link))))
             wikiTextRaw = wikiTextRaw.replace(link, linkIso)
     elif type(classLink) is str:
         if "all" in classLink.lower():
-            linkIso = S.ALLCLASSESBOX.format(iso)
+            linkIso = S.ALLCLASSESBOX.format(S.ISO)
         else:
-            linkIso = classLink.replace("]]", "/{}|{}]]".format(iso, _lf(classLink)))
+            linkIso = classLink.replace("]]", "/{}|{}]]".format(S.ISO, _lf(classLink)))
         wikiTextRaw = wikiTextRaw.replace(classLink, linkIso)
 
     return wikiTextRaw
@@ -274,6 +262,61 @@ def translate_update_history(itemName, wikiTextRaw):
                   S.ADDEDTOGAME.format(itemName), wikiTextRaw)
 
 
+# ===================
+# Wikimedia API usage
+# ===================
+
+
+def translate_wikilink(wikiTextRaw):
+    links = re.findall("\[\[.*?\]\]", wikiTextRaw)
+    for l in links:
+        ln = _lf_ext(_lf(l))
+        ln = re.sub("#.*$", "", ln)
+        ln = ln.replace(" ", "_")
+        text = urllib.request.urlopen("http://wiki.teamfortress.com/w/api.php?format=xml&action=query&titles={}/{}&prop=info&inprop=displaytitle&redirects".format(quote(ln), S.ISO)).read()
+        text = str(text, "utf-8")
+        if 'missing=""' in text:
+            print("Invalid page name: ", l)
+            continue
+
+        pagetitle = re.findall('title=".*?"', text)[0]
+        pagetitle = pagetitle.replace('title="', '').replace('"', '')
+        displaytitle = re.findall('displaytitle=".*?"', text)[0]
+        displaytitle = displaytitle.replace('displaytitle="', '').replace('"', '')
+
+        ln = "[[{}|{}]]".format(pagetitle, displaytitle)
+        wikiTextRaw = wikiTextRaw.replace(l, ln)
+        
+    return wikiTextRaw
+
+
+def translate_wikipedia_link(wikiTextRaw):
+    links = re.findall("\[\[w:.*?\]\]", wikiTextRaw)
+    for l in links:
+        ln = _lf_w(l)
+        ln = re.sub("#.*$", "", ln)
+        ln = ln.replace(" ", "_")
+        text = urllib.request.urlopen("http://en.wikipedia.org/w/api.php?format=xml&action=query&titles={}&prop=langlinks&lllimit=400&redirects".format(quote(ln))).read()
+        print("http://en.wikipedia.org/w/api.php?format=xml&action=query&titles={}&prop=langlinks&lllimit=400&redirects".format(quote(ln)))
+        text = str(text, "utf-8")
+        if 'missing=""' in text:
+            print("Invalid page name: ", l)
+            continue
+
+        t_re = 'lang="{}" xml:space="preserve">.*?\>'.format(S.ISO)
+        try:
+            t = re.findall(t_re, text)[0]
+            t = re.sub('lang=".*?>', '', t).replace("</ll>", "")
+
+            tn = "[[w:{0}:{1}|{1}]]".format(S.ISO, t)
+            wikiTextRaw = wikiTextRaw.replace(l, tn)
+        except IndexError:
+            print("No /{} article for {}".format(S.ISO, l))
+            continue
+
+    return wikiTextRaw
+
+
 # ==================
 # Creating sentences
 # ==================
@@ -281,7 +324,7 @@ def translate_update_history(itemName, wikiTextRaw):
 
 def create_sentence_1_cw(classLink, classLinkCounter,
                          itemName, wikiTextRaw,
-                         wikiTextType, iso):
+                         wikiTextType):
 
     sentence1 = re.findall(".*?'''" + itemName + "'''.*? for .*?\.",
                            wikiTextRaw)[0]
@@ -303,7 +346,7 @@ def create_sentence_1_cw(classLink, classLinkCounter,
     typeLink = eval("S.SENTENCE_1_" + wikiTextTypeFormat)
     if get_item_promo(wikiTextRaw):
         promo = eval("S.SENTENCE_1_PROMO_" + wikiTextTypeFormat)
-        if wikiTextType == "cosmetic" and iso.lower() == "de":
+        if wikiTextType == "cosmetic" and S.ISO == "de":
             typeLink = ""
     else:
         promo = ""

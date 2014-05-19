@@ -8,6 +8,30 @@ import core
 
 CONFIG = "config.pkl"
 
+GUI_METHODS = ("add_displaytitle",
+               "create_sentence_1_cw",
+               "create_sentence_1_set",
+               "create_sentence_community",
+               "create_sentence_promo",
+               "transform_decimal",
+               "translate_categories",
+               "translate_classlinks",
+               "translate_headlines",
+               "translate_item_flags",
+               "translate_levels",
+               "translate_update_history",
+               "translate_wikilink",
+               "translate_wikipedia_link")
+
+
+GUI_METHODS_NOARGS = ("transform_decimal",
+                      "translate_categories",
+                      "translate_headlines",
+                      "translate_item_flags",
+                      "translate_levels",
+                      "translate_wikilink",
+                      "translate_wikipedia_link")
+
 def config_exc():
     file = open(CONFIG, "wb")
     configFile = ["!", "de", []]
@@ -187,7 +211,7 @@ def translate():
         wikiTextList = wikiText.split("\n!\n")
         wikiTextListTrans = []
 
-    methods = [core.GUI_METHODS[i] for i in listboxMethods.curselection()]
+    methods = [GUI_METHODS[i] for i in listboxMethods.curselection()]
     iso = open_config(1)
     core.set_iso(iso)
     if not selection:
@@ -198,14 +222,14 @@ def translate():
             classLink, classLinkCounter = core.get_using_classes(wikiTextRaw)
             for method in methods:
                 print("Method: ", method)
-                print("Args: ", inspect.getargspec(eval("core."+method)))
-                args = eval("inspect.getargspec(core."+method+")")
+                print("Args: ", inspect.getargspec(method))
+                args = eval("inspect.getargspec("+"core."+method+")")
                 wikiTextRaw = eval("core."+method+"("+", ".join(args[0])+")")
             wikiTextListTrans.append(wikiTextRaw)
     elif selection:
         for method in methods:
             print("Method: ", method)
-            if method in core.GUI_METHODS_NOARGS:
+            if method in GUI_METHODS_NOARGS:
                 wikiTextRaw = eval("core."+method+"(wikiText)")
         wikiTextListTrans.append(wikiTextRaw)
 
@@ -225,7 +249,7 @@ def update_presets(args):
         return
     listboxMethods.selection_clear(0, END)
     for item in l[i+1]:
-        listboxMethods.selection_set(core.GUI_METHODS.index(item))
+        listboxMethods.selection_set(GUI_METHODS.index(item))
 
 if __name__ == "__main__":
     open_config(0)
@@ -253,14 +277,13 @@ if __name__ == "__main__":
     textOutput = Text(mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
     comboboxPreset = ttk.Combobox(mainframe, values=presetsSaved, exportselection=0)
     listboxMethods = Listbox(mainframe,
-                             listvariable=StringVar(value=core.GUI_METHODS),
+                             listvariable=StringVar(value=GUI_METHODS),
                              selectmode=MULTIPLE,
                              exportselection=0)
-    progressbar = ttk.Progressbar(mainframe, orient=HORIZONTAL, length=300)
     buttonSavePreset = ttk.Button(mainframe, text="Save preset",
                                   command=lambda: save_config(2,
                                                               (comboboxPreset.get(),
-                                                               [core.GUI_METHODS[i] for i in listboxMethods.curselection()])))
+                                                               [GUI_METHODS[i] for i in listboxMethods.curselection()])))
     buttonTranslate = ttk.Button(mainframe, text="Translate", command=translate, width=40)
 
     mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
@@ -268,7 +291,6 @@ if __name__ == "__main__":
     textOutput.grid(column=1, row=1, rowspan=2, sticky=(N,S,E,W))
     comboboxPreset.grid(column=2, row=0)
     listboxMethods.grid(column=2, row=1, rowspan=5, sticky=(N,S,E,W))
-    progressbar.grid(column=0, row=3)
     buttonSavePreset.grid(column=2, row=2)
     buttonTranslate.grid(column=2, row=3)
 

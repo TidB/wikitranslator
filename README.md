@@ -9,10 +9,8 @@ Comes with a GUI.
 
 To-Do
 -----
-- Some more features:
-- Automated checking for Wikipedia links
-- Automated checking of quotes
 - Cleaning the code up
+- Translation of {{main}} and {{see also}}
 
 
 Wanna learn more?

@@ -9,9 +9,11 @@ import sDE
 # ISO
 # ===
 
+
 def set_iso(iso):
     global S
     S = eval("s" + iso.upper())
+
 
 # ===
 # Run
@@ -144,7 +146,7 @@ def get_using_classes(wikiTextRaw):
 
     if classLinkCounter > 1:
         classLink = classLink.split(", ")
-        
+
     return classLink, classLinkCounter
 
 
@@ -286,7 +288,7 @@ def translate_wikilink(wikiTextRaw):
 
         ln = "[[{}|{}]]".format(pagetitle, displaytitle)
         wikiTextRaw = wikiTextRaw.replace(l, ln)
-        
+
     return wikiTextRaw
 
 
@@ -297,7 +299,6 @@ def translate_wikipedia_link(wikiTextRaw):
         ln = re.sub("#.*$", "", ln)
         ln = ln.replace(" ", "_")
         text = urllib.request.urlopen("http://en.wikipedia.org/w/api.php?format=xml&action=query&titles={}&prop=langlinks&lllimit=400&redirects".format(quote(ln))).read()
-        print("http://en.wikipedia.org/w/api.php?format=xml&action=query&titles={}&prop=langlinks&lllimit=400&redirects".format(quote(ln)))
         text = str(text, "utf-8")
         if 'missing=""' in text:
             print("Invalid page name: ", l)
@@ -352,7 +353,7 @@ def create_sentence_1_cw(classLink, classLinkCounter,
         promo = ""
 
     classList = create_class_list(classLink, classLinkCounter)
-    
+
     sentence1Trans = S.SENTENCE_1_ALL.format(itemName,
                                              nounMarkerIndefinite,
                                              com,

@@ -222,7 +222,7 @@ def translate():
             classLink, classLinkCounter = core.get_using_classes(wikiTextRaw)
             for method in methods:
                 print("Method: ", method)
-                print("Args: ", inspect.getargspec(method))
+                print("Args: ", inspect.getargspec(eval("core."+method)))
                 args = eval("inspect.getargspec("+"core."+method+")")
                 wikiTextRaw = eval("core."+method+"("+", ".join(args[0])+")")
             wikiTextListTrans.append(wikiTextRaw)

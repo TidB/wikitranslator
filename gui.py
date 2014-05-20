@@ -19,6 +19,7 @@ GUI_METHODS = ("add_displaytitle",
                "translate_headlines",
                "translate_item_flags",
                "translate_levels",
+               "translate_main_seealso",
                "translate_update_history",
                "translate_wikilink",
                "translate_wikipedia_link")
@@ -29,6 +30,7 @@ GUI_METHODS_NOARGS = ("transform_decimal",
                       "translate_headlines",
                       "translate_item_flags",
                       "translate_levels",
+                      "translate_main_seealso",
                       "translate_wikilink",
                       "translate_wikipedia_link")
 
@@ -217,25 +219,34 @@ def translate():
     methods = [GUI_METHODS[int(i)] for i in listboxMethods.curselection()]
     iso = open_config(1)
     core.set_iso(iso)
-    if not selection:
-        for wikiText in wikiTextList:
-            wikiTextRaw = wikiText
+    
+    for wikiTextRaw in wikiTextList:
+        try:
             wikiTextType = core.get_wikitext_type(wikiTextRaw)
             itemName = core.get_itemname(wikiTextRaw)
             classLink, classLinkCounter = core.get_using_classes(wikiTextRaw)
-            for method in methods:
-                print("Method: ", method)
-                print("Args: ", inspect.getargspec(eval("core."+method)))
-                args = eval("inspect.getargspec("+"core."+method+")")
-                wikiTextRaw = eval("core."+method+"("+", ".join(args[0])+")")
-            wikiTextListTrans.append(wikiTextRaw)
-    elif selection:
+            restricted = False
+        except:
+            print("Couldn't gather all information")
+            restricted = True
+
+        print("-")
         for method in methods:
             print("Method: ", method)
-            print("Args: ", inspect.getargspec(eval("core."+method)))
-            if method in GUI_METHODS_NOARGS:
-                wikiTextRaw = eval("core."+method+"(wikiText)")
+            args = eval("inspect.getargspec("+"core."+method+")")
+            print("Arguments:", args)
+            if restricted:
+                if method in GUI_METHODS_NOARGS:
+                    wikiTextRaw = eval("core."+method+"(wikiTextRaw)")
+                    print("Done")
+                else:
+                    continue
+            else:
+                wikiTextRaw = eval("core."+method+"("+", ".join(args[0])+")")
+                print("Done")
+            print("-")
         wikiTextListTrans.append(wikiTextRaw)
+                    
 
     wikiTextRaw = "\n!\n".join(wikiTextListTrans)
     

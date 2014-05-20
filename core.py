@@ -93,6 +93,20 @@ def _lf_w(link):
         return re.sub("[^[w]:.*?", "", link.replace("[[w:", ""))
 
 
+def _lf_t_wl(link):
+    text = urllib.request.urlopen("http://wiki.teamfortress.com/w/api.php?format=xml&action=query&titles={}/{}&prop=info&inprop=displaytitle&redirects".format(quote(link), S.ISO)).read()
+    text = str(text, "utf-8")
+    if 'missing=""' in text:
+        print("Invalid page name: ", link)
+        return link, link
+
+    pagetitle = re.findall('title=".*?"', text)[0]
+    pagetitle = pagetitle.replace('title="', '').replace('"', '')
+    displaytitle = re.findall('displaytitle=".*?"', text)[0]
+    displaytitle = displaytitle.replace('displaytitle="', '').replace('"', '')
+    return pagetitle, displaytitle
+
+
 def add_displaytitle(itemName, wikiTextRaw):
     return "\n".join([S.DISPLAYTITLE.format(itemName), wikiTextRaw])
 
@@ -207,7 +221,6 @@ def translate_classlinks(classLink, wikiTextRaw):
 
 def translate_headlines(wikiTextRaw):
     headlines = re.findall("==.*?==", wikiTextRaw)
-
     for hl in headlines:
         hln = re.sub(" *==", "", re.sub("== *", "", hl)).strip()
         try:
@@ -259,8 +272,24 @@ def translate_levels(wikiTextRaw):
     return wikiTextRaw.replace(level, levelNew)
 
 
+def translate_main_seealso(wikiTextRaw):
+    temps = []
+    temps.extend(re.findall("\{\{[Mm]ain.*?\}\}", wikiTextRaw))
+    temps.extend(re.findall("\{\{[Ss]ee also.*?\}\}", wikiTextRaw))
+    for t in temps:
+        link = re.findall("\|.*?[^|]*", t)[0].replace("|", "").replace("}", "")
+        pagetitle, displaytitle = _lf_t_wl(link)
+        if "main" in t.lower():
+            tn = "{{{{Main|{}|l1={}}}}}".format(pagetitle, displaytitle)
+        elif "see also" in t.lower():
+            tn = "{{{{See also|{}|l1={}}}}}".format(pagetitle, displaytitle)
+        wikiTextRaw = wikiTextRaw.replace(t, tn)
+
+    return wikiTextRaw
+
+
 def translate_update_history(itemName, wikiTextRaw):
-    return re.sub(r".*?[Aa]dded.*? to the game.",
+    return re.sub(".*?[Aa]dded.*? to the game\.",
                   S.ADDEDTOGAME.format(itemName), wikiTextRaw)
 
 
@@ -275,17 +304,7 @@ def translate_wikilink(wikiTextRaw):
         ln = _lf_ext(_lf(l))
         ln = re.sub("#.*$", "", ln)
         ln = ln.replace(" ", "_")
-        text = urllib.request.urlopen("http://wiki.teamfortress.com/w/api.php?format=xml&action=query&titles={}/{}&prop=info&inprop=displaytitle&redirects".format(quote(ln), S.ISO)).read()
-        text = str(text, "utf-8")
-        if 'missing=""' in text:
-            print("Invalid page name: ", l)
-            continue
-
-        pagetitle = re.findall('title=".*?"', text)[0]
-        pagetitle = pagetitle.replace('title="', '').replace('"', '')
-        displaytitle = re.findall('displaytitle=".*?"', text)[0]
-        displaytitle = displaytitle.replace('displaytitle="', '').replace('"', '')
-
+        pagetitle, displaytitle = _lf_t_wl(ln)
         ln = "[[{}|{}]]".format(pagetitle, displaytitle)
         wikiTextRaw = wikiTextRaw.replace(l, ln)
 
@@ -387,10 +406,8 @@ def create_sentence_1_set(classLink, classLinkCounter, itemName, wikiTextRaw):
 def create_sentence_community(itemName, wikiTextRaw):
     sentenceCommunity = re.findall(".*?contributed.*?\[\[Steam Workshop\]\].*?\.",
                                    wikiTextRaw)
-
     if sentenceCommunity:
         link = re.findall("\[http.*?contribute.*?\]", sentenceCommunity[0])
-
         if link:
             link = re.sub(" contribute.*?\]", "", link[0]).replace("[", "")
             link = S.SENTENCE_COMMUNITY_LINK.format(link)
@@ -413,7 +430,6 @@ def create_sentence_community(itemName, wikiTextRaw):
 def create_sentence_promo(itemName, wikiTextRaw):
     sentencePromo = re.findall(".*?\[\[Genuine\]\].*?quality.*?\.",
                                wikiTextRaw)
-
     if sentencePromo:
         if "[[Steam]]" in sentencePromo:
             spt_s = S.SENTENCE_PROMOTIONAL_STEAM
@@ -438,7 +454,7 @@ def create_sentence_promo(itemName, wikiTextRaw):
         except:
             spt_d = ""
         try:
-            game = re.findall("''\[\[.*?\]\]''", sentencePromo[0])[0]
+            game = re.findall("\[?\[?''.*?\]?\]?''", sentencePromo[0])[0]
             game = _lf(game.replace("''", ""))
         except IndexError:
             return wikiTextRaw

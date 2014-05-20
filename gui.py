@@ -192,6 +192,7 @@ def settings_dialog():
 
 
 def translate():
+    print("Translation started")
     if textOutput.get("1.0", "end").strip() != "":
         overwrite = messagebox.askyesno(
             message="There is text left in the output box! Do you want to overwrite the text?",
@@ -211,7 +212,9 @@ def translate():
         wikiTextList = wikiText.split("\n!\n")
         wikiTextListTrans = []
 
-    methods = [GUI_METHODS[i] for i in listboxMethods.curselection()]
+    for i in listboxMethods.curselection():
+        print("methods[{}]: {}".format(i, GUI_METHODS[int(i)]))
+    methods = [GUI_METHODS[int(i)] for i in listboxMethods.curselection()]
     iso = open_config(1)
     core.set_iso(iso)
     if not selection:
@@ -229,6 +232,7 @@ def translate():
     elif selection:
         for method in methods:
             print("Method: ", method)
+            print("Args: ", inspect.getargspec(eval("core."+method)))
             if method in GUI_METHODS_NOARGS:
                 wikiTextRaw = eval("core."+method+"(wikiText)")
         wikiTextListTrans.append(wikiTextRaw)
@@ -252,8 +256,10 @@ def update_presets(args):
         listboxMethods.selection_set(GUI_METHODS.index(item))
 
 if __name__ == "__main__":
+    print("Running")
     open_config(0)
     presetsSaved = open_config(2)[::2]
+    print("presetsSaved: ", presetsSaved)
     
     root = Tk()
     root.title("WikiTranslator v2")

@@ -10,7 +10,8 @@ Comes with a GUI.
 To-Do
 -----
 - Cleaning the code up
-- Translation of {{main}} and {{see also}}
+- Improved user guidance
+- Fixing various problems with Mac OS X (copying/selecting text)
 
 
 Wanna learn more?

@@ -9,6 +9,7 @@ import core
 CONFIG = "config.pkl"
 
 GUI_METHODS = ("add_displaytitle",
+               "check_quote",
                "create_sentence_1_cw",
                "create_sentence_1_set",
                "create_sentence_community",
@@ -25,7 +26,8 @@ GUI_METHODS = ("add_displaytitle",
                "translate_wikipedia_link")
 
 
-GUI_METHODS_NOARGS = ("transform_decimal",
+GUI_METHODS_NOARGS = ("check_quote",
+                      "transform_decimal",
                       "translate_categories",
                       "translate_headlines",
                       "translate_item_flags",

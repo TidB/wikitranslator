@@ -88,27 +88,48 @@ def _lf_to_t(link):
 
 def _lf_w(link):
     if "{{" in link:
-        return re.sub("[^{w]\|.*?", "", link.replace("{{w|", ""))
+        return re.sub("\|[^|]*?\}\}", "", re.sub("\{\{[Ww][\w]*?\|", "", link))
     elif "[[" in link:
-        return re.sub("[^[w]:.*?", "", link.replace("[[w:", ""))
+        return re.sub("\|.*?\]\]", "", re.sub("\[\[[Ww][\w]*?:", "", link))
 
 
 def _lf_t_wl(link):
-    text = urllib.request.urlopen("http://wiki.teamfortress.com/w/api.php?format=xml&action=query&titles={}/{}&prop=info&inprop=displaytitle&redirects".format(quote(link), S.ISO)).read()
+    text = urllib.request.urlopen("http://wiki.teamfortress.com/w/api.php?format=xml&action=query&titles={}&prop=info&inprop=displaytitle&redirects".format(quote(link))).read()
     text = str(text, "utf-8")
     if 'missing=""' in text:
         print("Invalid page name: ", link)
-        return link, link
+        return link, link, False
 
     pagetitle = re.findall('title=".*?"', text)[0]
     pagetitle = pagetitle.replace('title="', '').replace('"', '')
     displaytitle = re.findall('displaytitle=".*?"', text)[0]
     displaytitle = displaytitle.replace('displaytitle="', '').replace('"', '')
-    return pagetitle, displaytitle
+    return pagetitle, displaytitle, True
 
 
 def add_displaytitle(itemName, wikiTextRaw):
     return "\n".join([S.DISPLAYTITLE.format(itemName), wikiTextRaw])
+
+
+def check_quote(wikiTextRaw):
+    quotes = re.findall("\{\{[Qq]uotation.*?\}\}", wikiTextRaw)
+    for q in quotes:
+        file = re.findall("\|sound=.*\}\}", q)
+        if not file:
+            print(q, "is not sound-enabled")
+            continue
+
+        file = file[0].replace("|sound=", "").replace(".wav", "").replace("}", "")
+        filen = "File:{} {}.wav".format(file, S.ISO)
+        if not _lf_t_wl(filen)[2]:
+            print("No localized file for", filen)
+            qn = "|sound={}|en-sound=yes}}}}".format(file)
+        else:
+            qn = "|sound={}}}}}".format(filen)
+
+        wikiTextRaw = re.sub("\|sound.*?\}\}", qn, wikiTextRaw)
+
+    return wikiTextRaw
 
 
 def create_class_list(classLink, classLinkCounter):
@@ -299,12 +320,16 @@ def translate_update_history(itemName, wikiTextRaw):
 
 
 def translate_wikilink(wikiTextRaw):
-    links = re.findall("\[\[.*?\]\]", wikiTextRaw)
+    links = re.findall("\[\[.*?\]\]",
+                       re.sub("\[\[[Ww]ikipedia:", "[[w:", wikiTextRaw))
     for l in links:
+        if "/de" in l:
+            continue
         ln = _lf_ext(_lf(l))
         ln = re.sub("#.*$", "", ln)
         ln = ln.replace(" ", "_")
-        pagetitle, displaytitle = _lf_t_wl(ln)
+        ln = ln+"/"+S.ISO
+        pagetitle, displaytitle, _ = _lf_t_wl(ln)
         ln = "[[{}|{}]]".format(pagetitle, displaytitle)
         wikiTextRaw = wikiTextRaw.replace(l, ln)
 
@@ -312,7 +337,9 @@ def translate_wikilink(wikiTextRaw):
 
 
 def translate_wikipedia_link(wikiTextRaw):
-    links = re.findall("\[\[w:.*?\]\]", wikiTextRaw)
+    links = []
+    links.extend(re.findall("\[\[[Ww][\w]*:.*?\]\]", wikiTextRaw))
+    links.extend(re.findall("\{\{[Ww][\w]*\|.*?\}\}", wikiTextRaw))
     for l in links:
         ln = _lf_w(l)
         ln = re.sub("#.*$", "", ln)

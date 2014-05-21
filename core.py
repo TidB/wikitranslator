@@ -123,7 +123,7 @@ def check_quote(wikiTextRaw):
         filen = "File:{} {}.wav".format(file, S.ISO)
         if not _lf_t_wl(filen)[2]:
             print("No localized file for", filen)
-            qn = "|sound={}|en-sound=yes}}}}".format(file)
+            qn = "|sound={}|en-sound=yes}}}}".format(file+".wav")
         else:
             qn = "|sound={}}}}}".format(filen)
 

@@ -7,6 +7,10 @@ import webbrowser
 import core
 
 CONFIG = "config.pkl"
+FILE_PATH = "autosave.txt"
+URL_GITHUB = "https://github.com/TidB/WikiTranslator"
+URL_WIKI = "http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator"
+VERSION = "2014-06-02:1" 
 
 GUI_METHODS = ("add_displaytitle",
                "check_quote",
@@ -56,15 +60,15 @@ def help_dialog():
                           font=fontHeadline)
     labelGithub = Label(helpFrame, text="WikiTranslator on GitHub")
     labelGithubLink = Label(helpFrame,
-                            text="(https://github.com/TidB/WikiTranslator)",
+                            text="("+URL_GITHUB+")",
                             font=fontLink)
     labelTFWiki = Label(helpFrame, text="WikiTranslator on the TF Wiki")
     labelTFWikiLink = Label(helpFrame,
-                            text="(http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator)",
+                            text="("+URL_WIKI+")",
                             font=fontLink)
 
-    labelGithubLink.bind("<1>", lambda event: link_to(0))
-    labelTFWikiLink.bind("<1>", lambda event: link_to(1))
+    labelGithubLink.bind("<1>", lambda event: webbrowser.open(URL_GITHUB))
+    labelTFWikiLink.bind("<1>", lambda event: webbrowser.open(URL_WIKI))
 
     helpFrame.grid(column=0, row=0)
     labelHeadline.grid(column=0, row=0)
@@ -72,13 +76,6 @@ def help_dialog():
     labelTFWiki.grid(column=0, row=3)
     labelGithubLink.grid(column=0, row=2)
     labelTFWikiLink.grid(column=0, row=4)    
-
-
-def link_to(link):
-    if link == 0:
-        webbrowser.open("https://github.com/TidB/WikiTranslator")
-    elif link == 1:
-        webbrowser.open("http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator")
 
 
 def open_config(index):
@@ -102,9 +99,10 @@ def open_file():
         if overwrite == False:
             return
 
-    fileName = filedialog.askopenfilename()
+    FILE_PATH = filedialog.askopenfilename()
+    print("FILE_PATH:", FILE_PATH)
     try:
-        file = open(fileName, "r")
+        file = open(FILE_PATH, "r")
     except:
         print("Invalid input file")
         return
@@ -153,7 +151,7 @@ def save_config(index, item):
 
 def save_file():
     try:
-        file = open("autosave.txt", "a")
+        file = open(FILE_PATH, "a")
     except:
         return
     file.write(textOutput.get("1.0", END))
@@ -275,7 +273,7 @@ if __name__ == "__main__":
     print("presetsSaved: ", presetsSaved)
     
     root = Tk()
-    root.title("WikiTranslator v2")
+    root.title("WikiTranslator v2 | {}".format(VERSION))
     root.protocol('WM_DELETE_WINDOW', save_changes)
 
     mainframe = ttk.Frame(root, padding="3 3 12 12")
@@ -320,7 +318,6 @@ if __name__ == "__main__":
     mainframe.columnconfigure(2, weight=1, minsize=130)
     mainframe.rowconfigure(1, weight=1, minsize=150)
 
-    root.bind("<Return>", update_presets)
     root.bind("<<ComboboxSelected>>", update_presets)
     root.bind("<Control-Z>", textInput.edit_undo)
     root.bind("<Control-Shift-Z>", textInput.edit_redo)

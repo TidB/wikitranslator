@@ -88,9 +88,9 @@ def _lf_to_t(link):
 
 def _lf_w(link):
     if "{{" in link:
-        return re.sub("\|[^|]*?\}\}", "", re.sub("\{\{[Ww][\w]*?\|", "", link))
+        return re.sub("\|[^|]*?\}\}", "", re.sub("\{\{[Ww][\w]*?\|", "", link)).replace("}}", "")
     elif "[[" in link:
-        return re.sub("\|.*?\]\]", "", re.sub("\[\[[Ww][\w]*?:", "", link))
+        return re.sub("\|.*?\]\]", "", re.sub("\[\[[Ww][\w]*?:", "", link)).replace("]]", "")
 
 
 def _lf_t_wl(link):
@@ -299,7 +299,7 @@ def translate_main_seealso(wikiTextRaw):
     temps.extend(re.findall("\{\{[Ss]ee also.*?\}\}", wikiTextRaw))
     for t in temps:
         link = re.findall("\|.*?[^|]*", t)[0].replace("|", "").replace("}", "")
-        pagetitle, displaytitle = _lf_t_wl(link)
+        pagetitle, displaytitle, _ = _lf_t_wl(link)
         if "main" in t.lower():
             tn = "{{{{Main|{}|l1={}}}}}".format(pagetitle, displaytitle)
         elif "see also" in t.lower():
@@ -323,7 +323,11 @@ def translate_wikilink(wikiTextRaw):
     links = re.findall("\[\[.*?\]\]",
                        re.sub("\[\[[Ww]ikipedia:", "[[w:", wikiTextRaw))
     for l in links:
-        if "/de" in l:
+        if "/de" in l \
+           or "category:" in l.lower() \
+           or "file:" in l.lower() \
+           or "image:" in l.lower() \
+           or "[[w:" in l.lower():
             continue
         ln = _lf_ext(_lf(l))
         ln = re.sub("#.*$", "", ln)
@@ -358,7 +362,7 @@ def translate_wikipedia_link(wikiTextRaw):
             tn = "[[w:{0}:{1}|{1}]]".format(S.ISO, t)
             wikiTextRaw = wikiTextRaw.replace(l, tn)
         except IndexError:
-            print("No /{} article for {}".format(S.ISO, l))
+            print("No /{} article for {} => {}".format(S.ISO, l, ln))
             continue
 
     return wikiTextRaw
@@ -431,8 +435,9 @@ def create_sentence_1_set(classLink, classLinkCounter, itemName, wikiTextRaw):
 
 
 def create_sentence_community(itemName, wikiTextRaw):
-    sentenceCommunity = re.findall(".*?contributed.*?\[\[Steam Workshop\]\].*?\.",
+    sentenceCommunity = re.findall(".*?contributed.*?Steam Workshop.*?\.",
                                    wikiTextRaw)
+    
     if sentenceCommunity:
         link = re.findall("\[http.*?contribute.*?\]", sentenceCommunity[0])
         if link:

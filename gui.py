@@ -10,7 +10,7 @@ CONFIG = "config.pkl"
 FILE_PATH = "autosave.txt"
 URL_GITHUB = "https://github.com/TidB/WikiTranslator"
 URL_WIKI = "http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator"
-VERSION = "2014-06-02:1" 
+VERSION = "2014-06-03:1" 
 
 GUI_METHODS = ("add_displaytitle",
                "check_quote",

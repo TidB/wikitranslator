@@ -1,6 +1,7 @@
 import re
 from urllib.parse import quote
 import urllib.request
+import xml.etree.ElementTree as ET
 
 import sDE
 
@@ -96,14 +97,14 @@ def _lf_w(link):
 def _lf_t_wl(link):
     text = urllib.request.urlopen("http://wiki.teamfortress.com/w/api.php?format=xml&action=query&titles={}&prop=info&inprop=displaytitle&redirects".format(quote(link))).read()
     text = str(text, "utf-8")
-    if 'missing=""' in text:
+    root = ET.fromstring(text)
+    if root.find(".//*[@missing='']"):
         print("Invalid page name: ", link)
         return link, link, False
 
-    pagetitle = re.findall('title=".*?"', text)[0]
-    pagetitle = pagetitle.replace('title="', '').replace('"', '')
-    displaytitle = re.findall('displaytitle=".*?"', text)[0]
-    displaytitle = displaytitle.replace('displaytitle="', '').replace('"', '')
+    pagetitle = root.find(".//*[@title]").attrib['title']
+    displaytitle = root.find(".//*[@displaytitle]").attrib['displaytitle']
+    
     return pagetitle, displaytitle, True
 
 
@@ -350,21 +351,19 @@ def translate_wikipedia_link(wikiTextRaw):
         ln = ln.replace(" ", "_")
         text = urllib.request.urlopen("http://en.wikipedia.org/w/api.php?format=xml&action=query&titles={}&prop=langlinks&lllimit=400&redirects".format(quote(ln))).read()
         text = str(text, "utf-8")
-        if 'missing=""' in text:
+        root = ET.fromstring(text)
+        if root.find(".//*[@missing='']"):
             print("Invalid page name: ", l)
             continue
 
-        t_re = 'lang="{}" xml:space="preserve">.*?\>'.format(S.ISO)
-        try:
-            t = re.findall(t_re, text)[0]
-            t = re.sub('lang=".*?>', '', t).replace("</ll>", "")
-
-            tn = "[[w:{0}:{1}|{1}]]".format(S.ISO, t)
-            wikiTextRaw = wikiTextRaw.replace(l, tn)
-        except IndexError:
+        t = root.find(".//*[@lang='{}']".format(S.ISO))
+        if t is None:
             print("No /{} article for {} => {}".format(S.ISO, l, ln))
             continue
 
+        tn = "[[w:{0}:{1}|{1}]]".format(S.ISO, t.text)
+        wikiTextRaw = wikiTextRaw.replace(l, tn)
+            
     return wikiTextRaw
 
 

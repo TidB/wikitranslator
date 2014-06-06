@@ -1,4 +1,3 @@
-import inspect
 import pickle
 from tkinter import *
 from tkinter import ttk
@@ -10,7 +9,7 @@ CONFIG = "config.pkl"
 FILE_PATH = "autosave.txt"
 URL_GITHUB = "https://github.com/TidB/WikiTranslator"
 URL_WIKI = "http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator"
-VERSION = "2014-06-03:1" 
+VERSION = "2014-06-06:1" 
 
 GUI_METHODS = ("add_displaytitle",
                "check_quote",
@@ -25,6 +24,7 @@ GUI_METHODS = ("add_displaytitle",
                "translate_item_flags",
                "translate_levels",
                "translate_main_seealso",
+               "translate_set_contents",
                "translate_update_history",
                "translate_wikilink",
                "translate_wikipedia_link")
@@ -37,6 +37,7 @@ GUI_METHODS_NOARGS = ("check_quote",
                       "translate_item_flags",
                       "translate_levels",
                       "translate_main_seealso",
+                      "translate_set_contents",
                       "translate_wikilink",
                       "translate_wikipedia_link")
 
@@ -218,36 +219,12 @@ def translate():
         print("methods[{}]: {}".format(i, GUI_METHODS[int(i)]))
     methods = [GUI_METHODS[int(i)] for i in listboxMethods.curselection()]
     iso = open_config(1)
-    core.set_iso(iso)
     
-    for wikiTextRaw in wikiTextList:
-        try:
-            wikiTextType = core.get_wikitext_type(wikiTextRaw)
-            itemName = core.get_itemname(wikiTextRaw)
-            classLink, classLinkCounter = core.get_using_classes(wikiTextRaw)
-            restricted = False
-        except:
-            print("Couldn't gather all information")
-            restricted = True
-
-        print("-")
-        for method in methods:
-            print("Method: ", method)
-            args = eval("inspect.getargspec("+"core."+method+")")
-            print("Arguments:", args)
-            if restricted:
-                if method in GUI_METHODS_NOARGS:
-                    wikiTextRaw = eval("core."+method+"(wikiTextRaw)")
-                    print("Done")
-                else:
-                    continue
-            else:
-                wikiTextRaw = eval("core."+method+"("+", ".join(args[0])+")")
-                print("Done")
-            print("-")
+    for wtr in wikiTextList:
+        wt = core.Wikitext(wtr, iso, methods)
+        wikiTextRaw = wt.translate()
         wikiTextListTrans.append(wikiTextRaw)
                     
-
     wikiTextRaw = "\n!\n".join(wikiTextListTrans)
     
     textOutput.delete("1.0", END)

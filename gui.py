@@ -309,14 +309,14 @@ if __name__ == "__main__":
 
     mainframe.grid(column=0, row=0, sticky=("n","w","e","s"))
     textInput.grid(column=0, row=1, rowspan=2, sticky=("n","e","s"))
-    scrollInput.grid(column=0, row=1, rowspan=2, sticky=("n","e","s"))
-    textOutput.grid(column=1, row=1, rowspan=2, sticky=("n","w","e","s"))
-    scrollOutput.grid(column=1, row=1, rowspan=2, sticky=("n","e","s"))
-    comboboxPreset.grid(column=2, row=0, columnspan=2)
-    listboxMethods.grid(column=2, row=1, columnspan=2, rowspan=5, sticky=("n","w","e","s"))
-    buttonSavePreset.grid(column=2, row=2)
-    buttonClear.grid(column=3, row=2)
-    buttonTranslate.grid(column=2, row=3, columnspan=2)
+    scrollInput.grid(column=1, row=1, rowspan=2, sticky=("n","w","s"))
+    textOutput.grid(column=2, row=1, rowspan=2, sticky=("n","w","e","s"))
+    scrollOutput.grid(column=3, row=1, rowspan=2, sticky=("n","w","s"))
+    comboboxPreset.grid(column=4, row=0, columnspan=2)
+    listboxMethods.grid(column=4, row=1, columnspan=2, rowspan=5, sticky=("n","w","e","s"))
+    buttonSavePreset.grid(column=4, row=2)
+    buttonClear.grid(column=5, row=2)
+    buttonTranslate.grid(column=3, row=3, columnspan=2)
 
     textInput['yscrollcommand'] = scrollInput.set
     textOutput['yscrollcommand'] = scrollOutput.set
@@ -324,9 +324,9 @@ if __name__ == "__main__":
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     mainframe.columnconfigure(0, weight=2, minsize=200)
-    mainframe.columnconfigure(1, weight=2, minsize=200)
-    mainframe.columnconfigure(2, weight=1, minsize=130)
-    mainframe.columnconfigure(3, weight=1, minsize=100)
+    mainframe.columnconfigure(2, weight=2, minsize=200)
+    mainframe.columnconfigure(4, weight=1, minsize=130)
+    mainframe.columnconfigure(5, weight=1, minsize=100)
     mainframe.rowconfigure(1, weight=1, minsize=150)
 
     root.bind("<<ComboboxSelected>>", update_presets)

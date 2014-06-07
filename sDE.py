@@ -1,6 +1,3 @@
-#ISO
-ISO = "de"
-
 #STANDARD
 ADDEDTOGAME = "* (ARTIKEL) {{{{item name|{0}}}}} wurde dem Spiel hinzugefügt."
 ALLCLASSESBOX = "[[Classes/{0}|Allen Klassen]]"

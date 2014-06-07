@@ -1,5 +1,5 @@
 import pickle
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 import webbrowser
 
@@ -9,7 +9,7 @@ CONFIG = "config.pkl"
 FILE_PATH = "autosave.txt"
 URL_GITHUB = "https://github.com/TidB/WikiTranslator"
 URL_WIKI = "http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator"
-VERSION = "2014-06-06:1" 
+VERSION = "2014-06-07:1"
 
 GUI_METHODS = ("add_displaytitle",
                "check_quote",
@@ -18,6 +18,7 @@ GUI_METHODS = ("add_displaytitle",
                "create_sentence_community",
                "create_sentence_promo",
                "transform_decimal",
+               "transform_link",
                "translate_categories",
                "translate_classlinks",
                "translate_headlines",
@@ -32,6 +33,7 @@ GUI_METHODS = ("add_displaytitle",
 
 GUI_METHODS_NOARGS = ("check_quote",
                       "transform_decimal",
+                      "transform_link",
                       "translate_categories",
                       "translate_headlines",
                       "translate_item_flags",
@@ -49,22 +51,30 @@ def config_exc():
     print("Recreating done")
 
 
+def end():
+    if textOutput.get("1.0", "end") != "":
+        save_file()
+    root.destroy()
+    root.quit()
+
+
 def help_dialog():
-    fontHeadline = font.Font(family='Helvetica', size=18, underline=1)
-    fontLink = font.Font(size=7)
-    helpWindow = Toplevel(root)
-    helpWindow.resizable(FALSE, FALSE)
+    fontHeadline = tk.font.Font(family='Helvetica', size=18, underline=1)
+    fontLink = tk.font.Font(size=7)
+    helpWindow = tk.Toplevel(root)
+    helpWindow.resizable(0, 0)
+    helpWindow.title("Help")
     helpFrame = ttk.Frame(helpWindow, padding="3 3 12 12")
 
-    labelHeadline = Label(helpFrame,
+    labelHeadline = tk.Label(helpFrame,
                           text="WikiTranslator v2",
                           font=fontHeadline)
-    labelGithub = Label(helpFrame, text="WikiTranslator on GitHub")
-    labelGithubLink = Label(helpFrame,
+    labelGithub = tk.Label(helpFrame, text="WikiTranslator on GitHub")
+    labelGithubLink = tk.Label(helpFrame,
                             text="("+URL_GITHUB+")",
                             font=fontLink)
-    labelTFWiki = Label(helpFrame, text="WikiTranslator on the TF Wiki")
-    labelTFWikiLink = Label(helpFrame,
+    labelTFWiki = tk.Label(helpFrame, text="WikiTranslator on the TF Wiki")
+    labelTFWikiLink = tk.Label(helpFrame,
                             text="("+URL_WIKI+")",
                             font=fontLink)
 
@@ -76,23 +86,45 @@ def help_dialog():
     labelGithub.grid(column=0, row=1)
     labelTFWiki.grid(column=0, row=3)
     labelGithubLink.grid(column=0, row=2)
-    labelTFWikiLink.grid(column=0, row=4)    
+    labelTFWikiLink.grid(column=0, row=4)
+
+
+def import_category(entryCategory):
+    wikiTextList = core.import_category(entryCategory.get())
+    for text in wikiTextList:
+        textInput.insert("end", text)
+
+
+def import_category_dialog():
+    importWindow = tk.Toplevel(root)
+    importWindow.resizable(0, 0)
+    importWindow.title("Import category")
+    importFrame = ttk.Frame(importWindow, padding="3 3 12 12")
+
+    labelDesc = tk.Label(importFrame, text="Enter a existing category")
+    entryCategory = tk.Entry(importFrame, exportselection=0)
+    buttonSubmit = tk.Button(importFrame,
+                             text="Enter",
+                             command=lambda: import_category(entryCategory))
+    
+    importFrame.grid(column=0, row=0)
+    labelDesc.grid(column=0, row=0)
+    entryCategory.grid(column=0, row=1)
+    buttonSubmit.grid(column=0, row=2)
 
 
 def open_config(index):
-    try:
-        f = open(CONFIG, "rb")
-        l = pickle.load(f)[index]
-        f.close()
-        return l
-    except:
+        with open(CONFIG, "rb") as f:
+            l = pickle.load(f)[index]
+            return l
+
         print("Reading configFile failed. Recreating...")
         config_exc()
 
 
 def open_file():
     if textInput.get("1.0", "end").strip() != "":
-        overwrite = messagebox.askyesno(
+        overwrite = tk.messagebox.askyesno(
             message="There is text left in the input box! Do you want to overwrite the text?",
             icon='warning',
             title='Overwrite?'
@@ -100,27 +132,18 @@ def open_file():
         if overwrite == False:
             return
 
-    FILE_PATH = filedialog.askopenfilename()
-    print("FILE_PATH:", FILE_PATH)
+    FILE_PATH = tk.filedialog.askopenfilename()
     try:
-        file = open(FILE_PATH, "r")
+        file = open(FILE_PATH, "rb")
     except:
         print("Invalid input file")
         return
 
     text = "!"
     while text != "":
-        text = file.readline()
-        textInput.insert(END, text)
+        text = file.readline().decode("utf-8")
+        textInput.insert("end", text)
     file.close()
-
-
-def save_changes():
-    if textOutput.get("1.0", END) != "":
-        save_file()
-    root.destroy()
-    root.quit()
-    print("Quit")
 
 
 def save_config(index, item):
@@ -144,45 +167,44 @@ def save_config(index, item):
         config_exc()
         return
 
-    file = open(CONFIG, "wb")
-    pickle.dump(configFile, file)
-    file.close()
-    print("Saved config")
+    with open(CONFIG, "wb") as file:
+        pickle.dump(configFile, file)
+        print("Saved config")
 
 
-def save_file():
-    try:
-        file = open(FILE_PATH, "a")
-    except:
-        return
-    file.write(textOutput.get("1.0", END))
-    file.close()
-    print("Autosaved")
+def save_file(selection=False, path=FILE_PATH):
+    if selection:
+        path = tk.filedialog.asksaveasfilename(defaultextension=".txt",
+                                               filetypes=[("text file", ".txt")])
+    with open(path, "ab") as file:
+        file.write(bytes(textOutput.get("1.0", "end"), "utf-8"))
+        print("Autosaved")
 
 
 def settings_dialog():
     separator = open_config(0)
     iso = open_config(1)
-    settingWindow = Toplevel(root)
-    settingWindow.resizable(FALSE, FALSE)
+    settingWindow = tk.Toplevel(root)
+    settingWindow.resizable(0, 0)
+    settingWindow.title("Settings")
     settingFrame = ttk.Frame(settingWindow, padding="3 3 12 12")
 
-    labelSeparator = Label(settingFrame, text="Standard separation character")
-    entrySeparator = Entry(settingFrame, text=separator, exportselection=0)
-    entrySeparator.delete(0, END)
+    labelSeparator = tk.Label(settingFrame, text="Standard separation character")
+    entrySeparator = tk.Entry(settingFrame, text=separator, exportselection=0)
+    entrySeparator.delete(0, "end")
     entrySeparator.insert(0, separator)
-    buttonSeparator = Button(settingFrame, text="Save",
-                             command=lambda: save_config(0, entrySeparator.get()))
+    buttonSeparator = tk.Button(settingFrame, text="Save",
+                                command=lambda: save_config(0, entrySeparator.get()))
 
-    labelLanguage = Label(settingFrame, text="Language (ISO code)")
-    entryLanguage = Entry(settingFrame, text=iso, exportselection=0)
-    entryLanguage.delete(0, END)
+    labelLanguage = tk.Label(settingFrame, text="Language (ISO code)")
+    entryLanguage = tk.Entry(settingFrame, text=iso, exportselection=0)
+    entryLanguage.delete(0, "end")
     entryLanguage.insert(0, iso)
-    buttonLanguage = Button(settingFrame, text="Save",
-                            command=lambda: save_config(1, entryLanguage.get()))
+    buttonLanguage = tk.Button(settingFrame, text="Save",
+                               command=lambda: save_config(1, entryLanguage.get()))
 
-    buttonClose = Button(settingFrame, text="Close",
-                         command=lambda: settingWindow.destroy())
+    buttonClose = tk.Button(settingFrame, text="Close",
+                            command=lambda: settingWindow.destroy())
 
     settingFrame.grid(column=0, row=0)
     labelSeparator.grid(column=0, row=0)
@@ -219,15 +241,15 @@ def translate():
         print("methods[{}]: {}".format(i, GUI_METHODS[int(i)]))
     methods = [GUI_METHODS[int(i)] for i in listboxMethods.curselection()]
     iso = open_config(1)
-    
+
     for wtr in wikiTextList:
         wt = core.Wikitext(wtr, iso, methods)
         wikiTextRaw = wt.translate()
         wikiTextListTrans.append(wikiTextRaw)
-                    
+
     wikiTextRaw = "\n!\n".join(wikiTextListTrans)
-    
-    textOutput.delete("1.0", END)
+
+    textOutput.delete("1.0", "end")
     textOutput.insert("1.0", wikiTextRaw)
 
 
@@ -239,7 +261,7 @@ def update_presets(args):
     except ValueError:
         print("Invalid preset name")
         return
-    listboxMethods.selection_clear(0, END)
+    listboxMethods.selection_clear(0, "end")
     for item in l[i+1]:
         listboxMethods.selection_set(GUI_METHODS.index(item))
 
@@ -248,51 +270,63 @@ if __name__ == "__main__":
     open_config(0)
     presetsSaved = open_config(2)[::2]
     print("presetsSaved: ", presetsSaved)
-    
-    root = Tk()
+
+    root = tk.Tk()
     root.title("WikiTranslator v2 | {}".format(VERSION))
-    root.protocol('WM_DELETE_WINDOW', save_changes)
+    root.protocol('WM_DELETE_WINDOW', end)
 
     mainframe = ttk.Frame(root, padding="3 3 12 12")
 
-    root.option_add('*tearOff', FALSE)
-    menubar = Menu(root)
+    root.option_add('*tearOff', 0)
+    menubar = tk.Menu(root)
     root['menu'] = menubar
-    menu_file = Menu(menubar)
-    menu_options = Menu(menubar)
+    menu_file = tk.Menu(menubar)
+    menu_options = tk.Menu(menubar)
     menubar.add_cascade(menu=menu_file, label='File')
     menu_file.add_command(label='Open...', command=open_file)
-    menu_file.add_command(label='Save...', command=save_file)
+    menu_file.add_command(label='Import category...', command=import_category_dialog)
+    menu_file.add_command(label='Save...', command=lambda: save_file(True))
     menubar.add_cascade(menu=menu_options, label='Options')
     menu_options.add_command(label='Settings...', command=settings_dialog)
     menu_options.add_command(label='Help', command=help_dialog)
 
-    textInput = Text(mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
-    textOutput = Text(mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
+    textInput = tk.Text(mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
+    scrollInput = ttk.Scrollbar(mainframe, orient="vertical", command=textInput.yview)
+    textOutput = tk.Text(mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
+    scrollOutput = ttk.Scrollbar(mainframe, orient="vertical", command=textOutput.yview)
     comboboxPreset = ttk.Combobox(mainframe, values=presetsSaved, exportselection=0)
-    listboxMethods = Listbox(mainframe,
-                             listvariable=StringVar(value=GUI_METHODS),
-                             selectmode=MULTIPLE,
+    listboxMethods = tk.Listbox(mainframe,
+                             listvariable=tk.StringVar(value=GUI_METHODS),
+                             selectmode="multiple",
                              exportselection=0)
     buttonSavePreset = ttk.Button(mainframe, text="Save preset",
                                   command=lambda: save_config(2,
                                                               (comboboxPreset.get(),
                                                                [GUI_METHODS[i] for i in listboxMethods.curselection()])))
-    buttonTranslate = ttk.Button(mainframe, text="Translate", command=translate, width=40)
+    buttonClear = ttk.Button(mainframe, text="Clear selection",
+                             command=lambda: listboxMethods.selection_clear(0, "end"))
+    buttonTranslate = ttk.Button(mainframe, text="Translate", command=translate, width=30)
 
-    mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-    textInput.grid(column=0, row=1, rowspan=2, sticky=(N,S,E,W))
-    textOutput.grid(column=1, row=1, rowspan=2, sticky=(N,S,E,W))
-    comboboxPreset.grid(column=2, row=0)
-    listboxMethods.grid(column=2, row=1, rowspan=5, sticky=(N,S,E,W))
+    mainframe.grid(column=0, row=0, sticky=("n","w","e","s"))
+    textInput.grid(column=0, row=1, rowspan=2, sticky=("n","e","s"))
+    scrollInput.grid(column=0, row=1, rowspan=2, sticky=("n","e","s"))
+    textOutput.grid(column=1, row=1, rowspan=2, sticky=("n","w","e","s"))
+    scrollOutput.grid(column=1, row=1, rowspan=2, sticky=("n","e","s"))
+    comboboxPreset.grid(column=2, row=0, columnspan=2)
+    listboxMethods.grid(column=2, row=1, columnspan=2, rowspan=5, sticky=("n","w","e","s"))
     buttonSavePreset.grid(column=2, row=2)
-    buttonTranslate.grid(column=2, row=3)
+    buttonClear.grid(column=3, row=2)
+    buttonTranslate.grid(column=2, row=3, columnspan=2)
+
+    textInput['yscrollcommand'] = scrollInput.set
+    textOutput['yscrollcommand'] = scrollOutput.set
 
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     mainframe.columnconfigure(0, weight=2, minsize=200)
     mainframe.columnconfigure(1, weight=2, minsize=200)
     mainframe.columnconfigure(2, weight=1, minsize=130)
+    mainframe.columnconfigure(3, weight=1, minsize=100)
     mainframe.rowconfigure(1, weight=1, minsize=150)
 
     root.bind("<<ComboboxSelected>>", update_presets)

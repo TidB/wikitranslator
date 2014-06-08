@@ -1,15 +1,18 @@
 import pickle
+from _tkinter import TclError
 import tkinter as tk
 from tkinter import ttk
 import webbrowser
 
 import core
 
+filePath = "autosave.txt"
+
 CONFIG = "config.pkl"
-FILE_PATH = "autosave.txt"
 URL_GITHUB = "https://github.com/TidB/WikiTranslator"
 URL_WIKI = "http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator"
-VERSION = "2014-06-07:1"
+
+__version__ = "2014-06-07:1"
 
 GUI_METHODS = ("add_displaytitle",
                "check_quote",
@@ -43,6 +46,7 @@ GUI_METHODS_NOARGS = ("check_quote",
                       "translate_wikilink",
                       "translate_wikipedia_link")
 
+
 def config_exc():
     file = open(CONFIG, "wb")
     configFile = ["!", "de", []]
@@ -67,16 +71,16 @@ def help_dialog():
     helpFrame = ttk.Frame(helpWindow, padding="3 3 12 12")
 
     labelHeadline = tk.Label(helpFrame,
-                          text="WikiTranslator v2",
-                          font=fontHeadline)
+                             text="WikiTranslator v2",
+                             font=fontHeadline)
     labelGithub = tk.Label(helpFrame, text="WikiTranslator on GitHub")
     labelGithubLink = tk.Label(helpFrame,
-                            text="("+URL_GITHUB+")",
-                            font=fontLink)
+                               text="("+URL_GITHUB+")",
+                               font=fontLink)
     labelTFWiki = tk.Label(helpFrame, text="WikiTranslator on the TF Wiki")
     labelTFWikiLink = tk.Label(helpFrame,
-                            text="("+URL_WIKI+")",
-                            font=fontLink)
+                               text="("+URL_WIKI+")",
+                               font=fontLink)
 
     labelGithubLink.bind("<1>", lambda event: webbrowser.open(URL_GITHUB))
     labelTFWikiLink.bind("<1>", lambda event: webbrowser.open(URL_WIKI))
@@ -89,8 +93,8 @@ def help_dialog():
     labelTFWikiLink.grid(column=0, row=4)
 
 
-def import_category(entryCategory):
-    wikiTextList = core.import_category(entryCategory.get())
+def import_category(category):
+    wikiTextList = core.import_category(category)
     for text in wikiTextList:
         textInput.insert("end", text)
 
@@ -105,8 +109,8 @@ def import_category_dialog():
     entryCategory = tk.Entry(importFrame, exportselection=0)
     buttonSubmit = tk.Button(importFrame,
                              text="Enter",
-                             command=lambda: import_category(entryCategory))
-    
+                             command=lambda: import_category(entryCategory.get()))
+
     importFrame.grid(column=0, row=0)
     labelDesc.grid(column=0, row=0)
     entryCategory.grid(column=0, row=1)
@@ -132,22 +136,21 @@ def open_file():
         if overwrite == False:
             return
 
-    FILE_PATH = tk.filedialog.askopenfilename()
+    file_path = tk.filedialog.askopenfilename()
     try:
-        file = open(FILE_PATH, "rb")
+        file = open(file_path, "rb")
     except:
         print("Invalid input file")
         return
 
     text = "!"
     while text != "":
-        text = file.readline().decode("utf-8")
+        text = file.readline().decode()
         textInput.insert("end", text)
     file.close()
 
 
 def save_config(index, item):
-    print(item)
     try:
         file = open(CONFIG, "rb")
         configFile = pickle.load(file)
@@ -157,7 +160,7 @@ def save_config(index, item):
         return
 
     try:
-        if index in [0,1]:
+        if index in [0, 1]:
             configFile[index] = item
         elif index == 2:
             configFile[2].append(item[0])
@@ -172,7 +175,7 @@ def save_config(index, item):
         print("Saved config")
 
 
-def save_file(selection=False, path=FILE_PATH):
+def save_file(selection=False, path=filePath):
     if selection:
         path = tk.filedialog.asksaveasfilename(defaultextension=".txt",
                                                filetypes=[("text file", ".txt")])
@@ -219,26 +222,22 @@ def settings_dialog():
 def translate():
     print("Translation started")
     if textOutput.get("1.0", "end").strip() != "":
-        overwrite = messagebox.askyesno(
+        overwrite = tk.messagebox.askyesno(
             message="There is text left in the output box! Do you want to overwrite the text?",
             icon='warning',
             title='Overwrite?'
             )
-        if overwrite == False:
+        if overwrite is False:
             return
 
     try:
         wikiText = textInput.selection_get()
-        selection = True
-    except:
+    except TclError:
         wikiText = textInput.get("1.0", "end").strip()
-        selection = False
     finally:
         wikiTextList = wikiText.split("\n!\n")
         wikiTextListTrans = []
 
-    for i in listboxMethods.curselection():
-        print("methods[{}]: {}".format(i, GUI_METHODS[int(i)]))
     methods = [GUI_METHODS[int(i)] for i in listboxMethods.curselection()]
     iso = open_config(1)
 
@@ -253,7 +252,7 @@ def translate():
     textOutput.insert("1.0", wikiTextRaw)
 
 
-def update_presets(args):
+def update_presets(_):
     l = open_config(2)
     presetName = l[comboboxPreset.current()*2]
     try:
@@ -272,7 +271,7 @@ if __name__ == "__main__":
     print("presetsSaved: ", presetsSaved)
 
     root = tk.Tk()
-    root.title("WikiTranslator v2 | {}".format(VERSION))
+    root.title("WikiTranslator v2 | {}".format(__version__))
     root.protocol('WM_DELETE_WINDOW', end)
 
     mainframe = ttk.Frame(root, padding="3 3 12 12")
@@ -296,9 +295,9 @@ if __name__ == "__main__":
     scrollOutput = ttk.Scrollbar(mainframe, orient="vertical", command=textOutput.yview)
     comboboxPreset = ttk.Combobox(mainframe, values=presetsSaved, exportselection=0)
     listboxMethods = tk.Listbox(mainframe,
-                             listvariable=tk.StringVar(value=GUI_METHODS),
-                             selectmode="multiple",
-                             exportselection=0)
+                                listvariable=tk.StringVar(value=GUI_METHODS),
+                                selectmode="multiple",
+                                exportselection=0)
     buttonSavePreset = ttk.Button(mainframe, text="Save preset",
                                   command=lambda: save_config(2,
                                                               (comboboxPreset.get(),
@@ -307,16 +306,16 @@ if __name__ == "__main__":
                              command=lambda: listboxMethods.selection_clear(0, "end"))
     buttonTranslate = ttk.Button(mainframe, text="Translate", command=translate, width=30)
 
-    mainframe.grid(column=0, row=0, sticky=("n","w","e","s"))
-    textInput.grid(column=0, row=1, rowspan=2, sticky=("n","e","s"))
-    scrollInput.grid(column=1, row=1, rowspan=2, sticky=("n","w","s"))
-    textOutput.grid(column=2, row=1, rowspan=2, sticky=("n","w","e","s"))
-    scrollOutput.grid(column=3, row=1, rowspan=2, sticky=("n","w","s"))
+    mainframe.grid(column=0, row=0, sticky="nwes")
+    textInput.grid(column=0, row=1, rowspan=2, sticky="nes")
+    scrollInput.grid(column=1, row=1, rowspan=2, sticky="nws")
+    textOutput.grid(column=2, row=1, rowspan=2, sticky="nwes")
+    scrollOutput.grid(column=3, row=1, rowspan=2, sticky="nws")
     comboboxPreset.grid(column=4, row=0, columnspan=2)
-    listboxMethods.grid(column=4, row=1, columnspan=2, rowspan=5, sticky=("n","w","e","s"))
-    buttonSavePreset.grid(column=4, row=2)
-    buttonClear.grid(column=5, row=2)
-    buttonTranslate.grid(column=3, row=3, columnspan=2)
+    listboxMethods.grid(column=4, row=1, columnspan=2, sticky="nwes")
+    buttonSavePreset.grid(column=4, row=3)
+    buttonClear.grid(column=5, row=3)
+    buttonTranslate.grid(column=4, row=4, columnspan=2)
 
     textInput['yscrollcommand'] = scrollInput.set
     textOutput['yscrollcommand'] = scrollOutput.set

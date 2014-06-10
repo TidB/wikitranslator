@@ -3,16 +3,47 @@ from urllib.parse import quote
 import urllib.request
 import xml.etree.ElementTree as ET
 
-import gui
 import sDE
 
 MAX_SIZE = 20000
+
+GUI_METHODS = ("add_displaytitle",
+               "check_quote",
+               "create_sentence_1_cw",
+               "create_sentence_1_set",
+               "create_sentence_community",
+               "create_sentence_promo",
+               "transform_decimal",
+               "transform_link",
+               "translate_categories",
+               "translate_classlinks",
+               "translate_headlines",
+               "translate_item_flags",
+               "translate_levels",
+               "translate_main_seealso",
+               "translate_set_contents",
+               "translate_update_history",
+               "translate_wikilink",
+               "translate_wikipedia_link")
+
+
+GUI_METHODS_NOARGS = ("check_quote",
+                      "transform_decimal",
+                      "transform_link",
+                      "translate_categories",
+                      "translate_headlines",
+                      "translate_item_flags",
+                      "translate_levels",
+                      "translate_main_seealso",
+                      "translate_set_contents",
+                      "translate_wikilink",
+                      "translate_wikipedia_link")
 
 
 def import_category(category):
     category = re.sub("[Cc]ategory:", "", category)
     text = urllib.request.urlopen("http://wiki.teamfortress.com/w/api.php?action=query&list=categorymembers&cmtitle=Category:{}&cmdir=asc&cmlimit=200&format=xml".format(quote(category))).read()
-    text = str(text)
+    text = str(text, "utf-8")
     root = ET.fromstring(text)
     if root.find(".//*cm") is None:
         print("Invalid category name:", category)
@@ -25,7 +56,7 @@ def import_category(category):
             title = i.attrib['title']
             title = title.replace(" ", "_")
             text = urllib.request.urlopen("http://wiki.teamfortress.com/w/api.php?action=query&titles={}&prop=revisions|info&rvprop=content&redirects&format=xml".format(title)).read()
-            text = str(text)
+            text = str(text, "utf-8")
             root = ET.fromstring(text)
             if int(root.find(".//*page").attrib['length']) >= MAX_SIZE:
                 continue
@@ -41,14 +72,17 @@ class Wikitext:
         self.wikiText = wikiText
         self.strings = eval("s" + iso.upper().replace("-", "_"))
         try:
-            self.get_wikitext_type()
-            self.get_itemname()
-            self.get_using_classes()
-            self.create_class_list()
+            self.wikiTextType = self.get_wikitext_type()
+            self.itemName = self.get_itemname()
+            self.classLink, self.classLinkCounter = self.get_using_classes()
+            self.classList = self.create_class_list()
             self.restricted = False
         except:
             print("Couldn't gather all information")
             self.restricted = True
+
+    def __str__(self):
+        print(self.wikiText)
 
     # ================
     # Wikitext options
@@ -71,7 +105,7 @@ class Wikitext:
 
     def lf_t_wl(self, link, sound=False):
         text = urllib.request.urlopen("http://wiki.teamfortress.com/w/api.php?format=xml&action=query&titles={}&prop=info&inprop=displaytitle&redirects".format(quote(link))).read()
-        text = str(text)
+        text = str(text, "utf-8")
         root = ET.fromstring(text)
         if not root.find(".//*[@missing='']") is None:
             print("Invalid page name:", link)
@@ -112,57 +146,62 @@ class Wikitext:
             self.classList = self.strings.SENTENCE_1_CLASSES_ONE.format(self.lf(self.classLink))
         elif self.classLinkCounter > 1:
             classList = self.strings.SENTENCE_1_CLASSES_ONE.format(self.lf(self.classLink[0]))
-            last = self.classLink[-1]
-            for c in self.classLink[1:-2]:
+            for c in self.classLink[1:-1]:
+                print("classLink:", self.classLink)
                 classList = (classList +
-                             ", " +
+                             self.strings.SENTENCE_1_CLASSES_COMMA +
                              self.strings.SENTENCE_1_CLASSES_ONE.format(self.lf(c)))
 
-            self.classList = (classList +
-                              " und " +
-                              self.strings.SENTENCE_1_CLASSES_ONE.format(self.lf(last)))
+            classList = (classList +
+                         self.strings.SENTENCE_1_CLASSES_AND +
+                         self.strings.SENTENCE_1_CLASSES_ONE.format(self.lf(self.classLink[-1])))
+
+            return classList
 
     def get_itemname(self):
         itemName = re.findall("'''.*?'''.*?[is|are].*?a",
                               re.sub("{{[Qq]uotation.*?}}", "", self.wikiText))
-        self.itemName = re.sub(" [is|are].*?a", "", re.sub("'''", "", itemName[0]))
+        itemName = re.sub(" [is|are].*?a", "", itemName[0].replace("'''", ""))
+
+        return itemName
 
     def get_item_promo(self):
-        return bool(re.findall("\{\{avail.*?promo.*?\}\}",
-                               self.wikiText))
+        return bool(re.findall("\{\{avail.*?promo.*?\}\}", self.wikiText))
 
     def get_item_community(self):
-        return bool(re.findall('.*?contributed.*?"*.*"*\.',
-                               self.wikiText))
+        return bool(re.findall('.*?contributed.*?"*.*"*\.', self.wikiText))
 
     def get_using_classes(self):
         classLink = re.findall("used-by +=.*", self.wikiText)
-        self.classLink = re.sub("used-by += +", "", classLink[0])
-        if "all" in self.lf(self.classLink).lower():
-            self.classLinkCounter = -1
-            return
+        classLink = re.sub("used-by += +", "", classLink[0])
+        if "all" in self.lf(classLink).lower():
+            classLinkCounter = -1
+            return classLink, classLinkCounter
         else:
-            self.classLinkCounter = self.classLink.count(",") + 1
+            classLinkCounter = classLink.count(",") + 1
 
-        if self.classLinkCounter > 1:
-            self.classLink = self.classLink.split(", ")
+        if classLinkCounter > 1:
+            classLink = classLink.split(", ")
+
+        return classLink, classLinkCounter
 
     def get_weapon_slot(self):
-        self.slot = re.sub("slot.*?= ", "",
-                           re.findall("slot.*?=.*", self.wikiText)[0])
+        self.slot = re.sub("slot.*?= ", "", re.findall("slot.*?=.*", self.wikiText)[0])
 
     def get_wikitext_type(self):
         if "{{item set infobox" in self.wikiText.lower():
-            self.wikiTextType = "set"
+            wikiTextType = "set"
         elif "{{item infobox" in self.wikiText.lower():
-            self.wikiTextType = re.sub("type.*?= ", "",
-                                       re.findall("type.*?=.*?\n",
-                                                  self.wikiText)[0]).replace("\n", "")
+            wikiTextType = re.sub("type.*?= ", "",
+                                  re.findall("type.*?=.*?\n",
+                                             self.wikiText)[0]).replace("\n", "")
 
-            if self.wikiTextType.lower() == "misc" or self.wikiTextType.lower() == "hat":
-                self.wikiTextType = "cosmetic"
+            if wikiTextType.lower() == "misc" or wikiTextType.lower() == "hat":
+                wikiTextType = "cosmetic"
         else:
-            self.wikiTextType = "none"
+            wikiTextType = "none"
+
+        return wikiTextType
 
     def transform_decimal(self):
         for n in re.findall('[^"]\d+\.\d+[^"]', self.wikiText):
@@ -172,10 +211,10 @@ class Wikitext:
         links = re.findall("\[\[.*?\]\]", self.wikiText)
         for l in links:
             if "/{}".format(self.iso) in l \
-               or "category:" in l.lower() \
-               or "file:" in l.lower() \
-               or "image:" in l.lower() \
-               or "[[w:" in l.lower():
+                    or "category:" in l.lower() \
+                    or "image:" in l.lower() \
+                    or "file:" in l.lower() \
+                    or "[[w:" in l.lower():
                 continue
             self.wikiText = self.wikiText.replace(l, self.lf_to_t(self.lf_ext(l)))
 
@@ -199,11 +238,12 @@ class Wikitext:
             self.wikiText = self.wikiText.replace(self.classLink, linkIso)
 
     def translate_headlines(self):
-        headlines = re.findall("==.*?==", self.wikiText)
+        headlines = re.findall("=+.*?=+", self.wikiText)
         for hl in headlines:
-            hln = re.sub(" *==", "", re.sub("== *", "", hl)).strip()
+            level = int(hl.count("=") / 2)
+            hln = hl.replace("=", "").strip()
             try:
-                hln = self.strings.DICTIONARY_HEADLINES[hln.lower()].join(["== ", " =="])
+                hln = self.strings.DICTIONARY_HEADLINES[hln.lower()].join(["="*level, "="*level])
             except KeyError:
                 print("Unknown key:", hl)
                 continue
@@ -228,7 +268,7 @@ class Wikitext:
 
     def translate_levels(self):
         level = re.findall("Level \d+-?\d*? [A-z ]+", self.wikiText)[0]
-        levelNew = level.replace("Level ", "")
+        levelNew = level[6:]
 
         levelInt = re.findall("\d+-?\d*", levelNew)[0]
         levelKey = re.findall("[A-z ]+", levelNew)[0]
@@ -281,10 +321,10 @@ class Wikitext:
                            re.sub("\[\[[Ww]ikipedia:", "[[w:", self.wikiText))
         for l in links:
             if "/{}".format(self.iso) in l \
-               or "category:" in l.lower() \
-               or "file:" in l.lower() \
-               or "image:" in l.lower() \
-               or "[[w:" in l.lower():
+                    or "category:" in l.lower() \
+                    or "file:" in l.lower() \
+                    or "image:" in l.lower() \
+                    or "[[w:" in l.lower():
                 continue
             ln = self.lf_ext(self.lf(l))
             ln = re.sub("#.*$", "", ln)
@@ -303,7 +343,7 @@ class Wikitext:
             ln = re.sub("#.*$", "", ln)
             ln = ln.replace(" ", "_")
             text = urllib.request.urlopen("http://en.wikipedia.org/w/api.php?format=xml&action=query&titles={}&prop=langlinks&lllimit=400&redirects".format(quote(ln))).read()
-            text = str(text)
+            text = str(text, "utf-8")
             root = ET.fromstring(text)
             if root.find(".//*[@missing='']"):
                 print("Invalid page name: ", l)
@@ -322,8 +362,7 @@ class Wikitext:
     # ==================
 
     def create_sentence_1_cw(self):
-        sentence1 = re.findall(".*?'''" + self.itemName + "'''.*? for .*?\.",
-                               self.wikiText)[0]
+        sentence1 = re.findall(".*?'''" + self.itemName + "'''.*? for .*?\.", self.wikiText)[0]
 
         if self.wikiTextType == "weapon":
             self.strings.SENTENCE_1_WEAPON = eval("self.strings.SENTENCE_1_" +
@@ -340,6 +379,7 @@ class Wikitext:
         if self.get_item_promo():
             promo = eval("self.strings.SENTENCE_1_PROMO_" + self.wikiTextType.upper())
             if self.wikiTextType == "cosmetic" and self.strings == "de":
+                #Special case for German
                 typeLink = ""
         else:
             promo = ""
@@ -380,9 +420,7 @@ class Wikitext:
                 link = self.strings.SENTENCE_COMMUNITY_LINK.format(link)
 
             try:
-                name = re.sub('name \"', '',
-                              re.findall('name.*?\".*?\"',
-                                         sentenceCommunity[0])[0]).replace('"', '')
+                name = re.findall('name.*?\".*?\"', sentenceCommunity[0])[0][6:].replace('"', '')
                 name = self.strings.SENTENCE_COMMUNITY_NAME.format(name)
             except (TypeError, IndexError):
                 name = ""
@@ -394,8 +432,7 @@ class Wikitext:
             return
 
     def create_sentence_promo(self):
-        sentencePromo = re.findall(".*?\[\[Genuine\]\].*?quality.*?\.",
-                                   self.wikiText)
+        sentencePromo = re.findall(".*?\[\[Genuine\]\].*?quality.*?\.", self.wikiText)
         if sentencePromo:
             if "[[Steam]]" in sentencePromo:
                 spt_s = self.strings.SENTENCE_PROMOTIONAL_STEAM
@@ -403,17 +440,12 @@ class Wikitext:
                 spt_s = ""
 
             try:
-                date = re.findall("before .*?,.*?20\d\d", sentencePromo[0])
-                date = re.sub("before ", "", date[0])
-                dateDay = re.sub("[a-z] ", "",
-                                 re.findall("[a-z] \d[\d|,]",
-                                            date)[0]).replace(",", "")
+                date = re.findall("before .*?,.*?20\d\d", sentencePromo[0])[0]
+                date = date.replace("before ", "")
 
-                dateMonth = re.sub(" \d", "",
-                                   re.findall("[A-z].*?\d", date)[0])
-
-                dateYear = re.sub(", ", "",
-                                  re.findall(", \d{4}", date)[0])
+                dateDay = re.findall("\w \d[\d|,]", date)[0][2:].replace(",", "")
+                dateMonth = re.findall("[A-z].*?\d", date)[0][:-2]
+                dateYear = re.findall(", \d{4}", date)[0][2:]
 
                 dateFMT = "{{{{Date fmt|{}|{}|{}}}}}".format(dateMonth, dateDay, dateYear)
                 spt_d = self.strings.SENTENCE_PROMOTIONAL_DATE.format(dateFMT)
@@ -423,7 +455,7 @@ class Wikitext:
                 game = re.findall("\[?\[?''.*?\]?\]?''", sentencePromo[0])[0]
                 game = self.lf(game.replace("''", ""))
             except IndexError:
-                print("No game")
+                print("No game. Canceling promo sentence translation.")
                 return
 
             spt = self.strings.SENTENCE_PROMOTIONAL.format(self.itemName, game, spt_s, spt_d)
@@ -439,7 +471,7 @@ class Wikitext:
     def translate(self):
         for method in self.methods:
             print("Method: ", method)
-            if self.restricted and method not in gui.GUI_METHODS_NOARGS:
+            if self.restricted and method not in GUI_METHODS_NOARGS:
                 continue
 
             eval("self."+method+"()")

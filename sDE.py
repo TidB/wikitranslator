@@ -18,6 +18,8 @@ SENTENCE_1_SET = "[[Item sets/de|Gegenstandsset]]"
 SENTENCE_1_CLASSES_ALL = "alle [[Classes/de|Klassen]]"
 SENTENCE_1_CLASSES_ONE = "den [[{0}/de|{0}]]"
 SENTENCE_1_CLASSES_MORE = " und den [[{0}/de|{0}]]."
+SENTENCE_1_CLASSES_AND = " und "
+SENTENCE_1_CLASSES_COMMA = ", "
 
 SENTENCE_COMMUNITY = "(ARTIKEL) {{{{item name|{0}}}}} wurde im Steam Workshop{1} {2}."
 SENTENCE_COMMUNITY_LINK = "[{0} veröffentlicht]"
@@ -40,8 +42,8 @@ SENTENCE_1_MELEE = "[[Weapon/de#{0}melee|Nahkampfwaffe]]"
 DICTIONARY_FLAGS = {
     "not usable in crafting" : "Nicht zum Herstellen verwendbar",
     "not tradable" : "Nicht handelbar",
-    "not tradable or usable in crafting" : "Nicht handelbar oder zum Herstellen verwendbar",
-    }
+    "not tradable or usable in crafting" : "Nicht handelbar oder zum Herstellen verwendbar"
+}
 
 #ATTRIBUTES
 DICTIONARY_ATTS = {
@@ -50,8 +52,8 @@ DICTIONARY_ATTS = {
     "holiday restriction: winter" : "Feiertagsbeschränkung: Winter",
     "holiday restriction: halloween" : "Feiertagsbeschränkung: Halloween",
     "holiday restriction: halloween / full moon" : "Feiertagsbeschränkung: Halloween / Vollmond",
-    "holiday restriction: halloween / full moon / valentine's day" : "Feiertagsbeschränkung: Halloween / Vollmond / Valentinstag",
-    }
+    "holiday restriction: halloween / full moon / valentine's day" : "Feiertagsbeschränkung: Halloween / Vollmond / Valentinstag"
+}
 
 #HEADLINES
 DICTIONARY_HEADLINES = {
@@ -72,8 +74,8 @@ DICTIONARY_HEADLINES = {
     "styles" : "Stile",
     "trivia" : "Sonstiges",
     "unused content" : "Ungenutzter Inhalt",
-    "update history" : "Update-Verlauf",
-    }
+    "update history" : "Update-Verlauf"
+}
 
 #ITEM LEVELS
 DICTIONARY_LEVEL_C = {
@@ -177,5 +179,5 @@ DICTIONARY_LEVEL_C = {
     'Undead Pet' : 'Untotes Haustier',
     'Uniform' : 'Uniform',
     "Veteran's Beret" : 'Veteranenbarett',
-    'Wings' : 'Flügel',
-    }
+    'Wings' : 'Flügel'
+}

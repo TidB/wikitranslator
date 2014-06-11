@@ -74,7 +74,7 @@ class Wikitext:
         try:
             self.wikiTextType = self.get_wikitext_type()
             self.itemName = self.get_itemname()
-            self.classLink, self.classLinkCounter = self.get_using_classes()
+            self.classLink = self.get_using_classes()
             self.classList = self.create_class_list()
             self.restricted = False
         except:
@@ -140,11 +140,11 @@ class Wikitext:
             self.wikiText = re.sub("\|sound.*?\}\}", qn, self.wikiText)
 
     def create_class_list(self):
-        if self.classLinkCounter == -1 or self.classLinkCounter == 9:
-            self.classList = self.strings.SENTENCE_1_CLASSES_ALL
-        elif self.classLinkCounter == 1:
-            self.classList = self.strings.SENTENCE_1_CLASSES_ONE.format(self.lf(self.classLink))
-        elif self.classLinkCounter > 1:
+        if "all" in self.classLink[0].lower():
+            return self.strings.SENTENCE_1_CLASSES_ALL
+        elif len(self.classLink) == 1:
+            return self.strings.SENTENCE_1_CLASSES_ONE.format(self.lf(self.classLink[0]))
+        elif len(self.classLink) > 1:
             classList = self.strings.SENTENCE_1_CLASSES_ONE.format(self.lf(self.classLink[0]))
             for c in self.classLink[1:-1]:
                 print("classLink:", self.classLink)
@@ -175,15 +175,12 @@ class Wikitext:
         classLink = re.findall("used-by +=.*", self.wikiText)
         classLink = re.sub("used-by += +", "", classLink[0])
         if "all" in self.lf(classLink).lower():
-            classLinkCounter = -1
-            return classLink, classLinkCounter
+            return [classLink]
         else:
-            classLinkCounter = classLink.count(",") + 1
-
-        if classLinkCounter > 1:
-            classLink = classLink.split(", ")
-
-        return classLink, classLinkCounter
+            if classLink.count(",")+1 > 1:
+                return classLink.split(", ")
+            else:
+                return [classLink]
 
     def get_weapon_slot(self):
         self.slot = re.sub("slot.*?= ", "", re.findall("slot.*?=.*", self.wikiText)[0])
@@ -226,16 +223,13 @@ class Wikitext:
             self.wikiText = self.wikiText.replace(c, cn)
 
     def translate_classlinks(self):
-        if type(self.classLink) is list:
+        if "all" in self.classLink[0].lower():
+            linkIso = self.strings.ALLCLASSESBOX.format(self.iso)
+            self.wikiText = self.wikiText.replace(self.classLink[0], linkIso)
+        elif len(self.classLink) >= 1:
             for link in self.classLink:
                 linkIso = link.replace("]]", "/{}|{}]]".format(self.iso, self.lf_ext(self.lf(link))))
                 self.wikiText = self.wikiText.replace(link, linkIso)
-        elif type(self.classLink) is str:
-            if "all" in self.classLink.lower():
-                linkIso = self.strings.ALLCLASSESBOX.format(self.iso)
-            else:
-                linkIso = self.classLink.replace("]]", "/{}|{}]]".format(self.iso, self.lf(self.classLink)))
-            self.wikiText = self.wikiText.replace(self.classLink, linkIso)
 
     def translate_headlines(self):
         headlines = re.findall("=+.*?=+", self.wikiText)

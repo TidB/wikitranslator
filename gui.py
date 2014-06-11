@@ -10,7 +10,7 @@ CONFIG = "config.pkl"
 URL_GITHUB = "https://github.com/TidB/WikiTranslator"
 URL_WIKI = "http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator"
 
-__version__ = "2014-06-07:1"
+__version__ = "2014-06-11:1"
 
 
 class GUI(object):
@@ -297,7 +297,7 @@ class GUI(object):
 
 def _main():
     root = tk.Tk()
-    _gui = GUI(root)
+    _ = GUI(root)
     root.mainloop()
 
 if __name__ == "__main__":

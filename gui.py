@@ -10,7 +10,7 @@ CONFIG = "config.pkl"
 URL_GITHUB = "https://github.com/TidB/WikiTranslator"
 URL_WIKI = "http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator"
 
-__version__ = "2014-06-11:1"
+__version__ = "2014-06-11:2"
 
 
 class GUI(object):
@@ -86,10 +86,9 @@ class GUI(object):
 
     @staticmethod
     def config_exc():
-        file = open(CONFIG, "wb")
-        configFile = ["!", "de", []]
-        pickle.dump(configFile, file)
-        file.close()
+        with open(CONFIG, "wb") as file:
+            configFile = ["!", "de", []]
+            pickle.dump(configFile, file)
         print("Recreating done")
 
     def end(self):
@@ -170,23 +169,17 @@ class GUI(object):
                 return
 
         file_path = tk.filedialog.askopenfilename()
-        try:
-            file = open(file_path, "rb")
-        except:
-            print("Invalid input file")
-            return
-
-        text = "!"
-        while text != "":
-            text = file.readline().decode()
-            self.textInput.insert("end", text)
-        file.close()
+        with open(file_path, "rb") as file:
+            text = "!"
+            while text != "":
+                text = file.readline().decode()
+                self.textInput.insert("end", text)
 
     def save_config(self, index, item):
         try:
             file = open(CONFIG, "rb")
             configFile = pickle.load(file)
-        except:
+        except (FileNotFoundError, TypeError):
             print("configFile couldn't be loaded. Creating...")
             self.config_exc()
             return

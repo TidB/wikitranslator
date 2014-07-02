@@ -1,6 +1,6 @@
 #STANDARD
 ADDEDTOGAME = "* (ARTIKEL) {{{{item name|{0}}}}} wurde dem Spiel hinzugefügt."
-ALLCLASSESBOX = "[[Classes/{0}|Allen Klassen]]"
+ALLCLASSESBOX = "[[Classes/de|Allen Klassen]]"
 DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{0}}}}}}}}}"
 ITEMLOOK = " Es handelt sich dabei um"
 LEVEL = "{0} Level {1}"
@@ -53,6 +53,11 @@ DICTIONARY_ATTS = {
     "holiday restriction: halloween" : "Feiertagsbeschränkung: Halloween",
     "holiday restriction: halloween / full moon" : "Feiertagsbeschränkung: Halloween / Vollmond",
     "holiday restriction: halloween / full moon / valentine's day" : "Feiertagsbeschränkung: Halloween / Vollmond / Valentinstag"
+}
+
+#CLASSES
+DICTIONARY_CLASSES = {
+
 }
 
 #HEADLINES

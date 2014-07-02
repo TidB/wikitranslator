@@ -16,14 +16,14 @@ SENTENCE_1_PROMO_WEAPON = "[[Promotional items/fi|kampanjallinen]]"
 SENTENCE_1_COSMETIC = "[[Cosmetic items/fi|kosmeettinen esine]]"
 SENTENCE_1_SET = "[[Item sets/fi|esinesarja]]"
 SENTENCE_1_CLASSES_ALL = "kaikille [[Classes/fi|luokille]]"
-SENTENCE_1_CLASSES_ONE = "[[{}]]lle"
-SENTENCE_1_CLASSES_MORE = " ja [[{}]]lle."
+SENTENCE_1_CLASSES_ONE = "[[{}]]"
+SENTENCE_1_CLASSES_MORE = " ja [[{}]]."
 SENTENCE_1_CLASSES_AND = ", "
 SENTENCE_1_CLASSES_COMMA = " ja "
 
-SENTENCE_COMMUNITY = "{{{{item name|{}}}}} {} [[Steam Workshop/fi|Steam Workshopiin]]{}."
+SENTENCE_COMMUNITY = "{{{{item name|{0}}}}} {2}{1} [[Steam Workshop/fi|Steam Workshopiin]]."
 SENTENCE_COMMUNITY_LINK = "[{} lähetettiin]"
-SENTENCE_COMMUNITY_NAME = " nimellä "
+SENTENCE_COMMUNITY_NAME = " nimellä {}"
 
 SENTENCE_PROMOTIONAL = "{{{{item name|{}}}}} myönnetään [[Genuine/fi|Aitona]] pelaajille, jotka tilaavat pelin {}{}{}."
 SENTENCE_PROMOTIONAL_STEAM = " [[Steam/fi|Steamista]]"
@@ -54,6 +54,20 @@ DICTIONARY_ATTS = {
     "holiday restriction: halloween / full moon" : "",
     "holiday restriction: halloween / full moon / valentine's day" : "",
     }
+
+
+#CLASSES
+DICTIONARY_CLASSES = {
+    "Scout" : "Scoutille",
+    "Soldier" : "Soldierille",
+    "Pyro" : "Pyrolle",
+    "Demoman" : "Demomanille",
+    "Heavy" : "Heavylle",
+    "Engineer" : "Engineerille",
+    "Medic" : "Medicille",
+    "Sniper" : "Sniperille",
+    "Spyr" : "Spylle",
+}
 
 #HEADLINES
 DICTIONARY_HEADLINES = {
@@ -180,3 +194,4 @@ DICTIONARY_LEVEL_C = {
     "Veteran's Beret" : "",
     'Wings' : "",
 }
+

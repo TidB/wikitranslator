@@ -4,6 +4,8 @@ import urllib.request
 import xml.etree.ElementTree as ET
 
 import sDE
+import sFI
+import sPT_BR
 
 MAX_SIZE = 20000
 
@@ -63,7 +65,6 @@ def lf_w(link):
 def lf_t_wl(link, sound=False):
     root = get_wiki_root("http://wiki.teamfortress.com/w/api.php?format=xml&action=query&titles={}&prop=info&inprop=displaytitle&redirects".format(quote(link)))
     if not root.find(".//*[@missing='']") is None:
-        print("Invalid page name:", link)
         return link, link, False
 
     if sound:
@@ -90,8 +91,7 @@ class Wikitext:
             self.classLink = self.get_using_classes()
             self.classList = self.create_class_list()
             self.restricted = False
-        except Exception as e:
-            print("Couldn't gather all information:", e)
+        except Exception:
             self.restricted = True
 
     def __str__(self):
@@ -110,7 +110,6 @@ class Wikitext:
             file = file[0].replace("|sound=", "").replace(".wav", "").replace("}", "")
             filen = "File:{} {}.wav".format(file, self.language)
             if not lf_t_wl(filen, True)[2]:
-                print("No localized file for", filen)
                 qn = "|sound={}|en-sound=yes}}}}".format(file+".wav")
             else:
                 qn = "|sound={}}}}}".format(filen)
@@ -118,21 +117,28 @@ class Wikitext:
             self.wikiText = re.sub("\|sound.*?\}\}", qn, self.wikiText)
 
     def create_class_list(self):
+        if self.strings.DICTIONARY_CLASSES:
+            linktranslated = self.strings.DICTIONARY_CLASSES[lf_ext(lf(self.classLink[0]))]
+        else:
+            linktranslated = lf_ext(lf(self.classLink[0]))
         if "all" in self.classLink[0].lower():
             return self.strings.SENTENCE_1_CLASSES_ALL
         elif len(self.classLink) == 1:
-            return self.strings.SENTENCE_1_CLASSES_ONE.format(lf(self.classLink[0]))
+            return self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated)
         elif len(self.classLink) > 1:
-            classes = self.strings.SENTENCE_1_CLASSES_ONE.format(lf(self.classLink[0]))
+            classes = self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated)
             for c in self.classLink[1:-1]:
-                print("classLink:", self.classLink)
+                if self.strings.DICTIONARY_CLASSES:
+                    linktranslated = self.strings.DICTIONARY_CLASSES[lf_ext(lf(c))]
+                else:
+                    linktranslated = lf_ext(lf(c))
                 classes = (classes +
                            self.strings.SENTENCE_1_CLASSES_COMMA +
-                           self.strings.SENTENCE_1_CLASSES_ONE.format(lf(c)))
+                           self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated))
 
             classes = (classes +
                        self.strings.SENTENCE_1_CLASSES_AND +
-                       self.strings.SENTENCE_1_CLASSES_ONE.format(lf(self.classLink[-1])))
+                       self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated))
 
             return classes
 
@@ -217,7 +223,6 @@ class Wikitext:
             try:
                 hln = self.strings.DICTIONARY_HEADLINES[hln.lower()].join(["="*level, "="*level])
             except KeyError:
-                print("Unknown key:", hl)
                 continue
             self.wikiText = self.wikiText.replace(hl, hln)
 
@@ -246,7 +251,6 @@ class Wikitext:
         try:
             levelkeyn = self.strings.DICTIONARY_LEVEL_C[levelkey.strip()]
         except KeyError:
-            print("Unknown key:", levelkey)
             levelkeyn = levelkey.strip()
 
         levelnew = self.strings.LEVEL.format(levelkeyn, levelint)
@@ -313,12 +317,10 @@ class Wikitext:
             ln = ln.replace(" ", "_")
             root = get_wiki_root("http://en.wikipedia.org/w/api.php?format=xml&action=query&titles={}&prop=langlinks&lllimit=400&redirects".format(quote(ln)))
             if root.find(".//*[@missing='']"):
-                print("Invalid page name: ", l)
                 continue
 
             t = root.find(".//*[@lang='{}']".format(self.language))
             if t is None:
-                print("No /{} article for {} => {}".format(self.language, l, ln))
                 continue
 
             tn = "[[w:{0}:{1}|{1}]]".format(self.language, t.text)
@@ -416,8 +418,7 @@ class Wikitext:
 
                 datefmt = "{{{{Date fmt|{}|{}|{}}}}}".format(datemonth, dateday, dateyear)
                 spt_d = self.strings.SENTENCE_PROMOTIONAL_DATE.format(datefmt)
-            except Exception as e:
-                print(e)
+            except Exception:
                 spt_d = ""
             try:
                 game = re.findall("\[?\[?''.*?\]?\]?''", sentencepromo[0])[0]

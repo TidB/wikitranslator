@@ -11,18 +11,35 @@ CONFIG = "config.pkl"
 URL_GITHUB = "https://github.com/TidB/WikiTranslator"
 URL_WIKI = "http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator"
 
-__version__ = "2014-06-11:2"
+GUI_METHODS = ("add_displaytitle",
+               "check_quote",
+               "create_sentence_1_cw",
+               "create_sentence_1_set",
+               "create_sentence_community",
+               "create_sentence_promo",
+               "transform_decimal",
+               "transform_link",
+               "translate_categories",
+               "translate_classlinks",
+               "translate_headlines",
+               "translate_item_flags",
+               "translate_levels",
+               "translate_main_seealso",
+               "translate_set_contents",
+               "translate_update_history",
+               "translate_wikilink",
+               "translate_wikipedia_link")
+
+__version__ = "2014-07-02:1"
 
 
 class GUI(object):
 
     def __init__(self, parent):
-        print("Running")
         self.parent = parent
         self.open_config(0)
         self.filePath = "autosave.txt"
         self.presetsSaved = self.open_config(2)[::2]
-        print("presetsSaved: ", self.presetsSaved)
 
         self.parent.title("WikiTranslator v2 | {}".format(__version__))
         self.parent.protocol('WM_DELETE_WINDOW', self.end)
@@ -48,13 +65,13 @@ class GUI(object):
         self.scrollOutput = ttk.Scrollbar(self.mainframe, orient="vertical", command=self.textOutput.yview)
         self.comboboxPreset = ttk.Combobox(self.mainframe, values=self.presetsSaved, exportselection=0)
         self.listboxMethods = tk.Listbox(self.mainframe,
-                                         listvariable=tk.StringVar(value=core.GUI_METHODS),
+                                         listvariable=tk.StringVar(value=GUI_METHODS),
                                          selectmode="multiple",
                                          exportselection=0)
         self.buttonSavePreset = ttk.Button(self.mainframe, text="Save preset",
                                            command=lambda: self.save_config(2,
                                                                             (self.comboboxPreset.get(),
-                                                                             [core.GUI_METHODS[i] for i in self.listboxMethods.curselection()])))
+                                                                             [GUI_METHODS[i] for i in self.listboxMethods.curselection()])))
         self.buttonClear = ttk.Button(self.mainframe, text="Clear selection",
                                       command=lambda: self.listboxMethods.selection_clear(0, "end"))
         self.buttonTranslate = ttk.Button(self.mainframe, text="Translate", command=self.translate, width=30)
@@ -90,7 +107,6 @@ class GUI(object):
         with open(CONFIG, "wb") as file:
             configfile = ["!", "de", []]
             pickle.dump(configfile, file)
-        print("Recreating done")
 
     def end(self):
         if self.textOutput.get("1.0", "end") != "":
@@ -157,8 +173,8 @@ class GUI(object):
             l = pickle.load(f)[index]
             return l
 
-        print("Reading configFile failed. Recreating...")
         config_exc()
+        raise FileNotFoundError("Reading configFile failed. Recreating...")
 
     def open_file(self):
         if self.textInput.get("1.0", "end").strip() != "":
@@ -182,9 +198,8 @@ class GUI(object):
             file = open(CONFIG, "rb")
             configfile = pickle.load(file)
         except (FileNotFoundError, TypeError):
-            print("configFile couldn't be loaded. Creating...")
             self.config_exc()
-            return
+            raise ValueError("configFile couldn't be loaded. Creating...")
 
         try:
             if index in [0, 1]:
@@ -193,9 +208,8 @@ class GUI(object):
                 configfile[2].append(item[0])
                 configfile[2].extend(item[1:])
         except IndexError:
-            print("Invalid configFile. Recreating...")
             self.config_exc()
-            return
+            raise IndexError("Invalid configfile. Recreating...")
 
         with open(CONFIG, "wb") as file:
             pickle.dump(configfile, file)
@@ -246,7 +260,6 @@ class GUI(object):
         buttonclose.grid(column=0, row=4, columnspan=2)
 
     def translate(self):
-        print("Translation started")
         if self.textOutput.get("1.0", "end").strip() != "":
             overwrite = tk.messagebox.askyesno(
                 message="There is text left in the output box! Do you want to overwrite the text?",
@@ -264,7 +277,7 @@ class GUI(object):
             wikitexts = wikitext.split("\n!\n")
             wikitextstrans = []
 
-        methods = [core.GUI_METHODS[int(i)] for i in self.listboxMethods.curselection()]
+        methods = [GUI_METHODS[int(i)] for i in self.listboxMethods.curselection()]
         iso = self.open_config(1)
 
         for wtr in wikitexts:
@@ -283,11 +296,11 @@ class GUI(object):
         try:
             i = l.index(presetname)
         except ValueError:
-            print("Invalid preset name")
-            return
+            raise ValueError("Invalid preset name")
+
         self.listboxMethods.selection_clear(0, "end")
         for item in l[i+1]:
-            self.listboxMethods.selection_set(core.GUI_METHODS.index(item))
+            self.listboxMethods.selection_set(GUI_METHODS.index(item))
 
 
 def _main():

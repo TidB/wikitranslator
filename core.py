@@ -7,26 +7,6 @@ import sDE
 
 MAX_SIZE = 20000
 
-GUI_METHODS = ("add_displaytitle",
-               "check_quote",
-               "create_sentence_1_cw",
-               "create_sentence_1_set",
-               "create_sentence_community",
-               "create_sentence_promo",
-               "transform_decimal",
-               "transform_link",
-               "translate_categories",
-               "translate_classlinks",
-               "translate_headlines",
-               "translate_item_flags",
-               "translate_levels",
-               "translate_main_seealso",
-               "translate_set_contents",
-               "translate_update_history",
-               "translate_wikilink",
-               "translate_wikipedia_link")
-
-
 GUI_METHODS_NOARGS = ("check_quote",
                       "transform_decimal",
                       "transform_link",
@@ -110,8 +90,8 @@ class Wikitext:
             self.classLink = self.get_using_classes()
             self.classList = self.create_class_list()
             self.restricted = False
-        except:
-            print("Couldn't gather all information")
+        except Exception as e:
+            print("Couldn't gather all information:", e)
             self.restricted = True
 
     def __str__(self):
@@ -125,7 +105,6 @@ class Wikitext:
         for q in quotes:
             file = re.findall("\|sound=.*\}\}", q)
             if not file:
-                print(q, "is not sound-enabled")
                 continue
 
             file = file[0].replace("|sound=", "").replace(".wav", "").replace("}", "")
@@ -158,9 +137,9 @@ class Wikitext:
             return classes
 
     def get_itemname(self):
-        itemname = re.findall("'''.*?'''.*?[is|are].*?a",
-                              re.sub("{{[Qq]uotation.*?}}", "", self.wikiText))
-        itemname = re.sub(" [is|are].*?a", "", itemname[0].replace("'''", ""))
+        itemname = re.search("'''.*?'''.*?(is|are).*?(a|an)",
+                             re.sub("{{[Qq]uotation.*?}}", "", self.wikiText)).group()
+        itemname = re.sub(" [is|are].*?a", "", itemname.replace("'''", ""))
 
         return itemname
 
@@ -289,7 +268,7 @@ class Wikitext:
             self.wikiText = self.wikiText.replace(t, tn)
 
     def translate_set_contents(self):
-        match = re.search("(The|This) set (contains|includes) the following items:", self.wikiText).group()
+        match = re.search("(The|This)( set)?( contains| includes)?( the)?( following)? items.*?:", self.wikiText).group()
         self.wikiText = re.sub(match,
                                self.strings.SENTENCE_SET_INCLUDES,
                                self.wikiText)
@@ -308,8 +287,7 @@ class Wikitext:
     # ===================
 
     def translate_wikilink(self):
-        links = re.findall("\[\[.*?\]\]",
-                           re.sub("\[\[[Ww]ikipedia:", "[[w:", self.wikiText))
+        links = re.findall("\[\[.*?\]\]", re.sub("\[\[[Ww]ikipedia:", "[[w:", self.wikiText))
         for l in links:
             if "/{}".format(self.language) in l \
                     or "category:" in l.lower() \
@@ -392,10 +370,9 @@ class Wikitext:
                                                               self.strings.SENTENCE_1_SET,
                                                               self.classList)
 
-        sentence1_2 = re.findall(" It was .*?added to the game.*?\.", self.wikiText)[0]
+        sentence1_2 = re.findall("\. It was .*?\.", self.wikiText)[0][1:]
         patch = lf(re.findall("\[\[.*?\]\]", sentence1_2)[0])
         sentence1_2trans = self.strings.SENTENCE_SET.format(patch)
-
         self.wikiText = self.wikiText.replace(sentence1_1 + sentence1_2,
                                               sentence1_1trans + sentence1_2trans)
 
@@ -439,14 +416,14 @@ class Wikitext:
 
                 datefmt = "{{{{Date fmt|{}|{}|{}}}}}".format(datemonth, dateday, dateyear)
                 spt_d = self.strings.SENTENCE_PROMOTIONAL_DATE.format(datefmt)
-            except:
+            except Exception as e:
+                print(e)
                 spt_d = ""
             try:
                 game = re.findall("\[?\[?''.*?\]?\]?''", sentencepromo[0])[0]
                 game = lf(game.replace("''", ""))
             except IndexError:
-                print("No game. Canceling promo sentence translation.")
-                return
+                raise UserWarning("No game. Canceling promo sentence translation.")
 
             spt = self.strings.SENTENCE_PROMOTIONAL.format(self.itemName, game, spt_s, spt_d)
 
@@ -460,7 +437,6 @@ class Wikitext:
 
     def translate(self):
         for method in self.methods:
-            print("Method: ", method)
             if self.restricted and method not in GUI_METHODS_NOARGS:
                 continue
 

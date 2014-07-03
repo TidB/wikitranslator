@@ -5,9 +5,10 @@ import xml.etree.ElementTree as ET
 
 import sDE
 import sFI
+import sKO
 import sPT_BR
 
-MAX_SIZE = 20000
+MAX_SIZE = 10000
 
 GUI_METHODS_NOARGS = ("check_quote",
                       "transform_decimal",
@@ -117,30 +118,31 @@ class Wikitext:
             self.wikiText = re.sub("\|sound.*?\}\}", qn, self.wikiText)
 
     def create_class_list(self):
-        if self.strings.DICTIONARY_CLASSES:
-            linktranslated = self.strings.DICTIONARY_CLASSES[lf_ext(lf(self.classLink[0]))]
-        else:
-            linktranslated = lf_ext(lf(self.classLink[0]))
         if "all" in self.classLink[0].lower():
             return self.strings.SENTENCE_1_CLASSES_ALL
-        elif len(self.classLink) == 1:
-            return self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated)
-        elif len(self.classLink) > 1:
-            classes = self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated)
-            for c in self.classLink[1:-1]:
-                if self.strings.DICTIONARY_CLASSES:
-                    linktranslated = self.strings.DICTIONARY_CLASSES[lf_ext(lf(c))]
-                else:
-                    linktranslated = lf_ext(lf(c))
+        else:
+            if self.strings.DICTIONARY_CLASSES:
+                linktranslated = self.strings.DICTIONARY_CLASSES[lf_ext(lf(self.classLink[0]))]
+            else:
+                linktranslated = lf_ext(lf(self.classLink[0]))
+            if len(self.classLink) == 1:
+                return self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated)
+            elif len(self.classLink) > 1:
+                classes = self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated)
+                for c in self.classLink[1:-1]:
+                    if self.strings.DICTIONARY_CLASSES:
+                        linktranslated = self.strings.DICTIONARY_CLASSES[lf_ext(lf(c))]
+                    else:
+                        linktranslated = lf_ext(lf(c))
+                    classes = (classes +
+                               self.strings.SENTENCE_1_CLASSES_COMMA +
+                               self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated))
+
                 classes = (classes +
-                           self.strings.SENTENCE_1_CLASSES_COMMA +
+                           self.strings.SENTENCE_1_CLASSES_AND +
                            self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated))
 
-            classes = (classes +
-                       self.strings.SENTENCE_1_CLASSES_AND +
-                       self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated))
-
-            return classes
+                return classes
 
     def get_itemname(self):
         itemname = re.search("'''.*?'''.*?(is|are).*?(a|an)",
@@ -253,7 +255,7 @@ class Wikitext:
         except KeyError:
             levelkeyn = levelkey.strip()
 
-        levelnew = self.strings.LEVEL.format(levelkeyn, levelint)
+        levelnew = self.strings.LEVEL.format(levelint, levelkeyn)
         self.wikiText = self.wikiText.replace(level, levelnew)
 
     def translate_main_seealso(self):
@@ -344,7 +346,6 @@ class Wikitext:
             com = eval("self.strings.SENTENCE_1_COMMUNITY_" + self.wikiTextType.upper())
         else:
             com = ""
-
         typelink = eval("self.strings.SENTENCE_1_" + self.wikiTextType.upper())
         if self.get_item_promo():
             promo = eval("self.strings.SENTENCE_1_PROMO_" + self.wikiTextType.upper())
@@ -395,7 +396,6 @@ class Wikitext:
                 name = ""
 
             sct = self.strings.SENTENCE_COMMUNITY.format(self.itemName, name, link)
-
             self.wikiText = self.wikiText.replace(sentencecommunity[0], sct)
         else:
             return

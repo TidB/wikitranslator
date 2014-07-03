@@ -1,6 +1,6 @@
 #STANDARD
 ADDEDTOGAME = "{{{{item name|{}}}}} lisättiin peliin."
-ALLCLASSEBOX = "[[Classes/{}|Kaikki luokat]]"
+ALLCLASSESBOX = "[[Classes/{}|Kaikki luokat]]"
 DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{}}}}}}}}}"
 ITEMLOOK = " Se on"
 LEVEL = "Tason {} {}"
@@ -23,7 +23,7 @@ SENTENCE_1_CLASSES_COMMA = " ja "
 
 SENTENCE_COMMUNITY = "{{{{item name|{0}}}}} {2}{1} [[Steam Workshop/fi|Steam Workshopiin]]."
 SENTENCE_COMMUNITY_LINK = "[{} lähetettiin]"
-SENTENCE_COMMUNITY_NAME = " nimellä {}"
+SENTENCE_COMMUNITY_NAME = " nimellä \"{}\""
 
 SENTENCE_PROMOTIONAL = "{{{{item name|{}}}}} myönnetään [[Genuine/fi|Aitona]] pelaajille, jotka tilaavat pelin {}{}{}."
 SENTENCE_PROMOTIONAL_STEAM = " [[Steam/fi|Steamista]]"
@@ -130,7 +130,7 @@ DICTIONARY_LEVEL_C = {
     'Facial Hair' : "",
     'Flair!' : "",
     'Flip-Flops' : "",
-    'Fueltank' : "",
+    'Fuel Tank' : "",
     'Func_Medal' : "",
     'Futuristic Sound Device' : "",
     'Ghost' : "",

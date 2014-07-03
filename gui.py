@@ -30,7 +30,7 @@ GUI_METHODS = ("add_displaytitle",
                "translate_wikilink",
                "translate_wikipedia_link")
 
-__version__ = "2014-07-02:1"
+__version__ = "2014-07-03:1"
 
 
 class GUI(object):

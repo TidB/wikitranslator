@@ -3,7 +3,7 @@ ADDEDTOGAME = "* (ARTIKEL) {{{{item name|{0}}}}} wurde dem Spiel hinzugefügt."
 ALLCLASSESBOX = "[[Classes/de|Allen Klassen]]"
 DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{0}}}}}}}}}"
 ITEMLOOK = " Es handelt sich dabei um"
-LEVEL = "{0} Level {1}"
+LEVEL = "{1} Level {0}"
 NOUNMARKER_INDEFINITE_COSMETIC = "ein"
 NOUNMARKER_INDEFINITE_SET = "ein"
 NOUNMARKER_INDEFINITE_WEAPON = "eine"
@@ -122,7 +122,7 @@ DICTIONARY_LEVEL_C = {
     'Facial Hair' : 'Gesichtbehaarung',
     'Flair!' : 'Flair!',
     'Flip-Flops' : 'Flip-Flops',
-    'Fueltank' : 'Treibstofftank',
+    'Fuel Tank' : 'Treibstofftank',
     'Func_Medal' : 'Func_Medal',
     'Futuristic Sound Device' : 'Futuristisches Tongerät',
     'Ghost' : 'Geist',

@@ -1,6 +1,6 @@
 #STANDARD
 ADDEDTOGAME = "{{{{item name|{0}}}}}이/가 게임에 추가되었습니다."
-ALLCLASSEBOX = "[[Classes/{0}|모든 클래스]]"
+ALLCLASSESBOX = "[[Classes/{0}|모든 클래스]]"
 DISPLAYTITLE = "[[{{DISPLAYTITLE: {{{{item name|{0}}}}}}}"
 ITEMLOOK = "이 아이템은"
 LEVEL = "레벨 {0} {1}"
@@ -53,6 +53,19 @@ DICTIONARY_ATTS = {
     "holiday restriction: halloween" : "축제일 제한: 핼러윈",
     "holiday restriction: halloween / full moon" : "축제일 제한: 핼러윈 / 보름달",
     "holiday restriction: halloween / full moon / valentine's day" : "축제일 제한: 핼러윈 / 보름달 / 밸런타인 데이",
+}
+
+#CLASSES
+DICTIONARY_CLASSES = {
+    "Scout" : "스카웃",
+    "Soldier" : "솔저",
+    "Pyro" : "파이로",
+    "Demoman" : "데모맨",
+    "Heavy" : "헤비",
+    "Engineer" : "엔지니어",
+    "Medic" : "메딕",
+    "Sniper" : "스나이퍼",
+    "Spy" : "스파이",
 }
 
 #HEADLINES

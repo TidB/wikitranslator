@@ -1,6 +1,6 @@
 #STANDARD
 ADDEDTOGAME = "* (ARTIGO) {{{{item name|{0}}}}} foi adicionado ao jogo."
-ALLCLASSEBOX = "[[Classes/{0}|Todas as classes]]"
+ALLCLASSESBOX = "[[Classes/{0}|Todas as classes]]"
 DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{0}}}}}}}}}"
 ITEMLOOK = ""
 LEVEL = "{0} nível {1}"

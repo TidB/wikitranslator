@@ -1,14 +1,14 @@
 #STANDARD
-ADDEDTOGAME = "{{{{item name|{}}}}} lisättiin peliin."
-ALLCLASSESBOX = "[[Classes/{}|Kaikki luokat]]"
-DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{}}}}}}}}}"
+ADDEDTOGAME = "{{{{item name|{0}}}}} lisättiin peliin."
+ALLCLASSESBOX = "[[Classes/{0}|Kaikki luokat]]"
+DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{0}}}}}}}}}"
 ITEMLOOK = " Se on"
-LEVEL = "Tason {} {}"
+LEVEL = "Tason {1} {0}"
 NOUNMARKER_INDEFINITE_COSMETIC = ""
 NOUNMARKER_INDEFINITE_SET = ""
 NOUNMARKER_INDEFINITE_WEAPON = ""
 
-SENTENCE_1_ALL = "'''{{{{item name|{}}}}}''' on {}{}{} {} for {}."
+SENTENCE_1_ALL = "'''{{{{item name|{0}}}}}''' on {1}{2}{3} {4} for {5}."
 SENTENCE_1_COMMUNITY_COSMETIC = "[[Steam Workshop/fi|yhteisön luoma]]"
 SENTENCE_1_COMMUNITY_WEAPON = "[[Steam Workshop/fi|yhteisön luoma]]"
 SENTENCE_1_PROMO_COSMETIC = "[[Promotional items/fi|kampanjallinen]]"
@@ -16,21 +16,21 @@ SENTENCE_1_PROMO_WEAPON = "[[Promotional items/fi|kampanjallinen]]"
 SENTENCE_1_COSMETIC = "[[Cosmetic items/fi|kosmeettinen esine]]"
 SENTENCE_1_SET = "[[Item sets/fi|esinesarja]]"
 SENTENCE_1_CLASSES_ALL = "kaikille [[Classes/fi|luokille]]"
-SENTENCE_1_CLASSES_ONE = "[[{}]]"
-SENTENCE_1_CLASSES_MORE = " ja [[{}]]."
+SENTENCE_1_CLASSES_ONE = "[[{0}]]"
+SENTENCE_1_CLASSES_MORE = " ja [[{0}]]."
 SENTENCE_1_CLASSES_AND = ", "
 SENTENCE_1_CLASSES_COMMA = " ja "
 
 SENTENCE_COMMUNITY = "{{{{item name|{0}}}}} {2}{1} [[Steam Workshop/fi|Steam Workshopiin]]."
 SENTENCE_COMMUNITY_LINK = "[{} lähetettiin]"
-SENTENCE_COMMUNITY_NAME = " nimellä \"{}\""
+SENTENCE_COMMUNITY_NAME = " nimellä \"{0}\""
 
-SENTENCE_PROMOTIONAL = "{{{{item name|{}}}}} myönnetään [[Genuine/fi|Aitona]] pelaajille, jotka tilaavat pelin {}{}{}."
+SENTENCE_PROMOTIONAL = "{{{{item name|{0}}}}} myönnetään [[Genuine/fi|Aitona]] pelaajille, jotka tilaavat pelin {1}{2}{3}."
 SENTENCE_PROMOTIONAL_STEAM = " [[Steam/fi|Steamista]]"
-SENTENCE_PROMOTIONAL_DATE = " ennen {}>"
+SENTENCE_PROMOTIONAL_DATE = " ennen {0}"
 
 SENTENCE_SET = ""
-SENTENCE_SET_INCLUDES = "Das Set enthält die folgenden Gegenstände:"
+SENTENCE_SET_INCLUDES = ""
 
 SENTENCE_THUMBNAIL = ""
 
@@ -43,7 +43,7 @@ DICTIONARY_FLAGS = {
     "not usable in crafting" : "",
     "not tradable" : "",
     "not tradable or usable in crafting" : "",
-    }
+}
 
 #ATTRIBUTES
 DICTIONARY_ATTS = {
@@ -53,8 +53,7 @@ DICTIONARY_ATTS = {
     "holiday restriction: halloween" : "",
     "holiday restriction: halloween / full moon" : "",
     "holiday restriction: halloween / full moon / valentine's day" : "",
-    }
-
+}
 
 #CLASSES
 DICTIONARY_CLASSES = {
@@ -88,7 +87,7 @@ DICTIONARY_HEADLINES = {
     'trivia' : "",
     'unused content' : "",
     'update history' : "",
-    }
+}
 
 #ITEM LEVELS
 DICTIONARY_LEVEL_C = {

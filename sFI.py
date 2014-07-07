@@ -21,11 +21,11 @@ SENTENCE_1_CLASSES_MORE = " ja [[{0}]]."
 SENTENCE_1_CLASSES_AND = ", "
 SENTENCE_1_CLASSES_COMMA = " ja "
 
-SENTENCE_COMMUNITY = "{{{{item name|{0}}}}} {2}{1} [[Steam Workshop/fi|Steam Workshopiin]]."
+SENTENCE_COMMUNITY = "{{{{item name|{0}}}}} {2} [[Steam Workshop/fi|Steam Workshopiin]]{1}."
 SENTENCE_COMMUNITY_LINK = "[{} lähetettiin]"
 SENTENCE_COMMUNITY_NAME = " nimellä \"{0}\""
 
-SENTENCE_PROMOTIONAL = "{{{{item name|{0}}}}} myönnetään [[Genuine/fi|Aitona]] pelaajille, jotka tilaavat pelin {1}{2}{3}."
+SENTENCE_PROMOTIONAL = "{{{{item name|{0}}}}} myönnetään [[Genuine/fi|Aitona]] pelaajille, jotka tilaavat pelin ''[[{1}/fi|{1}]]''{2}{3}."
 SENTENCE_PROMOTIONAL_STEAM = " [[Steam/fi|Steamista]]"
 SENTENCE_PROMOTIONAL_DATE = " ennen {0}"
 

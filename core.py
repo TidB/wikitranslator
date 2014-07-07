@@ -85,7 +85,10 @@ class Wikitext:
         self.language = language
         self.methods = methods
         self.wikiText = wikitext
-        self.strings = eval("s" + language.upper().replace("-", "_"))
+        try:
+            self.strings = eval("s" + language.upper().replace("-", "_"))
+        except ImportError:
+            raise
         try:
             self.wikiTextType = self.get_wikitext_type()
             self.itemName = self.get_itemname()
@@ -302,11 +305,16 @@ class Wikitext:
                     or "[[w:" in l.lower():
                 continue
             ln = lf_ext(lf(l))
-            ln = re.sub("#.*$", "", ln)
+            anchor = re.findall("#.*$", ln)
+            if anchor:
+                anchor = anchor[0]
+                ln = ln.replace(anchor, "")
+            else:
+                anchor = ""
             ln = ln.replace(" ", "_")
             ln = ln+"/"+self.language
             pagetitle, displaytitle, __ = lf_t_wl(ln)
-            ln = "[[{}|{}]]".format(pagetitle, displaytitle)
+            ln = "[[{}{}|{}]]".format(pagetitle, anchor, displaytitle)
             self.wikiText = self.wikiText.replace(l, ln)
 
     def translate_wikipedia_link(self):
@@ -337,20 +345,19 @@ class Wikitext:
 
         if self.wikiTextType == "weapon":
             slot = self.get_weapon_slot()
-            self.strings.SENTENCE_1_WEAPON = eval("self.strings.SENTENCE_1_" +
-                                                  slot.upper()).format(lf(self.classLink[0]).lower())
+            typelink = getattr(self.strings, "SENTENCE_1_"+slot).format(lf(self.classLink[0]))
+        else:
+            typelink = getattr(self.strings, "SENTENCE_1_"+self.wikiTextType.upper())
 
-        nounmarkerindefinite = eval("self.strings.NOUNMARKER_INDEFINITE_" + self.wikiTextType.upper())
+        nounmarkerindefinite = getattr(self.strings, "NOUNMARKER_INDEFINITE_" + self.wikiTextType.upper())
 
         if self.get_item_community():
-            com = eval("self.strings.SENTENCE_1_COMMUNITY_" + self.wikiTextType.upper())
+            com = getattr(self.strings, "SENTENCE_1_COMMUNITY_"+self.wikiTextType.upper())
         else:
             com = ""
-        typelink = eval("self.strings.SENTENCE_1_" + self.wikiTextType.upper())
         if self.get_item_promo():
-            promo = eval("self.strings.SENTENCE_1_PROMO_" + self.wikiTextType.upper())
-            if self.wikiTextType == "cosmetic" and self.strings == "de":
-                #Special case for German
+            promo = getattr(self.strings, "SENTENCE_1_PROMO_"+self.wikiTextType.upper())
+            if self.wikiTextType == "cosmetic" and self.language == "de":
                 typelink = ""
         else:
             promo = ""
@@ -380,9 +387,7 @@ class Wikitext:
                                               sentence1_1trans + sentence1_2trans)
 
     def create_sentence_community(self):
-        sentencecommunity = re.findall(".*?contributed.*?Steam Workshop.*?\.",
-                                       self.wikiText)
-
+        sentencecommunity = re.findall(".*?contributed.*?Steam Workshop.*\.", self.wikiText)
         if sentencecommunity:
             link = re.findall("\[http.*?contribute.*?\]", sentencecommunity[0])
             if link:

@@ -8,7 +8,7 @@ import sFI
 import sKO
 import sPT_BR
 
-MAX_SIZE = 10000
+API_LOCATION = "http://wiki.teamfortress.com/w/api.php?action=query&format=xml"
 
 GUI_METHODS_NOARGS = ("check_quote",
                       "transform_decimal",
@@ -22,6 +22,8 @@ GUI_METHODS_NOARGS = ("check_quote",
                       "translate_wikilink",
                       "translate_wikipedia_link")
 
+MAX_PAGE_SIZE = 10000
+
 
 def get_wiki_root(link):
     text = urllib.request.urlopen(link).read()
@@ -30,7 +32,7 @@ def get_wiki_root(link):
 
 
 def import_category(category):
-    root = get_wiki_root("http://wiki.teamfortress.com/w/api.php?action=query&list=categorymembers&cmtitle=Category:{}&cmdir=asc&cmlimit=200&format=xml".format(quote(category)))
+    root = get_wiki_root(API_LOCATION+"&list=categorymembers&cmtitle=Category:{}&cmdir=asc&cmlimit=200".format(quote(category)))
     if root.find(".//*cm") is None:
         raise ValueError("Invalid category '{}'".format(category))
     else:
@@ -40,8 +42,8 @@ def import_category(category):
                 continue
             title = cmember.attrib['title']
             title = title.replace(" ", "_")
-            root = get_wiki_root("http://wiki.teamfortress.com/w/api.php?action=query&titles={}&prop=revisions|info&rvprop=content&redirects&format=xml".format(title))
-            if int(root.find(".//*page").attrib['length']) >= MAX_SIZE:
+            root = get_wiki_root(API_LOCATION+"&titles={}&prop=revisions|info&rvprop=content&redirects".format(title))
+            if int(root.find(".//*page").attrib['length']) >= MAX_PAGE_SIZE:
                 continue
             wikitext = root.find(".//*rev").text
             wikitexts.append(wikitext)
@@ -63,8 +65,8 @@ def lf_w(link):
         return re.sub("\|.*?\]\]", "", re.sub("\[\[[Ww][\w]*?:", "", link)).replace("]]", "")
 
 
-def lf_t_wl(link, sound=False):
-    root = get_wiki_root("http://wiki.teamfortress.com/w/api.php?format=xml&action=query&titles={}&prop=info&inprop=displaytitle&redirects".format(quote(link)))
+def get_wikilink(link, sound=False):
+    root = get_wiki_root(API_LOCATION+"&titles={}&prop=info&inprop=displaytitle&redirects".format(quote(link)))
     if not root.find(".//*[@missing='']") is None:
         return link, link, False
 
@@ -84,7 +86,7 @@ class Wikitext:
     def __init__(self, wikitext, language, methods):
         self.language = language
         self.methods = methods
-        self.wikiText = wikitext
+        self.wikitext = wikitext
         try:
             self.strings = eval("s" + language.upper().replace("-", "_"))
         except ImportError:
@@ -92,20 +94,20 @@ class Wikitext:
         try:
             self.wikiTextType = self.get_wikitext_type()
             self.itemName = self.get_itemname()
-            self.classLink = self.get_using_classes()
+            self.classLinks = self.get_using_classes()
             self.classList = self.create_class_list()
             self.restricted = False
         except Exception:
             self.restricted = True
 
     def __str__(self):
-        return self.wikiText
+        return self.wikitext
 
     def add_displaytitle(self):
-        self.wikiText = "\n".join([self.strings.DISPLAYTITLE.format(self.itemName), self.wikiText])
+        self.wikitext = "\n".join([self.strings.DISPLAYTITLE.format(self.itemName), self.wikitext])
 
     def check_quote(self):
-        quotes = re.findall("\{\{[Qq]uotation.*?\}\}", self.wikiText)
+        quotes = re.findall("\{\{[Qq]uotation.*?\}\}", self.wikitext)
         for q in quotes:
             file = re.findall("\|sound=.*\}\}", q)
             if not file:
@@ -113,55 +115,47 @@ class Wikitext:
 
             file = file[0].replace("|sound=", "").replace(".wav", "").replace("}", "")
             filen = "File:{} {}.wav".format(file, self.language)
-            if not lf_t_wl(filen, True)[2]:
+            if not get_wikilink(filen, True)[2]:
                 qn = "|sound={}|en-sound=yes}}}}".format(file+".wav")
             else:
                 qn = "|sound={}}}}}".format(filen)
 
-            self.wikiText = re.sub("\|sound.*?\}\}", qn, self.wikiText)
+            self.wikitext = re.sub("\|sound.*?\}\}", qn, self.wikitext)
 
     def create_class_list(self):
-        if "all" in self.classLink[0].lower():
+        if "all" in self.classLinks[0].lower():
             return self.strings.SENTENCE_1_CLASSES_ALL
         else:
-            if self.strings.DICTIONARY_CLASSES:
-                linktranslated = self.strings.DICTIONARY_CLASSES[lf_ext(lf(self.classLink[0]))]
-            else:
-                linktranslated = lf_ext(lf(self.classLink[0]))
-            if len(self.classLink) == 1:
-                return self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated)
-            elif len(self.classLink) > 1:
-                classes = self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated)
-                for c in self.classLink[1:-1]:
-                    if self.strings.DICTIONARY_CLASSES:
-                        linktranslated = self.strings.DICTIONARY_CLASSES[lf_ext(lf(c))]
-                    else:
-                        linktranslated = lf_ext(lf(c))
+            for i, classLink in enumerate(self.classLinks):
+                if self.strings.DICTIONARY_CLASSES:
+                    self.classLinks[i] = self.strings.DICTIONARY_CLASSES[lf_ext(lf(classLink))]
+                else:
+                    self.classLinks[i] = lf_ext(lf(classLink))
+
+            if len(self.classLinks) == 1:
+                return self.strings.SENTENCE_1_CLASSES_ONE.format(self.classLinks[0])
+            elif len(self.classLinks) > 1:
+                classes = self.strings.SENTENCE_1_CLASSES_ONE.format(self.classLinks[0])
+                for c in self.classLinks[1:-1]:
                     classes = (classes +
                                self.strings.SENTENCE_1_CLASSES_COMMA +
-                               self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated))
+                               self.strings.SENTENCE_1_CLASSES_ONE.format(c))
 
                 classes = (classes +
                            self.strings.SENTENCE_1_CLASSES_AND +
-                           self.strings.SENTENCE_1_CLASSES_ONE.format(linktranslated))
+                           self.strings.SENTENCE_1_CLASSES_ONE.format(self.classLinks[-1]))
 
                 return classes
 
     def get_itemname(self):
         itemname = re.search("'''.*?'''.*?(is|are).*?(a|an)",
-                             re.sub("{{[Qq]uotation.*?}}", "", self.wikiText)).group()
+                             re.sub("{{[Qq]uotation.*?}}", "", self.wikitext)).group()
         itemname = re.sub(" [is|are].*?a", "", itemname.replace("'''", ""))
 
         return itemname
 
-    def get_item_promo(self):
-        return bool(re.findall("\{\{avail.*?promo.*?\}\}", self.wikiText))
-
-    def get_item_community(self):
-        return bool(re.findall('.*?contributed.*?"*.*"*\.', self.wikiText))
-
     def get_using_classes(self):
-        classlink = re.findall("used-by +=.*", self.wikiText)
+        classlink = re.findall("used-by +=.*", self.wikitext)
         classlink = re.sub("used-by += +", "", classlink[0])
         if "all" in lf(classlink).lower():
             return [classlink]
@@ -172,29 +166,29 @@ class Wikitext:
                 return [classlink]
 
     def get_weapon_slot(self):
-        return re.sub("slot.*?= ", "", re.findall("slot.*?=.*", self.wikiText)[0])
+        return re.sub("slot.*?= ", "", re.findall("slot.*?=.*", self.wikitext)[0])
 
     def get_wikitext_type(self):
-        if "{{item set infobox" in self.wikiText.lower():
-            wikitexttype = "set"
-        elif "{{item infobox" in self.wikiText.lower():
-            wikitexttype = re.sub("type.*?= ", "",
-                                  re.findall("type.*?=.*?\n",
-                                             self.wikiText)[0]).replace("\n", "")
+        if "{{item set infobox" in self.wikitext.lower():
+            wikitext_type = "set"
+        elif "{{item infobox" in self.wikitext.lower():
+            wikitext_type = re.sub("type.*?= ", "",
+                                   re.findall("type.*?=.*?\n",
+                                              self.wikitext)[0]).replace("\n", "")
 
-            if wikitexttype.lower() == "misc" or wikitexttype.lower() == "hat":
-                wikitexttype = "cosmetic"
+            if wikitext_type.lower() == "misc" or wikitext_type.lower() == "hat":
+                wikitext_type = "cosmetic"
         else:
-            wikitexttype = "none"
+            wikitext_type = "none"
 
-        return wikitexttype
+        return wikitext_type
 
     def transform_decimal(self):
-        for dot in re.findall('[^"]\d+\.\d+[^"]', self.wikiText):
-            self.wikiText = self.wikiText.replace(dot, dot.replace(".", ","))
+        for dot in re.findall('[^"]\d+\.\d+[^"]', self.wikitext):
+            self.wikitext = self.wikitext.replace(dot, dot.replace(".", ","))
 
     def transform_link(self):
-        links = re.findall("\[\[.*?\]\]", self.wikiText)
+        links = re.findall("\[\[.*?\]\]", self.wikitext)
         for l in links:
             if "/{}".format(self.language) in l \
                     or "category:" in l.lower() \
@@ -202,26 +196,26 @@ class Wikitext:
                     or "file:" in l.lower() \
                     or "[[w:" in l.lower():
                 continue
-            self.wikiText = self.wikiText.replace(l, lf_to_t(lf_ext(l)))
+            self.wikitext = self.wikitext.replace(l, lf_to_t(lf_ext(l)))
 
     def translate_categories(self):
-        categories = re.findall("\[\[Category:.*?\]\]", self.wikiText)
+        categories = re.findall("\[\[Category:.*?\]\]", self.wikitext)
 
         for c in categories:
             cn = c.replace("]]", "/{}]]".format(self.language))
-            self.wikiText = self.wikiText.replace(c, cn)
+            self.wikitext = self.wikitext.replace(c, cn)
 
     def translate_classlinks(self):
-        if "all" in self.classLink[0].lower():
+        if "all" in self.classLinks[0].lower():
             linkiso = self.strings.ALLCLASSESBOX.format(self.language)
-            self.wikiText = self.wikiText.replace(self.classLink[0], linkiso)
-        elif len(self.classLink) >= 1:
-            for link in self.classLink:
+            self.wikitext = self.wikitext.replace(self.classLinks[0], linkiso)
+        elif len(self.classLinks) >= 1:
+            for link in self.classLinks:
                 linkiso = link.replace("]]", "/{}|{}]]".format(self.language, lf_ext(lf(link))))
-                self.wikiText = self.wikiText.replace(link, linkiso)
+                self.wikitext = self.wikitext.replace(link, linkiso)
 
     def translate_headlines(self):
-        headlines = re.findall("=+.*?=+", self.wikiText)
+        headlines = re.findall("=+.*?=+", self.wikitext)
         for hl in headlines:
             level = int(hl.count("=") / 2)
             hln = hl.replace("=", "").strip()
@@ -229,25 +223,31 @@ class Wikitext:
                 hln = self.strings.DICTIONARY_HEADLINES[hln.lower()].join(["="*level, "="*level])
             except KeyError:
                 continue
-            self.wikiText = self.wikiText.replace(hl, hln)
+            self.wikitext = self.wikitext.replace(hl, hln)
+
+    def translate_image_thumbnail(self):
+        result = re.search("\| ?(The )?(Steam )?Workshop thumbnail (image )?for.*", self.wikitext)
+        if result:
+            result_translated = self.strings.SENTENCE_THUMBNAIL.format(self.itemName)
+            self.wikitext = self.wikitext.replace(result.group(), result_translated)
 
     def translate_item_flags(self):
         try:
-            itemflag = re.search("\|.*?item-flags.*", self.wikiText).group()
+            itemflag = re.search("\|.*?item-flags.*", self.wikitext).group()
             itemflagnew = "| item-flags   = " + self.strings.DICTIONARY_FLAGS[re.sub("\|.*?= +", "", itemflag).lower()]
-            self.wikiText = self.wikiText.replace(itemflag, itemflagnew)
+            self.wikitext = self.wikitext.replace(itemflag, itemflagnew)
         except (AttributeError, KeyError):
             pass
 
         try:
-            itematt = re.search("\|.*?att-1-negative.*", self.wikiText).group()
+            itematt = re.search("\|.*?att-1-negative.*", self.wikitext).group()
             itemattn = "| att-1-negative   = " + self.strings.DICTIONARY_ATTS[re.sub("\|.*?= +", "", itematt).lower()]
-            self.wikiText = self.wikiText.replace(itematt, itemattn)
+            self.wikitext = self.wikitext.replace(itematt, itemattn)
         except (AttributeError, KeyError):
             pass
 
     def translate_levels(self):
-        level = re.findall("Level \d+-?\d*? [A-z ]+", self.wikiText)[0]
+        level = re.findall("Level \d+-?\d*? [A-z ]+", self.wikitext)[0]
         levelnew = level[6:]
 
         levelint = re.findall("\d+-?\d*", levelnew)[0]
@@ -259,44 +259,43 @@ class Wikitext:
             levelkeyn = levelkey.strip()
 
         levelnew = self.strings.LEVEL.format(levelint, levelkeyn)
-        self.wikiText = self.wikiText.replace(level, levelnew)
+        self.wikitext = self.wikitext.replace(level, levelnew)
 
     def translate_main_seealso(self):
-        temps = []
-        temps.extend(re.findall("\{\{[Mm]ain.*?\}\}", self.wikiText))
-        temps.extend(re.findall("\{\{[Ss]ee also.*?\}\}", self.wikiText))
-        for t in temps:
-            link = re.findall("\|.*?[^|]*", t)[0].replace("|", "").replace("}", "")
-            pagetitle, displaytitle, __ = lf_t_wl(link)
-            if "main" in t.lower():
+        templates = []
+        templates.extend(re.findall("\{\{[Mm]ain.*?\}\}", self.wikitext))
+        templates.extend(re.findall("\{\{[Ss]ee also.*?\}\}", self.wikitext))
+        for template in templates:
+            link = re.findall("\|.*?[^|]*", template)[0].replace("|", "").replace("}", "")
+            pagetitle, displaytitle, __ = get_wikilink(link)
+            if "main" in template.lower():
                 tn = "{{{{Main|{}|l1={}}}}}".format(pagetitle, displaytitle)
-            elif "see also" in t.lower():
+            elif "see also" in template.lower():
                 tn = "{{{{See also|{}|l1={}}}}}".format(pagetitle, displaytitle)
             else:
                 return
-            self.wikiText = self.wikiText.replace(t, tn)
+            self.wikitext = self.wikitext.replace(template, tn)
 
     def translate_set_contents(self):
-        match = re.search("(The|This)( set)?( contains| includes)?( the)?( following)? items.*?:", self.wikiText).group()
-        self.wikiText = re.sub(match,
-                               self.strings.SENTENCE_SET_INCLUDES,
-                               self.wikiText)
+        result = re.search("(The|This)( set)?( contains| includes)?( the)?( following)? items.*?:", self.wikitext)
+        match = result.group()
+        self.wikitext = re.sub(match, self.strings.SENTENCE_SET_INCLUDES, self.wikitext)
 
-        part = self.wikiText[self.wikiText.index(self.strings.SENTENCE_SET_INCLUDES):]
+        part = self.wikitext[self.wikitext.index(self.strings.SENTENCE_SET_INCLUDES):]
         for link in re.finditer("\* ?\[\[.*?\]\]", part):
             link = link.group()
-            self.wikiText = self.wikiText.replace(link, lf_to_t(link))
+            self.wikitext = self.wikitext.replace(link, lf_to_t(link))
 
     def translate_update_history(self):
-        self.wikiText = re.sub(".*?[Aa]dded.*? to the game\.",
-                               self.strings.ADDEDTOGAME.format(self.itemName), self.wikiText)
+        self.wikitext = re.sub(".*?[Aa]dded.*? to the game\.",
+                               self.strings.ADDEDTOGAME.format(self.itemName), self.wikitext)
 
     # ===================
     # Wikimedia API usage
     # ===================
 
     def translate_wikilink(self):
-        links = re.findall("\[\[.*?\]\]", re.sub("\[\[[Ww]ikipedia:", "[[w:", self.wikiText))
+        links = re.findall("\[\[.*?\]\]", re.sub("\[\[[Ww]ikipedia:", "[[w:", self.wikitext))
         for l in links:
             if "/{}".format(self.language) in l \
                     or "category:" in l.lower() \
@@ -313,14 +312,14 @@ class Wikitext:
                 anchor = ""
             ln = ln.replace(" ", "_")
             ln = ln+"/"+self.language
-            pagetitle, displaytitle, __ = lf_t_wl(ln)
+            pagetitle, displaytitle, __ = get_wikilink(ln)
             ln = "[[{}{}|{}]]".format(pagetitle, anchor, displaytitle)
-            self.wikiText = self.wikiText.replace(l, ln)
+            self.wikitext = self.wikitext.replace(l, ln)
 
     def translate_wikipedia_link(self):
         links = []
-        links.extend(re.findall("\[\[[Ww][\w]*:.*?\]\]", self.wikiText))
-        links.extend(re.findall("\{\{[Ww][\w]*\|.*?\}\}", self.wikiText))
+        links.extend(re.findall("\[\[[Ww][\w]*:.*?\]\]", self.wikitext))
+        links.extend(re.findall("\{\{[Ww][\w]*\|.*?\}\}", self.wikitext))
         for l in links:
             ln = lf_w(l)
             ln = re.sub("#.*$", "", ln)
@@ -334,28 +333,28 @@ class Wikitext:
                 continue
 
             tn = "[[w:{0}:{1}|{1}]]".format(self.language, t.text)
-            self.wikiText = self.wikiText.replace(l, tn)
+            self.wikitext = self.wikitext.replace(l, tn)
 
     # ==================
     # Creating sentences
     # ==================
 
     def create_sentence_1_cw(self):
-        sentence1 = re.findall(".*?'''" + self.itemName + "'''.*? for .*?\.", self.wikiText)[0]
+        sentence1 = re.findall(".*?'''"+self.itemName+"'''.*? for .*?\.", self.wikitext)[0]
 
         if self.wikiTextType == "weapon":
             slot = self.get_weapon_slot()
-            typelink = getattr(self.strings, "SENTENCE_1_"+slot).format(lf(self.classLink[0]))
+            typelink = getattr(self.strings, "SENTENCE_1_"+slot.upper()).format(lf(self.classLinks[0]))
         else:
             typelink = getattr(self.strings, "SENTENCE_1_"+self.wikiTextType.upper())
 
         nounmarkerindefinite = getattr(self.strings, "NOUNMARKER_INDEFINITE_" + self.wikiTextType.upper())
 
-        if self.get_item_community():
+        if re.findall('.*?contributed.*?"*.*"*\.', self.wikitext):
             com = getattr(self.strings, "SENTENCE_1_COMMUNITY_"+self.wikiTextType.upper())
         else:
             com = ""
-        if self.get_item_promo():
+        if re.findall("\{\{avail.*?promo.*?\}\}", self.wikitext):
             promo = getattr(self.strings, "SENTENCE_1_PROMO_"+self.wikiTextType.upper())
             if self.wikiTextType == "cosmetic" and self.language == "de":
                 typelink = ""
@@ -369,10 +368,10 @@ class Wikitext:
                                                             typelink,
                                                             self.classList)
 
-        self.wikiText = self.wikiText.replace(sentence1, (sentence1trans + self.strings.ITEMLOOK))
+        self.wikitext = self.wikitext.replace(sentence1, (sentence1trans + self.strings.ITEMLOOK))
 
     def create_sentence_1_set(self):
-        sentence1_1 = re.findall(".*?'''" + self.itemName + "'''.*? for .*?\.", self.wikiText)[0]
+        sentence1_1 = re.findall(".*?'''" + self.itemName + "'''.*? for .*?\.", self.wikitext)[0]
         sentence1_1trans = self.strings.SENTENCE_1_ALL.format(self.itemName,
                                                               self.strings.NOUNMARKER_INDEFINITE_SET,
                                                               "",
@@ -380,33 +379,32 @@ class Wikitext:
                                                               self.strings.SENTENCE_1_SET,
                                                               self.classList)
 
-        sentence1_2 = re.findall("\. It was .*?\.", self.wikiText)[0][1:]
+        sentence1_2 = re.findall("\. It was .*?\.", self.wikitext)[0][1:]
         patch = lf(re.findall("\[\[.*?\]\]", sentence1_2)[0])
         sentence1_2trans = self.strings.SENTENCE_SET.format(patch)
-        self.wikiText = self.wikiText.replace(sentence1_1 + sentence1_2,
-                                              sentence1_1trans + sentence1_2trans)
+        self.wikitext = self.wikitext.replace(sentence1_1+sentence1_2, sentence1_1trans+sentence1_2trans)
 
     def create_sentence_community(self):
-        sentencecommunity = re.findall(".*?contributed.*?Steam Workshop.*\.", self.wikiText)
-        if sentencecommunity:
-            link = re.findall("\[http.*?contribute.*?\]", sentencecommunity[0])
+        sentence_community = re.findall(".*?contributed.*?Steam Workshop.*\.", self.wikitext)
+        if sentence_community:
+            link = re.findall("\[http.*?contribute.*?\]", sentence_community[0])
             if link:
                 link = re.sub(" contribute.*?\]", "", link[0]).replace("[", "")
                 link = self.strings.SENTENCE_COMMUNITY_LINK.format(link)
 
             try:
-                name = re.findall('name.*?\".*?\"', sentencecommunity[0])[0][6:].replace('"', '')
+                name = re.findall('name.*?\".*?\"', sentence_community[0])[0][6:].replace('"', '')
                 name = self.strings.SENTENCE_COMMUNITY_NAME.format(name)
             except (TypeError, IndexError):
                 name = ""
 
             sct = self.strings.SENTENCE_COMMUNITY.format(self.itemName, name, link)
-            self.wikiText = self.wikiText.replace(sentencecommunity[0], sct)
+            self.wikitext = self.wikitext.replace(sentence_community[0], sct)
         else:
             return
 
     def create_sentence_promo(self):
-        sentencepromo = re.findall(".*?\[\[Genuine\]\].*?quality.*?\.", self.wikiText)
+        sentencepromo = re.findall(".*?\[\[Genuine\]\].*?quality.*?\.", self.wikitext)
         if sentencepromo:
             if "[[Steam]]" in sentencepromo:
                 spt_s = self.strings.SENTENCE_PROMOTIONAL_STEAM
@@ -417,11 +415,11 @@ class Wikitext:
                 date = re.findall("before .*?,.*?20\d\d", sentencepromo[0])[0]
                 date = date.replace("before ", "")
 
-                dateday = re.findall("\w \d[\d|,]", date)[0][2:].replace(",", "")
-                datemonth = re.findall("[A-z].*?\d", date)[0][:-2]
-                dateyear = re.findall(", \d{4}", date)[0][2:]
+                day = re.findall("\w \d[\d|,]", date)[0][2:].replace(",", "")
+                month = re.findall("[A-z].*?\d", date)[0][:-2]
+                year = re.findall(", \d{4}", date)[0][2:]
 
-                datefmt = "{{{{Date fmt|{}|{}|{}}}}}".format(datemonth, dateday, dateyear)
+                datefmt = "{{{{Date fmt|{}|{}|{}}}}}".format(month, day, year)
                 spt_d = self.strings.SENTENCE_PROMOTIONAL_DATE.format(datefmt)
             except Exception:
                 spt_d = ""
@@ -433,7 +431,7 @@ class Wikitext:
 
             spt = self.strings.SENTENCE_PROMOTIONAL.format(self.itemName, game, spt_s, spt_d)
 
-            self.wikiText = self.wikiText.replace(sentencepromo[0], spt)
+            self.wikitext = self.wikitext.replace(sentencepromo[0], spt)
         else:
             return
 
@@ -448,4 +446,4 @@ class Wikitext:
 
             getattr(self, method)()
 
-        return self.wikiText
+        return self.wikitext

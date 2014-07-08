@@ -22,6 +22,7 @@ GUI_METHODS = ("add_displaytitle",
                "translate_categories",
                "translate_classlinks",
                "translate_headlines",
+               "translate_image_thumbnail",
                "translate_item_flags",
                "translate_levels",
                "translate_main_seealso",
@@ -30,19 +31,35 @@ GUI_METHODS = ("add_displaytitle",
                "translate_wikilink",
                "translate_wikipedia_link")
 
-__version__ = "2014-07-04:1"
+__version__ = "2014-07-09:1"
+
+
+def open_config(index):
+    try:
+        file = open(CONFIG, "rb")
+        file.close()
+    except FileNotFoundError:
+        recreate_config()
+    finally:
+        with open(CONFIG, "rb") as file:
+            return pickle.load(file)[index]
+
+
+def recreate_config():
+    with open(CONFIG, "wb") as file:
+        configfile = ["!", "de", []]
+        pickle.dump(configfile, file)
 
 
 class GUI(object):
-
     def __init__(self, parent):
         self.parent = parent
-        self.open_config(0)
-        self.filePath = "autosave.txt"
-        self.presetsSaved = self.open_config(2)[::2]
+        open_config(0)
+        self.path = "autosave.txt"
+        self.presets = open_config(2)[::2]
 
         self.parent.title("WikiTranslator v2 | {}".format(__version__))
-        self.parent.protocol('WM_DELETE_WINDOW', self.end)
+        self.parent.protocol('WM_DELETE_WINDOW', self.quit)
 
         self.mainframe = ttk.Frame(self.parent, padding="3 3 12 12")
 
@@ -59,36 +76,34 @@ class GUI(object):
         menu_options.add_command(label='Settings...', command=self.settings_dialog)
         menu_options.add_command(label='Help', command=self.help_dialog)
 
-        self.textInput = tk.Text(self.mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
-        self.scrollInput = ttk.Scrollbar(self.mainframe, orient="vertical", command=self.textInput.yview)
-        self.textOutput = tk.Text(self.mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
-        self.scrollOutput = ttk.Scrollbar(self.mainframe, orient="vertical", command=self.textOutput.yview)
-        self.comboboxPreset = ttk.Combobox(self.mainframe, values=self.presetsSaved, exportselection=0)
-        self.listboxMethods = tk.Listbox(self.mainframe,
-                                         listvariable=tk.StringVar(value=GUI_METHODS),
-                                         selectmode="multiple",
-                                         exportselection=0)
-        self.buttonSavePreset = ttk.Button(self.mainframe, text="Save preset",
-                                           command=lambda: self.save_config(2,
-                                                                            (self.comboboxPreset.get(),
-                                                                             [GUI_METHODS[i] for i in self.listboxMethods.curselection()])))
-        self.buttonClear = ttk.Button(self.mainframe, text="Clear selection",
-                                      command=lambda: self.listboxMethods.selection_clear(0, "end"))
-        self.buttonTranslate = ttk.Button(self.mainframe, text="Translate", command=self.translate, width=30)
+        self.text_input = tk.Text(self.mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
+        self.scrollbar_input = ttk.Scrollbar(self.mainframe, orient="vertical", command=self.text_input.yview)
+        self.text_output = tk.Text(self.mainframe, width=70, height=40, wrap="char", maxundo=100, undo=True)
+        self.scrollbar_output = ttk.Scrollbar(self.mainframe, orient="vertical", command=self.text_output.yview)
+        self.combobox_presets = ttk.Combobox(self.mainframe, values=self.presets, exportselection=0)
+        self.methods = tk.Listbox(self.mainframe,
+                                  listvariable=tk.StringVar(value=GUI_METHODS),
+                                  selectmode="multiple",
+                                  exportselection=0)
+        self.save_preset = ttk.Button(self.mainframe, text="Save preset",
+                                      command=lambda: self.save_config(2, None))
+        self.clear = ttk.Button(self.mainframe, text="Clear selection",
+                                command=lambda: self.methods.selection_clear(0, "end"))
+        self.translate = ttk.Button(self.mainframe, text="Translate", command=self.translate, width=30)
 
         self.mainframe.grid(column=0, row=0, sticky="nwes")
-        self.textInput.grid(column=0, row=1, rowspan=2, sticky="nes")
-        self.scrollInput.grid(column=1, row=1, rowspan=2, sticky="nws")
-        self.textOutput.grid(column=2, row=1, rowspan=2, sticky="nwes")
-        self.scrollOutput.grid(column=3, row=1, rowspan=2, sticky="nws")
-        self.comboboxPreset.grid(column=4, row=0, columnspan=2)
-        self.listboxMethods.grid(column=4, row=1, columnspan=2, sticky="nwes")
-        self.buttonSavePreset.grid(column=4, row=3)
-        self.buttonClear.grid(column=5, row=3)
-        self.buttonTranslate.grid(column=4, row=4, columnspan=2)
+        self.text_input.grid(column=0, row=1, rowspan=2, sticky="nes")
+        self.scrollbar_input.grid(column=1, row=1, rowspan=2, sticky="nws")
+        self.text_output.grid(column=2, row=1, rowspan=2, sticky="nwes")
+        self.scrollbar_output.grid(column=3, row=1, rowspan=2, sticky="nws")
+        self.combobox_presets.grid(column=4, row=0, columnspan=2)
+        self.methods.grid(column=4, row=1, columnspan=2, sticky="nwes")
+        self.save_preset.grid(column=4, row=3)
+        self.clear.grid(column=5, row=3)
+        self.translate.grid(column=4, row=4, columnspan=2)
 
-        self.textInput['yscrollcommand'] = self.scrollInput.set
-        self.textOutput['yscrollcommand'] = self.scrollOutput.set
+        self.text_input['yscrollcommand'] = self.scrollbar_input.set
+        self.text_output['yscrollcommand'] = self.scrollbar_output.set
 
         self.parent.columnconfigure(0, weight=1)
         self.parent.rowconfigure(0, weight=1)
@@ -99,85 +114,68 @@ class GUI(object):
         self.mainframe.rowconfigure(1, weight=1, minsize=150)
 
         self.parent.bind("<<ComboboxSelected>>", self.update_presets)
-        self.parent.bind("<Control-Z>", self.textInput.edit_undo)
-        self.parent.bind("<Control-Shift-Z>", self.textInput.edit_redo)
+        self.parent.bind("<Control-Z>", self.text_input.edit_undo)
+        self.parent.bind("<Control-Shift-Z>", self.text_input.edit_redo)
 
-    @staticmethod
-    def config_exc():
-        with open(CONFIG, "wb") as file:
-            configfile = ["!", "de", []]
-            pickle.dump(configfile, file)
-
-    def end(self):
-        if self.textOutput.get("1.0", "end") != "":
+    def quit(self):
+        if self.text_output.get("1.0", "end") != "":
             self.save_file()
         self.parent.destroy()
         self.parent.quit()
 
     def help_dialog(self):
-        fontheadline = tk.font.Font(family='Helvetica', size=18, underline=1)
-        fontlink = tk.font.Font(size=7)
-        helpwindow = tk.Toplevel(self.parent)
-        helpwindow.resizable(0, 0)
-        helpwindow.title("Help")
-        helpframe = ttk.Frame(helpwindow, padding="3 3 12 12")
+        headline_font = tk.font.Font(family='Helvetica', size=18, underline=1)
+        link_font = tk.font.Font(size=7)
+        window = tk.Toplevel(self.parent)
+        window.resizable(0, 0)
+        window.title("Help")
+        frame = ttk.Frame(window, padding="3 3 12 12")
 
-        labelheadline = tk.Label(helpframe,
-                                 text="WikiTranslator v2",
-                                 font=fontheadline)
-        labelgithub = tk.Label(helpframe, text="WikiTranslator on GitHub")
-        labelgithublink = tk.Label(helpframe,
-                                   text="("+URL_GITHUB+")",
-                                   font=fontlink)
-        labelwiki = tk.Label(helpframe, text="WikiTranslator on the TF Wiki")
-        labelwikilink = tk.Label(helpframe,
-                                 text="("+URL_WIKI+")",
-                                 font=fontlink)
+        headline = tk.Label(frame,
+                            text="WikiTranslator v2",
+                            font=headline_font)
+        github = tk.Label(frame, text="WikiTranslator on GitHub")
+        github_link = tk.Label(frame,
+                               text="("+URL_GITHUB+")",
+                               font=link_font)
+        wiki_page = tk.Label(frame, text="WikiTranslator on the TF Wiki")
+        wiki_page_link = tk.Label(frame,
+                                  text="("+URL_WIKI+")",
+                                  font=link_font)
 
-        labelgithublink.bind("<1>", lambda event: webbrowser.open(URL_GITHUB))
-        labelwikilink.bind("<1>", lambda event: webbrowser.open(URL_WIKI))
+        github_link.bind("<1>", lambda event: webbrowser.open(URL_GITHUB))
+        wiki_page_link.bind("<1>", lambda event: webbrowser.open(URL_WIKI))
 
-        helpframe.grid(column=0, row=0)
-        labelheadline.grid(column=0, row=0)
-        labelgithub.grid(column=0, row=1)
-        labelwiki.grid(column=0, row=3)
-        labelgithublink.grid(column=0, row=2)
-        labelwikilink.grid(column=0, row=4)
+        frame.grid(column=0, row=0)
+        headline.grid(column=0, row=0)
+        github.grid(column=0, row=1)
+        wiki_page.grid(column=0, row=3)
+        github_link.grid(column=0, row=2)
+        wiki_page_link.grid(column=0, row=4)
 
     def import_category(self, category):
         category = re.sub("[Cc]ategory:", "", category)
         wikitexts = core.import_category(category)
         for text in wikitexts:
-            self.textInput.insert("end", text)
+            self.text_input.insert("end", text)
 
     def import_category_dialog(self):
-        importwindow = tk.Toplevel(self.parent)
-        importwindow.resizable(0, 0)
-        importwindow.title("Import category")
-        importframe = ttk.Frame(importwindow, padding="3 3 12 12")
+        window = tk.Toplevel(self.parent)
+        window.resizable(0, 0)
+        window.title("Import category")
+        frame = ttk.Frame(window, padding="3 3 12 12")
 
-        labeldesc = tk.Label(importframe, text="Enter a existing category")
-        entrycategory = tk.Entry(importframe, exportselection=0)
-        buttonsubmit = tk.Button(importframe,
-                                 text="Enter",
-                                 command=lambda: self.import_category(entrycategory.get()))
+        instruction = tk.Label(frame, text="Enter a existing category")
+        category = tk.Entry(frame, exportselection=0)
+        submit = tk.Button(frame, text="Enter", command=lambda: self.import_category(category.get()))
 
-        importframe.grid(column=0, row=0)
-        labeldesc.grid(column=0, row=0)
-        entrycategory.grid(column=0, row=1)
-        buttonsubmit.grid(column=0, row=2)
-
-    @staticmethod
-    def open_config(index):
-        with open(CONFIG, "rb") as f:
-            l = pickle.load(f)[index]
-            return l
-
-        config_exc()
-        raise FileNotFoundError("Reading configFile failed. Recreating...")
+        frame.grid(column=0, row=0)
+        instruction.grid(column=0, row=0)
+        category.grid(column=0, row=1)
+        submit.grid(column=0, row=2)
 
     def open_file(self):
-        if self.textInput.get("1.0", "end").strip() != "":
+        if self.text_input.get("1.0", "end").strip() != "":
             overwrite = tk.messagebox.askyesno(
                 message="There is text left in the input box! Do you want to overwrite the text?",
                 icon='warning',
@@ -191,76 +189,74 @@ class GUI(object):
             text = "!"
             while text != "":
                 text = file.readline().decode()
-                self.textInput.insert("end", text)
+                self.text_input.insert("end", text)
 
     def save_config(self, index, item):
         try:
             file = open(CONFIG, "rb")
             configfile = pickle.load(file)
         except (FileNotFoundError, TypeError):
-            self.config_exc()
+            recreate_config()
             raise ValueError("configFile couldn't be loaded. Creating...")
 
         try:
             if index in [0, 1]:
                 configfile[index] = item
             elif index == 2:
-                configfile[2].append(item[0])
-                configfile[2].extend(item[1:])
+                configfile[2].append(self.combobox_presets.get())
+                configfile[2].extend([GUI_METHODS[i] for i in self.methods.curselection()])
         except IndexError:
-            self.config_exc()
+            recreate_config()
             raise IndexError("Invalid configfile. Recreating...")
 
         with open(CONFIG, "wb") as file:
             pickle.dump(configfile, file)
-            print("Saved config")
 
     def save_file(self, selection=False, path=None):
         if path is None:
-            path = self.filePath
+            path = self.path
         if selection is True:
             path = tk.filedialog.asksaveasfilename(defaultextension=".txt",
                                                    filetypes=[("text file", ".txt")])
         with open(path, "ab") as file:
-            file.write(bytes(self.textOutput.get("1.0", "end"), "utf-8"))
-            print("Autosaved")
+            file.write(bytes(self.text_output.get("1.0", "end"), "utf-8"))
 
     def settings_dialog(self):
-        separator = self.open_config(0)
-        iso = self.open_config(1)
-        settingwindow = tk.Toplevel(self.parent)
-        settingwindow.resizable(0, 0)
-        settingwindow.title("Settings")
-        settingframe = ttk.Frame(settingwindow, padding="3 3 12 12")
+        separator = open_config(0)
+        iso = open_config(1)
+        setting_window = tk.Toplevel(self.parent)
+        setting_window.resizable(0, 0)
+        setting_window.title("Settings")
+        setting_frame = ttk.Frame(setting_window, padding="3 3 12 12")
 
-        labelseparator = tk.Label(settingframe, text="Standard separation character")
-        entryseparator = tk.Entry(settingframe, text=separator, exportselection=0)
-        entryseparator.delete(0, "end")
-        entryseparator.insert(0, separator)
-        buttonseparator = tk.Button(settingframe, text="Save",
-                                    command=lambda: self.save_config(0, entryseparator.get()))
+        label_separator = tk.Label(setting_frame, text="Standard separation character")
+        entry_separator = tk.Entry(setting_frame, text=separator, exportselection=0)
+        entry_separator.delete(0, "end")
+        entry_separator.insert(0, separator)
+        button_separator = tk.Button(setting_frame, text="Save",
+                                     command=lambda: self.save_config(0, entry_separator.get()))
 
-        labellanguage = tk.Label(settingframe, text="Language (ISO code)")
-        entrylanguage = tk.Entry(settingframe, text=iso, exportselection=0)
-        entrylanguage.delete(0, "end")
-        entrylanguage.insert(0, iso)
-        buttonlanguage = tk.Button(settingframe, text="Save",
-                                   command=lambda: self.save_config(1, entrylanguage.get()))
+        label_language = tk.Label(setting_frame, text="Language (ISO code)")
+        entry_language = tk.Entry(setting_frame, text=iso, exportselection=0)
+        entry_language.delete(0, "end")
+        entry_language.insert(0, iso)
+        button_language = tk.Button(setting_frame, text="Save",
+                                    command=lambda: self.save_config(1, entry_language.get()))
 
-        buttonclose = tk.Button(settingframe, text="Close",
-                                command=lambda: settingwindow.destroy())
+        button_close = tk.Button(setting_frame, text="Close",
+                                 command=lambda: setting_window.destroy())
 
-        settingframe.grid(column=0, row=0)
-        labelseparator.grid(column=0, row=0)
-        entryseparator.grid(column=0, row=1)
-        buttonseparator.grid(column=1, row=1)
-        labellanguage.grid(column=0, row=2)
-        entrylanguage.grid(column=0, row=3)
-        buttonlanguage.grid(column=1, row=3)
-        buttonclose.grid(column=0, row=4, columnspan=2)
+        setting_frame.grid(column=0, row=0)
+        label_separator.grid(column=0, row=0)
+        entry_separator.grid(column=0, row=1)
+        button_separator.grid(column=1, row=1)
+        label_language.grid(column=0, row=2)
+        entry_language.grid(column=0, row=3)
+        button_language.grid(column=1, row=3)
+        button_close.grid(column=0, row=4, columnspan=2)
 
     def translate(self):
-        if self.textOutput.get("1.0", "end").strip() != "":
+        if self.text_output.get("1.0", "end").strip() != "":
             overwrite = tk.messagebox.askyesno(
                 message="There is text left in the output box! Do you want to overwrite the text?",
                 icon='warning',
@@ -269,38 +265,40 @@ class GUI(object):
             if overwrite is False:
                 return
 
+        wikitext_input = ""
         try:
-            wikitext = self.textInput.selection_get()
+            wikitext_input = self.text_input.selection_get()
         except TclError:
-            wikitext = self.textInput.get("1.0", "end").strip()
+            wikitext_input = self.text_input.get("1.0", "end").strip()
         finally:
-            wikitexts = wikitext.split("\n!\n")
-            wikitextstrans = []
+            wikitexts = wikitext_input.split("\n!\n")
+            wikitexts_trans = []
 
-        methods = [GUI_METHODS[int(i)] for i in self.listboxMethods.curselection()]
-        iso = self.open_config(1)
+        separation = open_config(0)
+        iso = open_config(1)
+        methods = [GUI_METHODS[int(i)] for i in self.methods.curselection()]
 
-        for wtr in wikitexts:
-            wt = core.Wikitext(wtr, iso, methods)
-            wikitextraw = wt.translate()
-            wikitextstrans.append(wikitextraw)
+        for wikitext in wikitexts:
+            wikitext = core.Wikitext(wikitext, iso, methods)
+            wikitext_translated = wikitext.translate()
+            wikitexts_trans.append(wikitext_translated)
 
-        wikitextraw = "\n!\n".join(wikitextstrans)
+        wikitext_translated = "\n{}\n".format(separation).join(wikitexts_trans)
 
-        self.textOutput.delete("1.0", "end")
-        self.textOutput.insert("1.0", wikitextraw)
+        self.text_output.delete("1.0", "end")
+        self.text_output.insert("1.0", wikitext_translated)
 
     def update_presets(self, _):
-        l = self.open_config(2)
-        presetname = l[self.comboboxPreset.current()*2]
+        presets = open_config(2)
+        preset_name = presets[self.combobox_presets.current()*2]
         try:
-            i = l.index(presetname)
+            i = presets.index(preset_name)
         except ValueError:
             raise ValueError("Invalid preset name")
 
-        self.listboxMethods.selection_clear(0, "end")
-        for item in l[i+1]:
-            self.listboxMethods.selection_set(GUI_METHODS.index(item))
+        self.methods.selection_clear(0, "end")
+        for item in presets[i+1]:
+            self.methods.selection_set(GUI_METHODS.index(item))
 
 
 def _main():

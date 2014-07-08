@@ -193,4 +193,3 @@ DICTIONARY_LEVEL_C = {
     "Veteran's Beret" : "",
     'Wings' : "",
 }
-

@@ -32,7 +32,7 @@ SENTENCE_PROMOTIONAL_DATE = " vor dem {0}"
 SENTENCE_SET = " Es wurde dem Spiel mit dem {{{{Update link|{0}}}}}-Update hinzugefügt."
 SENTENCE_SET_INCLUDES = "Das Set enthält die folgenden Gegenstände:"
 
-NOT_CRAFTABLE = "Nicht zum Herstellen verwendbar"
+SENTENCE_THUMBNAIL = "|Steam Workshop-Vorschaubild für (ARTIKEL) {{{{item name|{0}}}}}."
 
 SENTENCE_1_PRIMARY = "[[Weapon/de#{0}primary|Primärwaffe]]"
 SENTENCE_1_SECONDARY = "[[Weapon/de#{0}secondary|Sekundärwaffe]]"

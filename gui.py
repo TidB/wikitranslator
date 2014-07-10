@@ -47,7 +47,7 @@ def open_config(index):
 
 def recreate_config():
     with open(CONFIG, "wb") as file:
-        configfile = ["!", "de", []]
+        configfile = ["!", "de", {}]
         pickle.dump(configfile, file)
 
 
@@ -56,7 +56,7 @@ class GUI(object):
         self.parent = parent
         open_config(0)
         self.path = "autosave.txt"
-        self.presets = open_config(2)[::2]
+        self.presets = list(open_config(2).keys())
 
         self.parent.title("WikiTranslator v2 | {}".format(__version__))
         self.parent.protocol('WM_DELETE_WINDOW', self.quit)
@@ -113,7 +113,8 @@ class GUI(object):
         self.mainframe.columnconfigure(5, weight=1, minsize=100)
         self.mainframe.rowconfigure(1, weight=1, minsize=150)
 
-        self.parent.bind("<<ComboboxSelected>>", self.update_presets)
+        self.parent.bind("<<ComboboxSelected>>", self.update_methods)
+        self.parent.bind("<Return>", self.update_methods)
         self.parent.bind("<Control-Z>", self.text_input.edit_undo)
         self.parent.bind("<Control-Shift-Z>", self.text_input.edit_redo)
 
@@ -194,23 +195,22 @@ class GUI(object):
     def save_config(self, index, item):
         try:
             file = open(CONFIG, "rb")
-            configfile = pickle.load(file)
+            config_file = pickle.load(file)
         except (FileNotFoundError, TypeError):
             recreate_config()
-            raise ValueError("configFile couldn't be loaded. Creating...")
+            raise ValueError("config_file loading failed.")
 
         try:
             if index in [0, 1]:
-                configfile[index] = item
+                config_file[index] = item
             elif index == 2:
-                configfile[2].append(self.combobox_presets.get())
-                configfile[2].extend([GUI_METHODS[i] for i in self.methods.curselection()])
+                config_file[2][self.combobox_presets.get()] = [GUI_METHODS[i] for i in self.methods.curselection()]
         except IndexError:
             recreate_config()
-            raise IndexError("Invalid configfile. Recreating...")
+            raise IndexError("Invalid config_file.")
 
         with open(CONFIG, "wb") as file:
-            pickle.dump(configfile, file)
+            pickle.dump(config_file, file)
 
     def save_file(self, selection=False, path=None):
         if path is None:
@@ -288,17 +288,12 @@ class GUI(object):
         self.text_output.delete("1.0", "end")
         self.text_output.insert("1.0", wikitext_translated)
 
-    def update_presets(self, _):
+    def update_methods(self, _):
         presets = open_config(2)
-        preset_name = presets[self.combobox_presets.current()*2]
-        try:
-            i = presets.index(preset_name)
-        except ValueError:
-            raise ValueError("Invalid preset name")
-
+        methods = presets[self.combobox_presets.get()]
         self.methods.selection_clear(0, "end")
-        for item in presets[i+1]:
-            self.methods.selection_set(GUI_METHODS.index(item))
+        for method in methods:
+            self.methods.selection_set(GUI_METHODS.index(method))
 
 
 def _main():

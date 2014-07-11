@@ -19,8 +19,8 @@ GUI_METHODS_NOARGS = ("check_quote",
                       "translate_levels",
                       "translate_main_seealso",
                       "translate_set_contents",
-                      "translate_wikilink",
-                      "translate_wikipedia_link")
+                      "translate_wikilinks",
+                      "translate_wikipedia_links")
 
 MAX_PAGE_SIZE = 10000
 
@@ -132,20 +132,18 @@ class Wikitext:
                 else:
                     self.class_links[i] = lf_ext(classLink)
 
-            if len(self.class_links) == 1:
-                return self.strings.SENTENCE_1_CLASSES_ONE.format(self.class_links[0])
-            elif len(self.class_links) > 1:
-                classes = self.strings.SENTENCE_1_CLASSES_ONE.format(self.class_links[0])
-                for class_ in self.class_links[1:-1]:
-                    classes = (classes +
-                               self.strings.SENTENCE_1_CLASSES_COMMA +
-                               self.strings.SENTENCE_1_CLASSES_ONE.format(class_))
+            classes = self.strings.SENTENCE_1_CLASSES_ONE.format(self.class_links[0])
+            for class_ in self.class_links[1:-1]:
+                classes = (classes +
+                           self.strings.SENTENCE_1_CLASSES_COMMA +
+                           self.strings.SENTENCE_1_CLASSES_ONE.format(class_))
 
+            if len(self.class_links) > 1:
                 classes = (classes +
                            self.strings.SENTENCE_1_CLASSES_AND +
                            self.strings.SENTENCE_1_CLASSES_ONE.format(self.class_links[-1]))
 
-                return classes
+            return classes
 
     def get_itemname(self):
         itemname = re.search("'''.*?'''.*?(is|are).*?(a|an)",
@@ -250,18 +248,18 @@ class Wikitext:
 
     def translate_levels(self):
         level = re.findall("Level \d+-?\d*? [A-z ]+", self.wikitext)[0]
-        levelnew = level[6:]
+        level_translated = level[6:]
 
-        levelint = re.findall("\d+-?\d*", levelnew)[0]
-        levelkey = re.findall("[A-z ]+", levelnew)[0]
+        level_number = re.findall("\d+-?\d*", level_translated)[0]
+        level_key = re.findall("[A-z ]+", level_translated)[0]
 
         try:
-            levelkeyn = self.strings.DICTIONARY_LEVEL_C[levelkey.strip()]
+            level_key_new = self.strings.DICTIONARY_LEVEL_C[level_key.strip()]
         except KeyError:
-            levelkeyn = levelkey.strip()
+            level_key_new = level_key.strip()
 
-        levelnew = self.strings.LEVEL.format(levelint, levelkeyn)
-        self.wikitext = self.wikitext.replace(level, levelnew)
+        level_translated = self.strings.LEVEL.format(level_number, level_key_new)
+        self.wikitext = self.wikitext.replace(level, level_translated)
 
     def translate_main_seealso(self):
         templates = []
@@ -296,7 +294,7 @@ class Wikitext:
     # Wikimedia API usage
     # ===================
 
-    def translate_wikilink(self):
+    def translate_wikilinks(self):
         links = re.findall("\[\[.*?\]\]", re.sub("\[\[[Ww]ikipedia:", "[[w:", self.wikitext))
         for link in links:
             if "/{}".format(self.language) in link \
@@ -318,7 +316,7 @@ class Wikitext:
             link_formatted = "[[{}{}|{}]]".format(pagetitle, anchor, displaytitle)
             self.wikitext = self.wikitext.replace(link, link_formatted)
 
-    def translate_wikipedia_link(self):
+    def translate_wikipedia_links(self):
         links = []
         links.extend(re.findall("\[\[[Ww][\w]*:.*?\]\]", self.wikitext))
         links.extend(re.findall("\{\{[Ww][\w]*\|.*?\}\}", self.wikitext))

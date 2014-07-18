@@ -178,7 +178,7 @@ class Wikitext:
             if wikitext_type.lower() == "misc" or wikitext_type.lower() == "hat":
                 wikitext_type = "cosmetic"
         else:
-            wikitext_type = "none"
+            wikitext_type = None
 
         return wikitext_type
 

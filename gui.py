@@ -31,7 +31,7 @@ GUI_METHODS = ("add_displaytitle",
                "translate_wikilinks",
                "translate_wikipedia_links")
 
-__version__ = "2014-07-12:1"
+__version__ = "2014-07-18:1"
 
 
 def open_config(index):

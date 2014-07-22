@@ -1,3 +1,6 @@
+#NAME
+LANGUAGE_NAME = "Finnish"
+
 #STANDARD
 ADDEDTOGAME = "{{{{item name|{0}}}}} lisättiin peliin."
 ALLCLASSESBOX = "[[Classes/{0}|Kaikki luokat]]"

@@ -1,3 +1,6 @@
+#NAME
+LANGUAGE_NAME = "Brazilian"
+
 #STANDARD
 ADDEDTOGAME = "* (ARTIGO) {{{{item name|{0}}}}} foi adicionado ao jogo."
 ALLCLASSESBOX = "[[Classes/{0}|Todas as classes]]"

@@ -5,8 +5,11 @@ import xml.etree.ElementTree as ET
 
 import sDE
 import sFI
+import sIT
 import sKO
 import sPT_BR
+
+import vdfparser
 
 API_LOCATION = "http://wiki.teamfortress.com/w/api.php?action=query&format=xml"
 
@@ -14,6 +17,7 @@ GUI_METHODS_NOARGS = ("check_quote",
                       "transform_decimal",
                       "transform_link",
                       "translate_categories",
+                      "translate_description",
                       "translate_headlines",
                       "translate_item_flags",
                       "translate_levels",
@@ -23,6 +27,19 @@ GUI_METHODS_NOARGS = ("check_quote",
                       "translate_wikipedia_links")
 
 MAX_PAGE_SIZE = 10000
+
+
+def get_wikilink(link, sound=False):
+    root = get_wiki_root(API_LOCATION+"&titles={}&prop=info&inprop=displaytitle&redirects".format(quote(link)))
+    if not root.find(".//*[@missing='']") is None:
+        return link, link, False
+
+    if sound:
+        return link, link, True
+    else:
+        pagetitle = root.find(".//*[@title]").attrib['title']
+        displaytitle = root.find(".//*[@displaytitle]").attrib['displaytitle']
+        return pagetitle, displaytitle, True
 
 
 def get_wiki_root(link):
@@ -58,28 +75,15 @@ def lf_ext(link):
     return re.sub("\|.*[^]]", "", lf(link))
 
 
+def lf_to_t(link):
+    return link.replace("[[", "{{item link|").replace("]]", "}}")
+
+
 def lf_w(link):
     if "{{" in link:
         return re.sub("\|[^|]*?\}\}", "", re.sub("\{\{[Ww][\w]*?\|", "", link)).replace("}}", "")
     elif "[[" in link:
         return re.sub("\|.*?\]\]", "", re.sub("\[\[[Ww][\w]*?:", "", link)).replace("]]", "")
-
-
-def get_wikilink(link, sound=False):
-    root = get_wiki_root(API_LOCATION+"&titles={}&prop=info&inprop=displaytitle&redirects".format(quote(link)))
-    if not root.find(".//*[@missing='']") is None:
-        return link, link, False
-
-    if sound:
-        return link, link, True
-    else:
-        pagetitle = root.find(".//*[@title]").attrib['title']
-        displaytitle = root.find(".//*[@displaytitle]").attrib['displaytitle']
-        return pagetitle, displaytitle, True
-
-
-def lf_to_t(link):
-    return link.replace("[[", "{{item link|").replace("]]", "}}")
 
 
 class Wikitext:
@@ -211,6 +215,19 @@ class Wikitext:
             for link in self.class_links:
                 linkiso = link.replace("]]", "/{}|{}]]".format(self.language, lf_ext(link)))
                 self.wikitext = self.wikitext.replace(link, linkiso)
+
+    def translate_description(self):
+        description = re.sub(" ?\| ?item-description *?= ",
+                             "",
+                             re.search(" ?\| ?item-description *?=.*", self.wikitext).group()).strip()
+        url = API_LOCATION+"&titles=File:Tf_{}.txt&prop=imageinfo&iiprop=url&redirects".format(self.strings.LANGUAGE_NAME.lower())
+        localization_file_root = get_wiki_root(url)
+        localization_file_url = localization_file_root.find(".//*ii").attrib['url']
+        localization_file = urllib.request.urlopen(localization_file_url).read().decode("utf-8")[1:]
+        localization_dict = vdfparser.fromstring(localization_file)
+        key_english = [key for key, value in localization_dict["lang"]["Tokens"].items() if value == description][0]
+        value_german = localization_dict["lang"]["Tokens"][key_english[9:]]
+        self.wikitext = self.wikitext.replace(description, value_german)
 
     def translate_headlines(self):
         headlines = re.findall("=+.*?=+", self.wikitext)

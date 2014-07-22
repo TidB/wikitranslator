@@ -1,3 +1,6 @@
+#NAME
+LANGUAGE_NAME = "Korean"
+
 #STANDARD
 ADDEDTOGAME = "{{{{item name|{0}}}}}이/가 게임에 추가되었습니다."
 ALLCLASSESBOX = "[[Classes/{0}|모든 클래스]]"

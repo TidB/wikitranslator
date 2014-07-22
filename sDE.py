@@ -1,3 +1,6 @@
+#NAME
+LANGUAGE_NAME = "German"
+
 #STANDARD
 ADDEDTOGAME = "* (ARTIKEL) {{{{item name|{0}}}}} wurde dem Spiel hinzugefügt."
 ALLCLASSESBOX = "[[Classes/de|Allen Klassen]]"

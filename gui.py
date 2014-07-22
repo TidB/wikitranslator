@@ -21,6 +21,7 @@ GUI_METHODS = ("add_displaytitle",
                "transform_link",
                "translate_categories",
                "translate_classlinks",
+               "translate_description",
                "translate_headlines",
                "translate_image_thumbnail",
                "translate_item_flags",
@@ -31,7 +32,7 @@ GUI_METHODS = ("add_displaytitle",
                "translate_wikilinks",
                "translate_wikipedia_links")
 
-__version__ = "2014-07-18:1"
+__version__ = "2014-07-22:1"
 
 
 def open_config(index):

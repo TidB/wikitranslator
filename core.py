@@ -8,6 +8,7 @@ import sFI
 import sIT
 import sKO
 import sPT_BR
+import sRU
 
 import vdfparser
 

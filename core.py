@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 
 import sDE
 import sFI
+import sFR
 import sIT
 import sKO
 import sPT_BR

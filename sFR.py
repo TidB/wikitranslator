@@ -11,7 +11,11 @@ NOUNMARKER_INDEFINITE_COSMETIC = "un"
 NOUNMARKER_INDEFINITE_SET = "un"
 NOUNMARKER_INDEFINITE_WEAPON = "une"
 
+<<<<<<< Updated upstream
 SENTENCE_1_ALL = "(ARTICLE) '''{{{{item name|{0}}}}}''' est {4}{1}{2}{3} pour {5}"
+=======
+SENTENCE_1_ALL = "(ARTICLE) '''{{{item name|{0}}}}''' est {1}{2}{3}{4} pour {5}"
+>>>>>>> Stashed changes
 SENTENCE_1_COMMUNITY_COSMETIC = " [[Steam Workshop/fr|créé par la communauté]]"
 SENTENCE_1_COMMUNITY_WEAPON = " [[Steam Workshop/fr|créée par la communauté]]"
 SENTENCE_1_PROMO_COSMETIC = " [[Promotional items/fr|promotionnel]]"
@@ -82,12 +86,12 @@ DICTIONARY_HEADLINES = {
     'gallery' : "Galerie",
     'item set' : "Ensemble d'objets",
     'notes' : "Notes",
-    'painted variants' : "",
+    'painted variants' : "Variantes peintes",
     'references' : "Références",
     'related achievements' : "Succès associés",
     'see also' : "Voir aussi",
     'strange variant' : "Variante Etrange",
-    'styles' : "",
+    'styles' : "Styles",
     'trivia' : "Anecdotes",
     'unused content' : "Contenu inutilisé",
     'update history' : "Historique des mises à jour",
@@ -183,10 +187,10 @@ DICTIONARY_LEVEL_C = {
     'Spooky Companion' : "Compagnon effrayant",
     'Spurs' : "Éperons",
     'Squirrel' : "Écureuil",
-    'Stethoscope' : "Sthétoscope",
+    'Stethoscope' : "Stéthoscope",
     'Stocking' : "Stockage",
     'Supplies' : "Provisions",
-    'Tattoos' : "Tatoos",
+    'Tattoos' : "Tattoos",
     'Tentacles' : "Tentacules",
     'Tournament Medal' : "Médaille de tournoi",
     'Towel' : "Serviette",

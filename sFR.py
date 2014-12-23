@@ -11,7 +11,7 @@ NOUNMARKER_INDEFINITE_COSMETIC = "un"
 NOUNMARKER_INDEFINITE_SET = "un"
 NOUNMARKER_INDEFINITE_WEAPON = "une"
 
-SENTENCE_1_ALL = "(ARTICLE) '''{{item name|{0}}}''' est {4}{1}{2}{3} pour {5}"
+SENTENCE_1_ALL = "(ARTICLE) '''{{{{item name|{0}}}}}''' est {4}{1}{2}{3} pour {5}"
 SENTENCE_1_COMMUNITY_COSMETIC = " [[Steam Workshop/fr|créé par la communauté]]"
 SENTENCE_1_COMMUNITY_WEAPON = " [[Steam Workshop/fr|créée par la communauté]]"
 SENTENCE_1_PROMO_COSMETIC = " [[Promotional items/fr|promotionnel]]"
@@ -24,7 +24,7 @@ SENTENCE_1_CLASSES_MORE = " et le [[{0}/fr|{0}]]"
 SENTENCE_1_CLASSES_AND = ", "
 SENTENCE_1_CLASSES_COMMA = " et "
 
-SENTENCE_COMMUNITY = "(ARTICLE) {{item name|{0}}} a été {1} au [[Steam Workshop/fr|Steam Workshop]]{2}"
+SENTENCE_COMMUNITY = "(ARTICLE) {{{{item name|{0}}}}} a été {1} au [[Steam Workshop/fr|Steam Workshop]]{2}"
 SENTENCE_COMMUNITY_LINK = "[{0} soumis]"
 SENTENCE_COMMUNITY_NAME = ' sous le nom de "{0}"'
 
@@ -32,10 +32,10 @@ SENTENCE_PROMOTIONAL = "Cet objet a été attribué en qualité [[Genuine/fr|Aut
 SENTENCE_PROMOTIONAL_STEAM = " sur [[Steam/fr|Steam]]"
 SENTENCE_PROMOTIONAL_DATE = " avant le {0}"
 
-SENTENCE_SET = "Il a été ajouté dans la {{update link|{0}}}"
+SENTENCE_SET = "Il a été ajouté dans la {{{{update link|{0}}}}}"
 SENTENCE_SET_INCLUDES = "Cet ensemble inclut les objets suivants :"
 
-SENTENCE_THUMBNAIL = "|Image (ARTICLE : du, de la) {{item name|{0}}}"
+SENTENCE_THUMBNAIL = "|Image (ARTICLE : du, de la) {{{{item name|{0}}}}}"
 
 SENTENCE_1_SUB_PRIMARY = "[[Weapon/fr#{0}primary|arme principale]]"
 SENTENCE_1_SUB_SECONDARY = "[[Weapon/fr#{0}primary|arme secondaire]]"

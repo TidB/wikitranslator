@@ -1,5 +1,5 @@
 #NAME
-LANGUAGE_NAME = "Nederlands"
+LANGUAGE_NAME = "Dutch"
 
 #STANDARD
 ADDEDTOGAME = "Dit voorwerp is toegevoegd aan het spel."

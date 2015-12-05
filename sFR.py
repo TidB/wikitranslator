@@ -55,7 +55,7 @@ DICTIONARY_ATTS = {
     "holiday restriction: winter" : "Restriction de fête : Hiver",
     "holiday restriction: halloween" : "Restriction de fête : Halloween",
     "holiday restriction: halloween / full moon" : "Restriction de fête : Halloween / Pleine Lune",
-    "holiday restriction: halloween / full moon / valentine's day" : "",
+    "holiday restriction: halloween / full moon / valentine's day" : "Restriction de fête : Halloween / Pleine lune / Saint-Valentin",
     }
 
 #CLASSES

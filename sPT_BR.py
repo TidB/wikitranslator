@@ -35,7 +35,7 @@ SENTENCE_PROMOTIONAL_DATE = " antes do dia {0}"
 SENTENCE_SET = "Este conjunto foi adicionado ao jogo na {{Update link|{0}}}."
 SENTENCE_SET_INCLUDES = "O conjunto inclui os seguintes itens:"
 
-SENTENCE_THUMBNAIL = "|Miniatura da Oficina Steam para (ARTIGO) {{item name|{0}}}."
+SENTENCE_THUMBNAIL = "|Miniatura da Oficina Steam para (ARTIGO) {{{{item name|{0}}}}}."
 
 SENTENCE_1_SUB_PRIMARY = "[[Weapon/pt-br#{0}primary|arma primária]]"
 SENTENCE_1_SUB_SECONDARY = "[[Weapon/pt-br#{0}secondary|arma secundária]]"
@@ -65,24 +65,24 @@ DICTIONARY_CLASSES = {
 
 #HEADLINES
 DICTIONARY_HEADLINES = {
-    'as a crafting ingredient' : "Como um ingrediente de fabricação",
-    'blueprint' : "Projeto",
-    'bugs' : "Bugs",
-    'crafting' : "Fabricação",
-    'damage and function times' : "Dano e tempos de função",
-    'external links' : "Links externos",
-    'gallery' : "Galeria",
-    'item set' : "Conjunto de itens",
-    'notes' : 'Notas',
-    'painted variants' : "Variantes pintadas",
-    'references' : "Referências",
-    'related achievements' : "Conquistas relacionadas",
-    'see also' : "Veja também",
-    'strange variant' : "Variante estranha",
-    'styles' : "Estilos",
-    'trivia' : "Curiosidades",
-    'unused content' : "Conteúdo não utilizado",
-    'update history' : "Histórico de atualizações",
+    'as a crafting ingredient' : " Como um ingrediente de fabricação ",
+    'blueprint' : " Projeto ",
+    'bugs' : " Bugs ",
+    'crafting' : " Fabricação ",
+    'damage and function times' : " Dano e tempos de função ",
+    'external links' : " Links externos ",
+    'gallery' : " Galeria ",
+    'item set' : " Conjunto de itens ",
+    'notes' : " Notas ",
+    'painted variants' : " Variantes pintadas ",
+    'references' : " Referências ",
+    'related achievements' : " Conquistas relacionadas ",
+    'see also' : " Veja também ",
+    'strange variant' : " Variante estranha ",
+    'styles' : " Estilos ",
+    'trivia' : " Curiosidades ",
+    'unused content' : " Conteúdo não utilizado ",
+    'update history' : " Histórico de atualizações ",
 }
 
 #ITEM LEVELS

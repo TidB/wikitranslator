@@ -32,7 +32,7 @@ SENTENCE_PROMOTIONAL = "(ARTIGO) {{{{item name|{0}}}}} é concedido na qualidade
 SENTENCE_PROMOTIONAL_STEAM = " no [[Steam/pt-br|Steam]]"
 SENTENCE_PROMOTIONAL_DATE = " antes do dia {0}"
 
-SENTENCE_SET = "Este conjunto foi adicionado ao jogo na {{Update link|{0}}}."
+SENTENCE_SET = "Este conjunto foi adicionado ao jogo na {{{{Update link|{0}}}}}."
 SENTENCE_SET_INCLUDES = "O conjunto inclui os seguintes itens:"
 
 SENTENCE_THUMBNAIL = "|Miniatura da Oficina Steam para (ARTIGO) {{{{item name|{0}}}}}."
@@ -116,6 +116,7 @@ DICTIONARY_LEVEL_C = {
     'Cosmetic Armor' : 'Armadura Cosmética',
     'Cosmetic Augmentation' : 'Prótese Decorativa',
     'Cosmetic Axe' : 'Machado Cosmético',
+    'Cosmetic Item' : 'Item cosmético',
     'Cosmetic Knife' : 'Faca Decorativa',
     'Costume Piece' : 'Peça de Fantasia',
     'Decorative Bombs' : 'Bombas Decorativas',

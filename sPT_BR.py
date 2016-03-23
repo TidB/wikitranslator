@@ -24,11 +24,11 @@ SENTENCE_1_CLASSES_MORE = " e para o [[{0}]]."
 SENTENCE_1_CLASSES_AND = ", "
 SENTENCE_1_CLASSES_COMMA = " e "
 
-SENTENCE_COMMUNITY = "(ARTIGO) {{{{item name|{0}}}}} foi {2} para a [[Steam Workshop/pt-br|Oficina Steam]]{1}."
+SENTENCE_COMMUNITY = "(ARTIGO) {{{{item name|{0}}}}} foi {2} para a Oficina Steam{1}."
 SENTENCE_COMMUNITY_LINK = "[{0} contribuído]"
 SENTENCE_COMMUNITY_NAME = ' com o nome "''{0}''"'
 
-SENTENCE_PROMOTIONAL = "(ARTIGO) {{{{item name|{0}}}}} é concedido na qualidade [[Genuine/pt-br|genuína]] aos jogadores que compraram o jogo {1}{2}{3}."
+SENTENCE_PROMOTIONAL = "(ARTIGO) {{{{item name|{0}}}}} é concedido em qualidade [[Genuine/pt-br|Genuíno]] aos jogadores que compraram o jogo {1}{2}{3}."
 SENTENCE_PROMOTIONAL_STEAM = " no [[Steam/pt-br|Steam]]"
 SENTENCE_PROMOTIONAL_DATE = " antes do dia {0}"
 
@@ -46,6 +46,7 @@ DICTIONARY_FLAGS = {
     "not usable in crafting" : "Item de conquista: Não trocável",
     "not tradable" : "Não trocável",
     "not tradable or usable in crafting" : "Não trocável ou usável na Fabricação",
+    "not tradable, usable in crafting, or gift wrappable" : "Não trocável, usável na Fabricação ou embrulhável",
 }
 
 #ATTRIBUTES

@@ -34,6 +34,7 @@ LANGUAGES = {
     "nl": "Dutch",
     "pt-br": "Brazilian",
     "ru": "Russian",
+    "tr": "Turkish",
 }
 
 

@@ -1,18 +1,9 @@
 import re
-from urllib.parse import quote
 import urllib.request
 import xml.etree.ElementTree as ET
+from urllib.parse import quote
 
-import sDA
-import sDE
-import sFI
-import sFR
-import sIT
-import sKO
-import sNL
-import sPT_BR
-import sRU
-
+from lang import *
 import vdfparser
 
 API_LOCATION = "http://wiki.teamfortress.com/w/api.php?action=query&format=xml"
@@ -31,6 +22,19 @@ GUI_METHODS_NOARGS = ("check_quote",
                       "translate_wikipedia_links")
 
 MAX_PAGE_SIZE = 10000
+
+
+LANGUAGES = {
+    "da": "Danish",
+    "de": "German",
+    "fi": "Finnish",
+    "fr": "French",
+    "it": "Italian",
+    "ko": "Korean",
+    "nl": "Dutch",
+    "pt-br": "Brazilian",
+    "ru": "Russian",
+}
 
 
 def get_wikilink(link, sound=False):
@@ -95,10 +99,12 @@ class Wikitext:
         self.language = language
         self.methods = methods
         self.wikitext = wikitext
-        try:
-            self.strings = eval("s" + language.upper().replace("-", "_"))
-        except ImportError:
-            raise
+
+        if language.lower() not in LANGUAGES:
+            print("Language '{}' not supported.".format(language))
+            return
+        else:
+            self.strings = globals()[language]
 
         self.wikitext_type = self.get_wikitext_type()
         self.item_name = self.get_itemname()

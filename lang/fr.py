@@ -1,6 +1,6 @@
 # STANDARD
 ADDEDTOGAME = "(ARTICLE) {{{{item name|{item_name}}}}} a été ajouté dans le jeu"
-ALLCLASSESBOX = "[[Classes/pt-br|Toutes les classes]]"
+ALLCLASSESBOX = "[[Classes/fr|Toutes les classes]]"
 ITEMLOOK = " Il s'agit (ARTICLE : d'un, d'une)"
 NOUNMARKER_INDEFINITE_COSMETIC = "un"
 NOUNMARKER_INDEFINITE_SET = "un"

@@ -9,9 +9,16 @@ Comes with a GUI.
 
 To-Do
 -----
-- Cleaning the code up
+- Cleaning up the code
 - Improved user guidance
 - Fixing various problems with Mac OS X (copying/selecting text)
+- Adding a status bar to the GUI
+- Saving cache as files
+- {{w}} to [[w]] transformation
+- Tests (ahem)
+- Improving the selection-specific translation
+- Enable certain methods for unsupported languages
+- Show size of cache
 
 
 Wanna learn more?

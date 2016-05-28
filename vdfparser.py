@@ -2,7 +2,7 @@ import re
 
 
 def fromstring(vdf):
-    lines = re.split("(}|{)", vdf)
+    lines = re.split("(}|{)", vdf.strip())
 
     vdf_dict = {}
     parents = []
@@ -15,7 +15,11 @@ def fromstring(vdf):
             continue
 
         if line not in ["{", "}"]:
-            string_split = [re.sub("\\n|\\r*", "", part.strip()) for part in re.split('((?<!\\\\)".*?(?<!\\\\)")', line) if part.strip() != ""]
+            string_split = [
+                re.sub("\\n|\\r*", "", part.strip())
+                for part in re.split('((?<!\\\\)".*?(?<!\\\\)")', line)
+                if part.strip() != ""
+                ]
             keys, values = string_split[::2], string_split[1::2]
             if len(keys) != len(values):
                 continue
@@ -38,5 +42,5 @@ def fromstring(vdf):
                 parents.pop()
             else:
                 raise ValueError("Unexpected close bracket")
-        
+
     return vdf_dict

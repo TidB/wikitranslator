@@ -1,5 +1,5 @@
 # STANDARD
-ADDEDTOGAME = "* (ARTIGO) {{{{item name|{item_name}}}}} foi adicionado ao jogo."
+ADDEDTOGAME = "Este item foi adicionado ao jogo."
 ALLCLASSESBOX = "[[Classes/pt-br|Todas as classes]]"
 ITEMLOOK = ""
 NOUNMARKER_INDEFINITE_COSMETIC = "um"
@@ -19,18 +19,18 @@ SENTENCE_1_CLASSES_MORE = " e para o [[{class_name}/pt-br|{loc_class_name}]]."
 SENTENCE_1_CLASSES_AND = ", "
 SENTENCE_1_CLASSES_COMMA = " e "
 
-SENTENCE_COMMUNITY = "(ARTIGO) {{{{item name|{item_name}}}}} foi {custom_name} para a Oficina Steam{workshop_link}."
+SENTENCE_COMMUNITY = "Este item foi {workshop_link} para a Oficina Steam{custom_name}."
 SENTENCE_COMMUNITY_LINK = "[{link} contribuído]"
 SENTENCE_COMMUNITY_NAME = ' com o nome "''{name}''"'
 
-SENTENCE_PROMOTIONAL = "(ARTIGO) {{{{item name|{item_name}}}}} é concedido em qualidade [[Genuine/pt-br|Genuíno]] aos jogadores que compraram o jogo [[{game_name}/pt-br|{game_name}]]{date}{steam}."
+SENTENCE_PROMOTIONAL = "Este item é concedido em qualidade [[Genuine/pt-br|Genuíno]] aos jogadores que compraram o jogo [[{game_name}/pt-br|{game_name}]]{date}{steam}."
 SENTENCE_PROMOTIONAL_STEAM = " no [[Steam/pt-br|Steam]]"
 SENTENCE_PROMOTIONAL_DATE = " antes do dia {date}"
 
 SENTENCE_SET = "Este conjunto foi adicionado ao jogo na {{{{Update link|{update}}}}}."
 SENTENCE_SET_INCLUDES = "O conjunto inclui os seguintes itens:"
 
-SENTENCE_THUMBNAIL = "|Miniatura da Oficina Steam para (ARTIGO) {{{{item name|{item_name}}}}}."
+SENTENCE_THUMBNAIL = "|Miniatura da Oficina Steam para este item."
 
 SENTENCE_1_SUB_PRIMARY = "[[Weapon/pt-br#{class_name}primary|arma primária]]"
 SENTENCE_1_SUB_SECONDARY = "[[Weapon/pt-br#{class_name}secondary|arma secundária]]"
@@ -119,6 +119,7 @@ DICTIONARY_LEVEL_C = {
     'Cosmetic Armor': 'Armadura Cosmética',
     'Cosmetic Augmentation': 'Prótese Decorativa',
     'Cosmetic Axe': 'Machado Cosmético',
+    'Cosmetic Item': 'Item cosmético',
     'Cosmetic Knife': 'Faca Decorativa',
     'Costume Piece': 'Peça de Fantasia',
     'Decorative Bombs': 'Bombas Decorativas',

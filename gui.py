@@ -6,11 +6,12 @@ import webbrowser
 
 import api
 import core
+from functions import METHODS
 
 CONFIG = "config.json"
-GUI_METHODS = tuple(sorted(name for name in core.METHODS))
+GUI_METHODS = tuple(sorted(name for name in METHODS))
 AUTOSAVE = "autosave.txt"
-URL_GITHUB = "https://github.com/TidB/WikiTranslator"
+URL_GITHUB = "https://github.com/TidB/wikitranslator"
 URL_WIKI = "http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator"
 
 TF2_WIKI_API = "https://wiki.teamfortress.com/w/api.php"
@@ -90,7 +91,7 @@ class GUI(tk.Tk):
                 undo=True
         )
         self.scrollbar_input = ttk.Scrollbar(
-                self.mainframe, orient="vertical", command=self.text_input.yview
+            self.mainframe, orient="vertical", command=self.text_input.yview
         )
 
         self.text_output = tk.Text(
@@ -192,7 +193,7 @@ class GUI(tk.Tk):
     def open_file(self):
         if self.text_input.get("1.0", "end").strip() != "":
             overwrite = tk.messagebox.askyesno(
-                message="There is text left in the input box! Do you want to overwrite the text?",
+                message="Do you want to overwrite the text in the infobox?",
                 icon='warning',
                 title='Overwrite?'
             )
@@ -324,7 +325,7 @@ class GUI(tk.Tk):
         separation = open_config("separator")
         language = open_config("language")
         methods = [
-            core.METHODS[GUI_METHODS[int(i)]] for i in self.methods.curselection()
+            METHODS[GUI_METHODS[int(i)]] for i in self.methods.curselection()
             ]
 
         self.stack.clear()

@@ -23,9 +23,9 @@ SENTENCE_COMMUNITY = "Este item foi {workshop_link} para a Oficina Steam{custom_
 SENTENCE_COMMUNITY_LINK = "[{link} contribuído]"
 SENTENCE_COMMUNITY_NAME = ' com o nome "''{name}''"'
 
-SENTENCE_PROMOTIONAL = "Este item é concedido em qualidade [[Genuine/pt-br|Genuíno]] aos jogadores que compraram o jogo [[{game_name}/pt-br|{game_name}]]{date}{steam}."
+SENTENCE_PROMOTIONAL = "Este item foi concedido em qualidade [[Genuine/pt-br|Genuíno]] aos jogadores que compraram [[{game_name}/pt-br|{game_name}]]{date}{steam}."
 SENTENCE_PROMOTIONAL_STEAM = " no [[Steam/pt-br|Steam]]"
-SENTENCE_PROMOTIONAL_DATE = " antes do dia {date}"
+SENTENCE_PROMOTIONAL_DATE = " antes de {date}"
 
 SENTENCE_SET = "Este conjunto foi adicionado ao jogo na {{{{Update link|{update}}}}}."
 SENTENCE_SET_INCLUDES = "O conjunto inclui os seguintes itens:"
@@ -147,6 +147,7 @@ DICTIONARY_LEVEL_C = {
     'Kilt': 'Kilt',
     'Lantern': 'Lanterna',
     'Lunchbox': 'Lancheira',
+    'Machete': 'Facão',
     'Mascot': 'Mascote',
     'Mask': 'Máscara',
     'Medal': 'Medalha',

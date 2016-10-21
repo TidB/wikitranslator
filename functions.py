@@ -177,6 +177,17 @@ def translate_update_history(wikitext, strings):
     return wikitext.wikitext
 METHODS.append((translate_update_history, ("strings",)))
 
+#Copy pasted from translate_levels
+#I probably shouldn't do that but it works so ¯\_(ツ)_/¯
+def translate_unusual_effect(wikitext, strings):
+    infobox = wikitext.wikitext.filter_templates(matches="Item infobox")[0]
+    unusual_effect = infobox.get("unusual-effect")
+    value = unusual_effect.value.strip()
+    if value in strings.DICTIONARY_UNUSUAL_EFFECT:
+        unusual_effect.value.replace(value, strings.DICTIONARY_UNUSUAL_EFFECT[value])
+
+    return wikitext.wikitext
+METHODS.append((translate_unusual_effect, ("strings",)))
 
 # ==================
 # Creating sentences

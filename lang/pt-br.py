@@ -41,6 +41,7 @@ DICTIONARY_FLAGS = {
     "not usable in crafting": "Item de conquista: Não trocável",
     "not tradable": "Não trocável",
     "not tradable or usable in crafting": "Não trocável ou usável na Fabricação",
+    "not tradable, usable in crafting, or gift wrappable": "Não trocável, usável na Fabricação ou embrulhável",
 }
 
 # ATTRIBUTES
@@ -173,6 +174,11 @@ DICTIONARY_UNUSUAL_EFFECT = {
     "Galactic Codex": "Códice galático",
     "Ancient Codex": "Códice ancestral",
     "Nebula": "Nébula",
+    "Infernal Smoke": "Fumaça infernal",
+    "Infernal Flames": "Chamas infernais",
+    "Spectral Swirl": "Turbilhão espectral",
+    "Hellish Inferno": "Inferno infernal",
+    "Neutron Star": "Estrela de nêutron",
 }
 
 # HEADLINES

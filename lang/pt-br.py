@@ -223,6 +223,7 @@ DICTIONARY_LEVEL_C = {
     'Bongos': 'Bongôs',
     'Boots': 'Botas',
     'Botkiller': 'Antirrobôs',
+    'Shirt': 'Camisa',
     'Cape': 'Capa',
     'Championship Belt': 'Cinturão',
     'Cigar': 'Cigarro',

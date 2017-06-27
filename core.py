@@ -693,8 +693,8 @@ class Wikitext:
     def get_wikitext_type(self):
         infobox = self.wikitext.filter_templates(matches="item infobox")
         if infobox:
-            wikitext_type = infobox[0].get("type").value.strip()
-            if wikitext_type.lower() in ["misc", "hat"]:
+            wikitext_type = infobox[0].get("type").value.strip().lower()
+            if wikitext_type in ["misc", "hat"]:  # Legacy shit
                 wikitext_type = "cosmetic"
         elif self.wikitext.filter_templates(matches="item set infobox"):
             wikitext_type = "set"

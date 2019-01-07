@@ -16,9 +16,7 @@ To-Do
 - Saving cache as files
 - {{w}} to [[w]] transformation
 - Tests (ahem)
-- Improving the selection-specific translation
 - Enable certain methods for unsupported languages
-- Show size of cache
 
 
 Wanna learn more?

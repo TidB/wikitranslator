@@ -1,9 +1,6 @@
-from collections import OrderedDict
 from sys import stderr
 from time import sleep
 from traceback import format_exc
-
-import mwparserfromhell
 
 from helpers import chunker, show_progress
 
@@ -21,10 +18,10 @@ def safe_request(request, api_location, **kwargs):
                       "Info:", response["error"]["info"], file=stderr)
             else:
                 retry = False
+
+            return response
         except Exception:
             print(format_exc(), file=stderr)
-
-    return response
 
 
 class API:
@@ -60,35 +57,3 @@ class API:
 
         show_progress(len(pagetitles), len(pagetitles),
                       "Retrieved chunks.", True)
-
-    @staticmethod
-    def format_pages(all_pages):
-        """
-        Returns an OrderedDict of the form
-
-        {
-            title: {
-                "title": string,
-                "content": mwparserfromhell.Wikicode object,
-                "categories": [string, string, ...],
-                "displaytitle": string,
-            },
-            ...
-        }
-        """
-        formatted_pages = OrderedDict()
-        for i, page in enumerate(sorted(all_pages, key=lambda k: k["title"])):
-            title = page["title"]
-            show_progress(i+1, len(all_pages), "Formatting "+title)
-            content = mwparserfromhell.parse(page["revisions"][0]["*"])
-            categories = [category["title"] for category in page["categories"]]
-            displaytitle = page["displaytitle"]
-            formatted_pages[title] = {
-                "title": title,
-                "content": content,
-                "categories": categories,
-                "displaytitle": displaytitle
-            }
-        show_progress(len(all_pages), len(all_pages), "Formatted all.", True)
-
-        return formatted_pages

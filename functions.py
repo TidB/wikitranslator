@@ -1,3 +1,5 @@
+from enum import auto, Flag
+from functools import wraps
 import re
 
 import mwparserfromhell as mw
@@ -5,7 +7,25 @@ import mwparserfromhell as mw
 from helpers import clean_links, Wikilink
 
 DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{name}}}}}}}}}\n"
-METHODS = []
+FUNCTIONS = {}
+
+
+class Function(Flag):
+    CACHE = auto()
+    EXTENDED = auto()
+    STRINGS = auto()
+
+
+def register(*flags):
+    def decorator_register(func):
+        FUNCTIONS[func.__name__] = (func, flags)
+
+        @wraps(func)
+        def wrapper_register(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper_register
+    return decorator_register
 
 
 def create_class_list(class_links, strings):
@@ -43,22 +63,22 @@ def create_class_list(class_links, strings):
 # Individual translation methods
 # ==============================
 
-
+@register(Function.EXTENDED)
 def add_displaytitle(wikitext):
     wikitext.wikitext.insert(0, DISPLAYTITLE.format(name=wikitext.item_name))
 
     return wikitext.wikitext
-METHODS.append((add_displaytitle, ("extended",)))
 
 
+@register()
 def transform_decimal(wikitext):
     for dot in re.findall('[^"]\d+\.\d+[^"]', str(wikitext)):
         wikitext.wikitext.replace(dot, dot.replace(".", ","))
 
     return wikitext.wikitext
-METHODS.append((transform_decimal, ()))
 
 
+@register()
 def transform_link(wikitext):
     for link in wikitext.wikitext.filter_wikilinks():
         if re.match(":?(category|file|image|media|w):", str(link), flags=re.I):
@@ -70,18 +90,18 @@ def transform_link(wikitext):
         )
 
     return wikitext.wikitext
-METHODS.append((transform_link, ())),
 
 
+@register(Function.EXTENDED, Function.STRINGS)
 def translate_allclass_links(wikitext, strings):
     if "all" in wikitext.class_links[0].lower():
         linkiso = strings.ALLCLASSESBOX.format(wikitext.language)
         wikitext.wikitext.replace(str(wikitext.class_links[0]), linkiso)
 
     return wikitext.wikitext
-METHODS.append((translate_allclass_links, ("strings", "extended")))
 
 
+@register()
 def translate_categories(wikitext):
     categories = re.findall("\[\[Category:.*?\]\]", str(wikitext.wikitext))
     for category in categories:
@@ -89,9 +109,9 @@ def translate_categories(wikitext):
         wikitext.wikitext.replace(category, category_new)
 
     return wikitext.wikitext
-METHODS.append((translate_categories, ()))
 
 
+@register(Function.STRINGS)
 def translate_headlines(wikitext, strings):
     headlines = wikitext.wikitext.filter_headings()
     for heading in headlines:
@@ -104,9 +124,9 @@ def translate_headlines(wikitext, strings):
             wikitext.wikitext.replace(heading, trans_heading, recursive=False)
 
     return wikitext.wikitext
-METHODS.append((translate_headlines, ("strings",)))
 
 
+@register(Function.STRINGS)
 def translate_image_thumbnail(wikitext, strings):
     result = re.search(
         "\| ?(The )?(Steam )?Workshop thumbnail (image )?for.*",
@@ -116,9 +136,9 @@ def translate_image_thumbnail(wikitext, strings):
         wikitext.wikitext.replace(result.group(), strings.SENTENCE_THUMBNAIL)
 
     return wikitext.wikitext
-METHODS.append((translate_image_thumbnail, ("strings",)))
 
 
+@register(Function.STRINGS)
 def translate_item_flags(wikitext, strings):
     infobox = wikitext.wikitext.filter_templates(matches="Item infobox")[0]
     if infobox.has("item-flags"):
@@ -133,9 +153,9 @@ def translate_item_flags(wikitext, strings):
                     strings.DICTIONARY_ATTS[value.lower()]
                 )
     return wikitext.wikitext
-METHODS.append((translate_item_flags, ("strings",)))
 
 
+@register(Function.STRINGS)
 def translate_levels(wikitext, strings):
     infobox = wikitext.wikitext.filter_templates(matches="Item infobox")[0]
     item_kind = infobox.get("item-kind")
@@ -144,9 +164,9 @@ def translate_levels(wikitext, strings):
         item_kind.value.replace(value, strings.DICTIONARY_LEVEL_C[value])
 
     return wikitext.wikitext
-METHODS.append((translate_levels, ("strings",)))
 
 
+@register(Function.STRINGS)
 def translate_set_contents(wikitext, strings):
     result = re.search(
         "(The|This)( set)?( contains| includes)?( the)?( following)? items.*?:",
@@ -166,22 +186,21 @@ def translate_set_contents(wikitext, strings):
         )
 
     return wikitext.wikitext
-METHODS.append((translate_set_contents, ("strings",)))
 
 
+@register(Function.STRINGS)
 def translate_update_history(wikitext, strings):
     sentence = re.search(".*?[Aa]dded.*? to the game\.", str(wikitext.wikitext))
     if sentence:
         wikitext.wikitext.replace(sentence.group(), strings.ADDEDTOGAME)
 
     return wikitext.wikitext
-METHODS.append((translate_update_history, ("strings",)))
 
 
 # ==================
 # Creating sentences
 # ==================
-
+@register(Function.EXTENDED, Function.STRINGS)
 def create_sentence_1_cw(wikitext, strings):
     sentence = re.findall(
         ".*?'''"+wikitext.item_name+"'''.*? for .*?\.",
@@ -240,9 +259,9 @@ def create_sentence_1_cw(wikitext, strings):
 
     wikitext.wikitext.replace(sentence, sentence_trans + strings.ITEMLOOK)
     return wikitext.wikitext
-METHODS.append((create_sentence_1_cw, ("strings", "extended")))
 
 
+@register(Function.EXTENDED, Function.STRINGS)
 def create_sentence_1_set(wikitext, strings):
     sentence1_1 = re.findall(
         ".*?'''" + wikitext.item_name + "'''.*? for .*?\.",
@@ -265,9 +284,9 @@ def create_sentence_1_set(wikitext, strings):
 
     wikitext.wikitext.replace(sentence1_1+sentence1_2, sentence1_1trans+sentence1_2trans)
     return wikitext.wikitext
-METHODS.append((create_sentence_1_set, ("strings", "extended")))
 
 
+@register(Function.EXTENDED, Function.STRINGS)
 def create_sentence_community(wikitext, strings):
     sentence_community = re.findall(".*?contributed.*?Steam Workshop.*\.", str(wikitext))
     if sentence_community:
@@ -289,9 +308,9 @@ def create_sentence_community(wikitext, strings):
         )
         wikitext.wikitext.replace(sentence_community[0], sct)
         return wikitext.wikitext
-METHODS.append((create_sentence_community, ("strings", "extended")))
 
 
+@register(Function.EXTENDED, Function.STRINGS)
 def create_sentence_promo(wikitext, strings):
     sentencepromo = re.findall(".*?Genuine.*?quality.*?\.", str(wikitext))
     if sentencepromo:
@@ -328,14 +347,13 @@ def create_sentence_promo(wikitext, strings):
         wikitext.wikitext.replace(sentencepromo[0], spt)
 
     return wikitext.wikitext
-METHODS.append((create_sentence_promo, ("strings", "extended")))
 
 
 # ====================================
 # Methods operating on the Stack cache
 # ====================================
 
-
+@register(Function.CACHE)
 def translate_quotes(wikitext, stack):
     for template in wikitext.wikitext.ifilter_templates(matches="Quotation"):
         if not template.has("sound"):
@@ -354,9 +372,9 @@ def translate_quotes(wikitext, stack):
         if en_sound:
             template.add("en-sound", "yes", showkey=True)
     return wikitext.wikitext
-METHODS.append((translate_quotes, ("cache",)))
 
 
+@register(Function.CACHE)
 def translate_description(wikitext, stack):
     infobox = wikitext.wikitext.filter_templates(matches="Item infobox")[0]
     if infobox.has("item-description"):
@@ -370,9 +388,9 @@ def translate_description(wikitext, stack):
         value_german = stack.localization_file_cache[wikitext.language]["lang"]["Tokens"][key_english[9:]]
         description.value = str(description.value).replace(description_text, value_german)
     return wikitext.wikitext
-METHODS.append((translate_description, ("cache",)))
 
 
+@register(Function.CACHE)
 def translate_main_seealso(wikitext, stack):
     # Oh please, don't look at this
     for template in wikitext.wikitext.ifilter_templates(
@@ -399,9 +417,9 @@ def translate_main_seealso(wikitext, stack):
                     template.add("l"+str(arg_num), label, showkey=True)
                     arg_num += 1
     return wikitext.wikitext
-METHODS.append((translate_main_seealso, ("cache",)))
 
 
+@register(Function.CACHE)
 def translate_wikilinks(wikitext, stack):
     for wikilink in clean_links(wikitext.wikilinks, wikitext.language, prefixes=stack.prefixes):
         if not str(wikilink) in wikitext.wikitext:
@@ -425,9 +443,9 @@ def translate_wikilinks(wikitext, stack):
             break
         wikitext.wikitext.replace(str(wikilink), str(new_wikilink))
     return wikitext.wikitext
-METHODS.append((translate_wikilinks, ("cache",)))
 
 
+@register(Function.CACHE)
 def translate_wikipedia_links(wikitext, stack):
     for wikipedia_link in wikitext.wikipedia_links:
         if not str(wikipedia_link) in wikitext.wikitext:
@@ -449,7 +467,3 @@ def translate_wikipedia_links(wikitext, stack):
             break
         wikitext.wikitext.replace(str(wikipedia_link), str(new_link))
     return wikitext.wikitext
-METHODS.append((translate_wikipedia_links, ("cache",)))
-
-__all__ = [method.__name__ for method, _ in METHODS]
-METHODS = {method.__name__: (method, flags) for method, flags in METHODS}

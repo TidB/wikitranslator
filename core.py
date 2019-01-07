@@ -1,30 +1,55 @@
-from collections import defaultdict, OrderedDict
-import re
+from collections import defaultdict
 import sys
 import traceback
 
-import mwparserfromhell as mw
-
 from functions import *
 from helpers import clean_links, Wikilink
-from lang import *
 import vdfparser
 
-LANGUAGES = {
-    "da": "Danish",
-    "de": "German",
-    "fi": "Finnish",
-    "fr": "French",
-    "it": "Italian",
-    "ko": "Korean",
-    "nl": "Dutch",
-    "pt-br": "Brazilian",
-    "ru": "Russian",
-    "tr": "Turkish",
-}
 
 CHUNK_SIZE = 50
 DELAY = 0.5
+
+
+LANGUAGES = {
+    'da': 'Danish',
+    'de': 'German',
+    'fi': 'Finnish',
+    'fr': 'French',
+    'it': 'Italian',
+    'ko': 'Korean',
+    'nl': 'Dutch',
+    'pt-br': 'Brazilian',
+    'ru': 'Russian',
+    'tr': 'Turkish',
+}
+
+STANDARD_CONFIG = {
+    'language': 'de',
+    'presets': {
+        'Generic': [
+            'translate_categories', 'translate_headlines',
+        ],
+        'Cosmetic': [
+            'translate_categories', 'translate_allclass_links',
+            'translate_headlines', 'translate_image_thumbnail',
+            'translate_item_flags', 'translate_levels',
+            'translate_update_history', 'create_sentence_1_cw'
+        ],
+        'Weapon': [
+            'translate_categories', 'translate_allclass_links',
+            'translate_headlines', 'translate_image_thumbnail',
+            'translate_item_flags', 'translate_levels',
+            'translate_update_history', 'create_sentence_1_cw'
+        ],
+        'Set': [
+            'add_displaytitle', 'translate_categories',
+            'translate_allclass_links', 'translate_headlines',
+            'translate_image_thumbnail', 'translate_update_history',
+            'create_sentence_1_set', 'translate_set_contents'
+        ],
+    }
+}
 
 
 def merge_jsons(jsons):
@@ -76,9 +101,8 @@ def merge_jsons(jsons):
     return end_json
 
 
-class Stack(OrderedDict):
-    """An collections.OrderedDict with additional attributes, used for storing
-    multiple wikitexts.
+class Context:
+    """An object for caching purposes.
 
     Atrributes:
         tf2_api (api.API or None): Used for API calls at the TF2 Wiki. Defaults
@@ -87,7 +111,7 @@ class Stack(OrderedDict):
             Defaults to 'None'.
         wikilinks (dict[set]): Stores all wikilinks sorted by language.
     """
-    def __init__(self, args, tf2_api=None, wikipedia_api=None):
+    def __init__(self, tf2_api=None, wikipedia_api=None):
         """Input:
           List of dictionaries of the form:
             key: wikitext (Wikitext)
@@ -96,10 +120,6 @@ class Stack(OrderedDict):
           Creates collections.OrderedDict with:
             key: wikitext (Wikitext)
             value: methods (list of str)"""
-
-        if args:
-            self.update(args)
-            self.update_methods()
 
         self.tf2_api = tf2_api
         self.wikipedia_api = wikipedia_api
@@ -157,22 +177,17 @@ class Stack(OrderedDict):
 
         self.prefixes = []
 
-        super().__init__()
-
         self.cache_methods = set()  # Methods in the texts requiring the cache
         self.file_languages = set()  # Languages needed for localization files
 
-    def update_methods(self):
-        for wikitext, methods in self.items():
-            for method, flags in methods:
-                if "cache" in flags:
-                    self.cache_methods.add(method)
-                if method == translate_description:
-                    self.file_languages.add(wikitext.language)
-
-    def translate(self):
-        for wikitext, methods in self.items():
-            wikitext.translate(methods, self)
+    def translate(self, text, language, methods=None):
+        wikitext = Wikitext(text, language)
+        for method, flags in methods:
+            if "cache" in flags:
+                self.cache_methods.add(method)
+            if method == translate_description:
+                self.file_languages.add(wikitext.language)
+        return wikitext.translate(methods, self)
 
     def scan_all(self):
         if translate_main_seealso in self.cache_methods or \
@@ -554,24 +569,6 @@ class Stack(OrderedDict):
                                 if link.title == existing_link or link.title in value["aliases"]:
                                     self.wikipedia_links_cache[existing_link]["anchors"].add(link.anchor)
 
-    # --------------
-    # Clearing cache
-    # --------------
-
-    def clear_all(self):
-        self.clear_wikilink_cache()
-        self.clear_localization_file_cache()
-        self.clear_sound_file_cache()
-
-    def clear_wikilink_cache(self):
-        self.wikilink_cache = dict()
-
-    def clear_localization_file_cache(self):
-        self.localization_file_cache = dict()
-
-    def clear_sound_file_cache(self):
-        self.sound_file_cache = dict()
-
 
 class Wikitext:
     """
@@ -618,7 +615,7 @@ class Wikitext:
             wikitext: The wikitext. Type can be anything that can be parsed by
                 'mwparserfromhell.utils.parse_anything'.
             language (str): ISO code of the language the wikitext should be
-                translate to.
+                translated to.
         """
         self.language = language
         self.wikitext = mw.parse(wikitext)
@@ -649,7 +646,7 @@ class Wikitext:
     # Translate
     # =========
 
-    def translate(self, methods, stack):
+    def translate(self, methods, context):
         for method, flags in methods:
             if self.restricted and "extended" in flags:
                 continue
@@ -658,7 +655,7 @@ class Wikitext:
                 if "strings" in flags:
                     self.wikitext = method(self, globals()[self.language.lower()])
                 elif "cache" in flags:
-                    self.wikitext = method(self, stack)
+                    self.wikitext = method(self, context)
                 else:
                     self.wikitext = method(self)
             except Exception:

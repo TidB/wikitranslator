@@ -26,29 +26,6 @@ LANGUAGES = {
 
 STANDARD_CONFIG = {
     'language': 'de',
-    'presets': {
-        'Generic': [
-            'translate_categories', 'translate_headlines',
-        ],
-        'Cosmetic': [
-            'translate_categories', 'translate_allclass_links',
-            'translate_headlines', 'translate_image_thumbnail',
-            'translate_item_flags', 'translate_levels',
-            'translate_update_history', 'create_sentence_1_cw'
-        ],
-        'Weapon': [
-            'translate_categories', 'translate_allclass_links',
-            'translate_headlines', 'translate_image_thumbnail',
-            'translate_item_flags', 'translate_levels',
-            'translate_update_history', 'create_sentence_1_cw'
-        ],
-        'Set': [
-            'add_displaytitle', 'translate_categories',
-            'translate_allclass_links', 'translate_headlines',
-            'translate_image_thumbnail', 'translate_update_history',
-            'create_sentence_1_set', 'translate_set_contents'
-        ],
-    }
 }
 
 
@@ -180,14 +157,19 @@ class Context:
         self.cache_methods = set()  # Methods in the texts requiring the cache
         self.file_languages = set()  # Languages needed for localization files
 
-    def translate(self, text, language, methods=None):
-        wikitext = Wikitext(text, language)
-        for method, flags in methods:
-            if "cache" in flags:
-                self.cache_methods.add(method)
-            if method == translate_description:
-                self.file_languages.add(wikitext.language)
-        return wikitext.translate(methods, self)
+    def translate(self, language, *texts):
+        wikitexts = [
+            Wikitext(text, language)
+            for text in texts
+        ]
+
+        #for method, flags in methods:
+        #    if "cache" in flags:
+        #        self.cache_methods.add(method)
+        #    if method == translate_description:
+        #        self.file_languages.add(wikitext.language)
+
+        return [wikitext.translate(self) for wikitext in wikitexts]
 
     def scan_all(self):
         if translate_main_seealso in self.cache_methods or \
@@ -646,20 +628,18 @@ class Wikitext:
     # Translate
     # =========
 
-    def translate(self, methods, context):
-        for method, flags in methods:
+    def translate(self, context):
+        # Iterate through all functions
+        '''for method, flags in self.methods:
+            # TODO
             if self.restricted and "extended" in flags:
                 continue
-            print("trying method:", method.__name__)
             try:
-                if "strings" in flags:
-                    self.wikitext = method(self, globals()[self.language.lower()])
-                elif "cache" in flags:
-                    self.wikitext = method(self, context)
-                else:
-                    self.wikitext = method(self)
+                #if "strings" in flags:
+                #    self.wikitext = method(self, globals()[self.language.lower()])
+                self.wikitext = method(self, context)
             except Exception:
-                print(traceback.format_exc(), file=sys.stderr)
+                print(traceback.format_exc(), file=sys.stderr)'''
 
         return self.wikitext
 
@@ -682,7 +662,7 @@ class Wikitext:
             return [
                 str(link.title)
                 for link in infobox.get("used-by").value.filter_wikilinks()
-                    ]
+            ]
         elif self.wikitext_type == "set":
             infobox = self.wikitext.filter_templates(matches="item set infobox")[0]
             return [str(infobox.get("used-by").value).strip()]
@@ -691,7 +671,7 @@ class Wikitext:
         infobox = self.wikitext.filter_templates(matches="item infobox")
         if infobox:
             wikitext_type = infobox[0].get("type").value.strip().lower()
-            if wikitext_type in ["misc", "hat"]:  # Legacy shit
+            if wikitext_type in ["misc", "hat"]:  # Old cosmetics system
                 wikitext_type = "cosmetic"
         elif self.wikitext.filter_templates(matches="item set infobox"):
             wikitext_type = "set"

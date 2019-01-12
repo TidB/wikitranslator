@@ -54,31 +54,32 @@ class ControlPanel(ttk.Frame):
         language = open_config('language')
         api_access = open_config('api_access')
 
-        self.label_language = ttk.Label(self, text='Language')
-        self.combobox_language = ttk.Combobox(
+        self.language_label = ttk.Label(self, text='Language: ')
+        self.language = ttk.Combobox(
             self,
+            width=7,
             state='readonly',
             values=list(core.LANGUAGES.keys())
         )
-        self.combobox_language.set(language)
-        self.combobox_language.bind(
+        self.language.set(language)
+        self.language.bind(
             '<<ComboboxSelected>>', self.combobox_updated
         )
 
         self.var_api_access = tk.IntVar()
         self.checkbutton_api_access = ttk.Checkbutton(
-            self, text='Use online wiki to improve translations',
+            self, text='Use TF Wiki connection to improve translations',
             variable=self.var_api_access,
             command=lambda: save_config('api_access', self.var_api_access.get())
         )
         self.var_api_access.set(api_access)
 
-        self.label_language.grid(column=0, row=0, sticky='nwes')
-        self.combobox_language.grid(column=0, row=1, sticky='nwes')
-        self.checkbutton_api_access.grid(column=0, row=2, sticky='nwes')
+        self.language_label.grid(column=0, row=0, sticky='nwes')
+        self.language.grid(column=1, row=0, sticky='nwes', padx=(0, 15))
+        self.checkbutton_api_access.grid(column=2, row=0, sticky='nwes')
 
     def combobox_updated(self, _):
-        save_config('language', self.combobox_language.get())
+        save_config('language', self.language.get())
         self.translate_callback()
 
 
@@ -95,14 +96,13 @@ class GUI(tk.Tk):
         self.title('wikitranslator')
         self.protocol('WM_DELETE_WINDOW', self.exit)
 
-        self.frame = ttk.Frame(self, padding='3 3 3 3')
+        self.frame = ttk.Frame(self, padding='3 3 3 3', style='Wat.TFrame')
 
         self.text_input = tk.Text(
             self.frame,
             width=90, height=40,
             wrap='char',
-            maxundo=100,
-            undo=True
+            undo=True, maxundo=100
         )
         self.scrollbar_input = ttk.Scrollbar(
             self.frame, orient='vertical', command=self.text_input.yview
@@ -112,8 +112,6 @@ class GUI(tk.Tk):
             self.frame,
             width=90, height=40,
             wrap='char',
-            maxundo=100,
-            undo=True,
             state=tk.DISABLED
         )
         self.scrollbar_output = ttk.Scrollbar(
@@ -121,26 +119,25 @@ class GUI(tk.Tk):
         )
 
         self.control_panel = ControlPanel(
-            self.frame, self.translate, padding='6 6 6 6'
+            self.frame, self.translate, padding='3 3 3 3'
         )
 
         self.frame.grid(column=0, row=0, sticky='nwes')
 
-        self.text_input.grid(column=0, row=0, sticky='nwes')
-        self.scrollbar_input.grid(column=1, row=0, sticky='nwes')
-        self.control_panel.grid(column=2, row=0, sticky='nwes')
-        self.text_output.grid(column=3, row=0, sticky='nwes')
-        self.scrollbar_output.grid(column=4, row=0, sticky='nwes')
+        self.control_panel.grid(column=0, row=0, sticky='nwes')
+        self.text_input.grid(column=0, row=1, sticky='nwes')
+        self.scrollbar_input.grid(column=1, row=1, sticky='nwes')
+        self.text_output.grid(column=2, row=1, sticky='nwes')
+        self.scrollbar_output.grid(column=3, row=1, sticky='nwes')
 
         self.text_input['yscrollcommand'] = self.scrollbar_input.set
         self.text_output['yscrollcommand'] = self.scrollbar_output.set
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
-        self.frame.rowconfigure(0, weight=1, minsize=150)
-        self.frame.columnconfigure(0, weight=2, minsize=200)
-        self.frame.columnconfigure(2, minsize=250)
-        self.frame.columnconfigure(3, weight=2, minsize=130)
+        self.frame.rowconfigure(1, weight=1, minsize=150)
+        self.frame.columnconfigure(0, weight=2, minsize=400)
+        self.frame.columnconfigure(2, weight=2, minsize=400)
 
         self.bind('<Control-Z>', self.text_input.edit_undo)
         self.bind('<Control-Shift-Z>', self.text_input.edit_redo)

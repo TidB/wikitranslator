@@ -183,12 +183,6 @@ class Context:
             for text in texts
         ]
 
-        #for method, flags in methods:
-        #    if "cache" in flags:
-        #        self.cache_methods.add(method)
-        #    if method == translate_description:
-        #        self.file_languages.add(wikitext.language)
-
         return [wikitext.translate(self, api_access) for wikitext in wikitexts]
 
     def scan_all(self):

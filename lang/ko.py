@@ -37,14 +37,14 @@ SENTENCE_1_SUB_SECONDARY = "[[Weapon/ko#{class_name}secondary|보조무기]]"
 SENTENCE_1_SUB_MELEE = "[[Weapon/ko#{class_name}melee|근접무기]]"
 
 # FLAGS
-DICTIONARY_FLAGS = {
+ITEM_FLAGS = {
     "not usable in crafting": "제작에 사용할 수 없음",
     "not tradable": "거래 불가",
     "not tradable or usable in crafting": "거래 및 조합 불가",
 }
 
 # ATTRIBUTES
-DICTIONARY_ATTS = {
+ATTRIBUTES = {
     "achievement item: not tradable": "도전과제 아이템 :　거래 불가",
     "holiday restriction: tf birthday": "축제일 제한: TF 생일",
     "holiday restriction: winter": "축제일 제한: 겨울",
@@ -54,7 +54,7 @@ DICTIONARY_ATTS = {
 }
 
 # CLASSES
-DICTIONARY_CLASSES = {
+CLASSES = {
     "Scout": "스카웃",
     "Soldier": "솔저",
     "Pyro": "파이로",
@@ -67,7 +67,7 @@ DICTIONARY_CLASSES = {
 }
 
 # HEADLINES
-DICTIONARY_HEADLINES = {
+HEADINGS = {
     'as a crafting ingredient': "사용되는 제작식",
     'blueprint': "제작식",
     'bugs': "버그",
@@ -89,7 +89,7 @@ DICTIONARY_HEADLINES = {
 }
 
 # ITEM LEVELS
-DICTIONARY_LEVEL_C = {
+ITEM_LEVELS = {
     'Apparel': "의복",
     'Armband': "완장",
     'Aura of Incorruptibility': "순수함의 오라",

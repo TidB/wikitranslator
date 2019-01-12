@@ -37,14 +37,14 @@ SENTENCE_1_SUB_SECONDARY = "[[Weapon/nl#{class_name}secondary|secondair wapen]]"
 SENTENCE_1_SUB_MELEE = "[[Weapon/nl#{class_name}melee|melee wapen]]"
 
 # FLAGS
-DICTIONARY_FLAGS = {
+ITEM_FLAGS = {
     "not usable in crafting": "Niet te gebruiken bij ontwerpen",
     "not tradable": "Niet ruilbaar",
     "not tradable or usable in crafting": "Niet ruilbaar of te gebruiken bij ontwerpen",
 }
 
 # ATTRIBUTES
-DICTIONARY_ATTS = {
+ATTRIBUTES = {
     "achievement item: not tradable": "Prestatievoorwerp: niet ruilbaar",
     "holiday restriction: tf birthday": "Feestdagbeperking: verjaardag van TF",
     "holiday restriction: winter": "Feestdagbeperking: Winter",
@@ -54,7 +54,7 @@ DICTIONARY_ATTS = {
 }
 
 # CLASSES
-DICTIONARY_CLASSES = {
+CLASSES = {
     "Scout": "Scout",
     "Soldier": "Soldier",
     "Pyro": "Pyro",
@@ -67,7 +67,7 @@ DICTIONARY_CLASSES = {
 }
 
 # HEADLINES
-DICTIONARY_HEADLINES = {
+HEADINGS = {
     'as a crafting ingredient': "Als een ingredient voor ontwerpen",
     'blueprint': "Blauwdruk",
     'bugs': "Bugs",
@@ -89,7 +89,7 @@ DICTIONARY_HEADLINES = {
 }
 
 # ITEM LEVELS
-DICTIONARY_LEVEL_C = {
+ITEM_LEVELS = {
     'Apparel': "Kledij",
     'Armband': "Armband",
     'Aura of Incorruptibility': "Aura van Oncorruptheid",

@@ -4,6 +4,7 @@ import traceback
 
 from functions import *
 from helpers import clean_links, Wikilink
+from lang import *
 import vdfparser
 
 
@@ -26,6 +27,7 @@ LANGUAGES = {
 
 STANDARD_CONFIG = {
     'language': 'de',
+    'api_access': True,
 }
 
 
@@ -101,6 +103,8 @@ class Context:
         self.tf2_api = tf2_api
         self.wikipedia_api = wikipedia_api
 
+        self.strings = None
+
         self.wikilinks = defaultdict(set)  # Format: {language: {link,},}
         self.wikipedia_links = defaultdict(set)  # Format: {language: {link,},}
         self.sound_files = defaultdict(set)  # Format: {language: {file,},}
@@ -157,8 +161,24 @@ class Context:
         self.cache_methods = set()  # Methods in the texts requiring the cache
         self.file_languages = set()  # Languages needed for localization files
 
-    def translate(self, language, *texts):
-        wikitexts = [
+    def translate(self, language, api_access, *texts):
+        if api_access and (self.tf2_api is None or self.wikipedia_api is None):
+            raise ValueError('API access invalid without API locations')
+
+        self.strings = globals()[language.lower()]
+
+        wikitexts = []
+        for text in texts:
+            wikitext = Wikitext(text, language)
+            if api_access:
+                if wikitext.uses_description():
+                    self.file_languages.add(language)
+
+                self.wikilinks |= wikitext.get_template_links() | wikitext.get_wikilinks()
+                self.wikipedia_links |= wikitext.get_wikipedia_links()
+                self.sound_files |= wikitext.get_sound_files()
+            wikitexts.append(wikitext)
+        [
             Wikitext(text, language)
             for text in texts
         ]
@@ -169,39 +189,21 @@ class Context:
         #    if method == translate_description:
         #        self.file_languages.add(wikitext.language)
 
-        return [wikitext.translate(self) for wikitext in wikitexts]
+        return [wikitext.translate(self, api_access) for wikitext in wikitexts]
 
     def scan_all(self):
-        if translate_main_seealso in self.cache_methods or \
-                        translate_wikilinks in self.cache_methods:
-            self.wikilinks = defaultdict(set)
-        if translate_quotes in self.cache_methods:
-            self.get_used_sound_files()
-        if translate_main_seealso in self.cache_methods:
-            self.get_template_links()
-        if translate_wikilinks in self.cache_methods:
-            self.get_wikilinks()
-        if translate_wikipedia_links in self.cache_methods:
-            self.get_wikipedia_links()
-
-        if translate_main_seealso in self.cache_methods or \
-                translate_wikilinks in self.cache_methods:
+        if self.wikilinks:
             self.prefixes = self.get_prefixes()
             for language, wikilinks in self.wikilinks.items():
                 self.wikilinks[language] = clean_links(wikilinks, language, prefixes=self.prefixes)
 
     def retrieve_all(self):
-        if translate_quotes in self.cache_methods:
-            self.update_english_sound_file_cache()
-            self.update_localized_sound_file_cache()
-        if translate_description in self.cache_methods:
-            self.update_localization_file_cache()
-        if translate_main_seealso in self.cache_methods or \
-                translate_wikilinks in self.cache_methods:
-            self.update_english_wikilink_cache()
-            self.update_localized_wikilink_cache()
-        if translate_wikipedia_links in self.cache_methods:
-            self.update_wikipedia_links_cache()
+        self.update_english_sound_file_cache()
+        self.update_localized_sound_file_cache()
+        self.update_localization_file_cache()
+        self.update_english_wikilink_cache()
+        self.update_localized_wikilink_cache()
+        self.update_wikipedia_links_cache()
 
     def get_prefixes(self):
         """Get the used prefixes for interwiki links which have to be ignored.
@@ -219,32 +221,6 @@ class Context:
 
         prefixes = [i["prefix"] for i in response["query"]["interwikimap"]]
         return prefixes
-
-    # --------
-    # Scanning
-    # --------
-
-    def get_used_sound_files(self):
-        self.sound_files = defaultdict(set)
-        for text in self:
-            text.get_used_sound_files()
-            self.sound_files[text.language] |= text.sound_files
-
-    def get_template_links(self):
-        for text in self:
-            text.get_template_links()
-            self.wikilinks[text.language] |= text.template_links
-
-    def get_wikilinks(self):
-        for text in self:
-            text.get_wikilinks()
-            self.wikilinks[text.language] |= text.wikilinks
-
-    def get_wikipedia_links(self):
-        self.wikipedia_links = defaultdict(set)
-        for text in self:
-            text.get_wikipedia_links()
-            self.wikipedia_links[text.language] |= text.wikipedia_links
 
     # ----------
     # Retrieving
@@ -628,18 +604,16 @@ class Wikitext:
     # Translate
     # =========
 
-    def translate(self, context):
-        # Iterate through all functions
-        '''for method, flags in self.methods:
-            # TODO
-            if self.restricted and "extended" in flags:
+    def translate(self, context, api_access):
+        for function, flags in FUNCTIONS.values():
+            if self.restricted and Function.EXTENDED in flags:
+                continue
+            elif not api_access and Function.CACHE in flags:
                 continue
             try:
-                #if "strings" in flags:
-                #    self.wikitext = method(self, globals()[self.language.lower()])
-                self.wikitext = method(self, context)
+                self.wikitext = function(self, context)
             except Exception:
-                print(traceback.format_exc(), file=sys.stderr)'''
+                print(traceback.format_exc(), file=sys.stderr)
 
         return self.wikitext
 
@@ -684,7 +658,7 @@ class Wikitext:
     # Used by Stack
     # -------------
 
-    def get_used_sound_files(self):
+    def get_sound_files(self):
         """Get the files mentioned in the "sound" parameter of Quotation
         templates."""
         self.sound_files = set()

@@ -12,8 +12,6 @@ To-Do
 - Cleaning up the code
 - Improved user guidance
 - Fixing various problems with Mac OS X (copying/selecting text)
-- Adding a status bar to the GUI
-- Saving cache as files
 - {{w}} to [[w]] transformation
 - Tests (ahem)
 - Enable certain methods for unsupported languages

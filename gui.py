@@ -32,11 +32,27 @@ def recreate_config():
         json.dump(core.STANDARD_CONFIG, file, indent=4)
 
 
+def save_config(key, value):
+    try:
+        with open(CONFIG, 'r') as file:
+            config_file = json.load(file)
+    except (FileNotFoundError, TypeError):
+        recreate_config()
+        raise ValueError('config_file loading failed.')
+
+    config_file[key] = value
+
+    with open(CONFIG, 'w') as file:
+        json.dump(config_file, file, indent=4)
+
+
 class ControlPanel(ttk.Frame):
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, translate_callback, **kwargs):
         ttk.Frame.__init__(self, parent, **kwargs)
 
+        self.translate_callback = translate_callback
         language = open_config('language')
+        api_access = open_config('api_access')
 
         self.label_language = ttk.Label(self, text='Language')
         self.combobox_language = ttk.Combobox(
@@ -46,26 +62,24 @@ class ControlPanel(ttk.Frame):
         )
         self.combobox_language.set(language)
         self.combobox_language.bind(
-            '<<ComboboxSelected>>',
-            lambda _: self.save_config('language', self.combobox_language.get())
+            '<<ComboboxSelected>>', self.combobox_updated
         )
+
+        self.var_api_access = tk.IntVar()
+        self.checkbutton_api_access = ttk.Checkbutton(
+            self, text='Use online wiki to improve translations',
+            variable=self.var_api_access,
+            command=lambda: save_config('api_access', self.var_api_access.get())
+        )
+        self.var_api_access.set(api_access)
 
         self.label_language.grid(column=0, row=0, sticky='nwes')
         self.combobox_language.grid(column=0, row=1, sticky='nwes')
+        self.checkbutton_api_access.grid(column=0, row=2, sticky='nwes')
 
-    def save_config(self, key, value):
-        try:
-            file = open(CONFIG, 'r')
-            config_file = json.load(file)
-        except (FileNotFoundError, TypeError):
-            recreate_config()
-            raise ValueError('config_file loading failed.')
-
-        if key == 'language':
-            config_file[key] = value
-
-        with open(CONFIG, 'w') as file:
-            json.dump(config_file, file, indent=4)
+    def combobox_updated(self, _):
+        save_config('language', self.combobox_language.get())
+        self.translate_callback()
 
 
 class GUI(tk.Tk):
@@ -81,21 +95,21 @@ class GUI(tk.Tk):
         self.title('wikitranslator')
         self.protocol('WM_DELETE_WINDOW', self.exit)
 
-        self.mainframe = ttk.Frame(self, padding='3 3 3 3')
+        self.frame = ttk.Frame(self, padding='3 3 3 3')
 
         self.text_input = tk.Text(
-            self.mainframe,
+            self.frame,
             width=90, height=40,
             wrap='char',
             maxundo=100,
             undo=True
         )
         self.scrollbar_input = ttk.Scrollbar(
-            self.mainframe, orient='vertical', command=self.text_input.yview
+            self.frame, orient='vertical', command=self.text_input.yview
         )
 
         self.text_output = tk.Text(
-            self.mainframe,
+            self.frame,
             width=90, height=40,
             wrap='char',
             maxundo=100,
@@ -103,12 +117,14 @@ class GUI(tk.Tk):
             state=tk.DISABLED
         )
         self.scrollbar_output = ttk.Scrollbar(
-            self.mainframe, orient='vertical', command=self.text_output.yview
+            self.frame, orient='vertical', command=self.text_output.yview
         )
 
-        self.control_panel = ControlPanel(self.mainframe, padding='6 6 6 6')
+        self.control_panel = ControlPanel(
+            self.frame, self.translate, padding='6 6 6 6'
+        )
 
-        self.mainframe.grid(column=0, row=0, sticky='nwes')
+        self.frame.grid(column=0, row=0, sticky='nwes')
 
         self.text_input.grid(column=0, row=0, sticky='nwes')
         self.scrollbar_input.grid(column=1, row=0, sticky='nwes')
@@ -121,10 +137,10 @@ class GUI(tk.Tk):
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
-        self.mainframe.rowconfigure(0, weight=1, minsize=150)
-        self.mainframe.columnconfigure(0, weight=2, minsize=200)
-        self.mainframe.columnconfigure(2, minsize=250)
-        self.mainframe.columnconfigure(3, weight=2, minsize=130)
+        self.frame.rowconfigure(0, weight=1, minsize=150)
+        self.frame.columnconfigure(0, weight=2, minsize=200)
+        self.frame.columnconfigure(2, minsize=250)
+        self.frame.columnconfigure(3, weight=2, minsize=130)
 
         self.bind('<Control-Z>', self.text_input.edit_undo)
         self.bind('<Control-Shift-Z>', self.text_input.edit_redo)
@@ -140,7 +156,8 @@ class GUI(tk.Tk):
     def input_tick(self):
         current_input = self.text_input.get('1.0', 'end').strip()
         if current_input != self.last_input:
-            self.translate(current_input)
+            self.last_input = current_input
+            self.translate()
         self.after(1500, self.input_tick)
 
     def save_file(self, selection=False, path=None):
@@ -156,13 +173,15 @@ class GUI(tk.Tk):
         with open(path, 'ab') as file:
             file.write(bytes(self.text_output.get('1.0', 'end'), 'utf-8'))
 
-    def translate(self, wikitext_input):
+    def translate(self):
         language = open_config('language')
 
         self.context.scan_all()
         self.context.retrieve_all()
 
-        translated = self.context.translate(language, wikitext_input)
+        translated = self.context.translate(
+            language, self.control_panel.var_api_access.get(), self.last_input
+        )
 
         self.text_output.configure(state=tk.NORMAL)
         self.text_output.delete('1.0', 'end')

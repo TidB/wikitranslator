@@ -457,7 +457,12 @@ def translate_wikilinks(wikitext, context):
                 else:
                     new_wikilink.label = value["displaytitle"][wikitext.language]
             break
+
         wikitext.wikitext.replace(str(wikilink), str(new_wikilink))
+        if str(wikilink) in wikitext.wikitext:
+            # Yes we're doing it twice because mw doesn't catch everything in
+            # the first round
+            wikitext.wikitext.replace(str(wikilink), str(new_wikilink))
     return wikitext.wikitext
 
 

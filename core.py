@@ -1,4 +1,5 @@
 from collections import defaultdict
+import itertools
 import sys
 import traceback
 
@@ -655,7 +656,16 @@ class Wikitext:
 
     def get_wikilinks(self):
         wikilinks = set()
-        for wikilink in self.wikitext.ifilter_wikilinks():
+
+        # mwparserfromhell doesn't parse inside tags so we do that manually
+        tag_wikilinks = [
+            wikilink
+            for tag in self.wikitext.ifilter_tags()
+            if tag.contents is not None
+            for wikilink in mw.parse(str(tag.contents)).ifilter_wikilinks()
+        ]
+
+        for wikilink in itertools.chain(self.wikitext.ifilter_wikilinks(), tag_wikilinks):
             title = str(wikilink.title)
             label = wikilink.text if wikilink.text else ""
             # We don't need to check the links, clean_links() does that

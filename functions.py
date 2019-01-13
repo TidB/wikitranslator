@@ -6,7 +6,7 @@ import mwparserfromhell as mw
 
 from helpers import clean_links, Wikilink
 
-DISPLAYTITLE = "{{{{DISPLAYTITLE: {{{{item name|{name}}}}}}}}}\n"
+DISPLAYTITLE = '{{{{DISPLAYTITLE: {{{{item name|{name}}}}}}}}}\n'
 FUNCTIONS = {}
 
 
@@ -28,7 +28,7 @@ def register(*flags):
 
 
 def create_class_list(class_links, strings):
-    if "classes" in class_links[0].lower():
+    if 'classes' in class_links[0].lower():
         return strings.SENTENCE_1_CLASSES_ALL
     else:
         classes = strings.SENTENCE_1_CLASSES_ONE.format(

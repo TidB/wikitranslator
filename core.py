@@ -174,14 +174,13 @@ class Context:
                 if wikitext.uses_description():
                     self.file_languages.add(language)
 
-                self.wikilinks |= wikitext.get_template_links() | wikitext.get_wikilinks()
-                self.wikipedia_links |= wikitext.get_wikipedia_links()
-                self.sound_files |= wikitext.get_sound_files()
+                self.wikilinks[language] |= wikitext.wikilinks
+                self.wikipedia_links[language] |= wikitext.wikipedia_links
+                self.sound_files[language] |= wikitext.sound_files
             wikitexts.append(wikitext)
-        [
-            Wikitext(text, language)
-            for text in texts
-        ]
+
+        self.scan_all()
+        self.retrieve_all()
 
         return [wikitext.translate(self, api_access) for wikitext in wikitexts]
 
@@ -548,10 +547,6 @@ class Wikitext:
         wikilinks (set[Wikilink]): List of all wikilinks in the wikitext.
             Defaults to an empty set.
             Determined by method 'get_wikilinks'.
-        template_links (set[Wikilink]): List of all links found in {{Main}} and
-            {{See also}} templates in the wikitext.
-            Defaults to an empty set.
-            Determined by method 'get_template_links'.
         wikipedia_links (set[Wikilink]): List of all Wikipedia links found in
             the wikitext. Defaults to an empty set.
             Determined by method 'get_wikipedia_links'.
@@ -569,11 +564,11 @@ class Wikitext:
             language (str): ISO code of the language the wikitext should be
                 translated to.
         """
-        self.language = language
-        self.wikitext = mw.parse(wikitext)
-
         if language.lower() not in LANGUAGES:
             print("Language '{}' not supported.".format(language), file=sys.stderr)
+
+        self.language = language
+        self.wikitext = mw.parse(wikitext)
 
         self.wikitext_type = self.get_wikitext_type()
         self.item_name = self.get_item_name()
@@ -584,19 +579,14 @@ class Wikitext:
             self.restricted = False
             self.class_links = self.get_using_classes()
 
-        self.wikilinks = set()
-        self.template_links = set()
-        self.wikipedia_links = set()
-        self.sound_files = set()
+        self.wikilinks = self.get_wikilinks() | self.get_template_links()
+        self.wikipedia_links = self.get_wikipedia_links()
+        self.sound_files = self.get_sound_files()
 
     def __str__(self):
         """Returns:
              String representation of the stored wikitext."""
         return str(self.wikitext)
-
-    # =========
-    # Translate
-    # =========
 
     def translate(self, context, api_access):
         for function, flags in FUNCTIONS.values():
@@ -610,10 +600,6 @@ class Wikitext:
                 print(traceback.format_exc(), file=sys.stderr)
 
         return self.wikitext
-
-    # =======
-    # Analyze
-    # =======
 
     def get_item_name(self):
         itemname = self.wikitext.filter_tags(
@@ -648,42 +634,41 @@ class Wikitext:
 
         return wikitext_type
 
-    # -------------
-    # Used by Stack
-    # -------------
-
     def get_sound_files(self):
         """Get the files mentioned in the "sound" parameter of Quotation
         templates."""
-        self.sound_files = set()
+        sound_files = set()
         for template in self.wikitext.ifilter_templates(matches="Quotation"):
             if template.has("sound"):
-                self.sound_files.add(str(template.get("sound").value))
+                sound_files.add(str(template.get("sound").value))
+        return sound_files
 
     def get_template_links(self):
-        self.template_links = set()
+        template_links = set()
         for template in self.wikitext.ifilter_templates(
             matches=lambda x: str(x.name).lower() in ("see also", "main")
         ):
             for link in template.params:
                 if not link.showkey:
-                    self.template_links.add(Wikilink(link))
+                    template_links.add(Wikilink(link))
+        return template_links
 
     def get_wikilinks(self):
-        self.wikilinks = set()
+        wikilinks = set()
         for wikilink in self.wikitext.ifilter_wikilinks():
             title = str(wikilink.title)
             label = wikilink.text if wikilink.text else ""
             # We don't need to check the links, clean_links() does that
             link, anchor = title.rsplit("#", maxsplit=1) if "#" in title else (title, "")
-            self.wikilinks.add(Wikilink(
+            wikilinks.add(Wikilink(
                 link,
                 anchor=anchor,
                 label=label,
             ))
+        return wikilinks
 
     def get_wikipedia_links(self):
-        self.wikipedia_links = set()
+        wikipedia_links = set()
         for wikipedia_link in self.wikitext.filter_wikilinks():
             title = str(wikipedia_link.title)
             if not re.match("^(w|wikipedia):", title, flags=re.I):
@@ -691,9 +676,17 @@ class Wikitext:
             label = wikipedia_link.text if wikipedia_link.text else ""
             link, anchor = title.rsplit("#", maxsplit=1) if "#" in title else (title, "")
             interwiki, link = link.split(":", maxsplit=1)
-            self.wikipedia_links.add(Wikilink(
+            wikipedia_links.add(Wikilink(
                 link,
                 anchor=anchor,
                 label=label,
                 interwiki=interwiki
             ))
+        return wikipedia_links
+
+    def uses_description(self):
+        infobox = self.wikitext.filter_templates(matches="Item infobox")
+        if not infobox:
+            return False
+
+        return infobox[0].has("item-description")

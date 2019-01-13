@@ -1,22 +1,18 @@
 import json
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import ttk
 
 import api
 import core
 
 CONFIG = 'config.json'
 AUTOSAVE = 'autosave.txt'
-URL_GITHUB = 'https://github.com/TidB/wikitranslator'
-URL_WIKI = 'http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator'
 
 TF2_WIKI_API = 'https://wiki.teamfortress.com/w/api.php'
 WIKIPEDIA_API = 'https://en.wikipedia.org/w/api.php'
 
-TEXT_MODIFIED_DELAY = 1
 
-
-def open_config(key):
+def open_config():
     try:
         file = open(CONFIG, 'r')
         file.close()
@@ -24,7 +20,7 @@ def open_config(key):
         recreate_config()
     finally:
         with open(CONFIG, 'r') as file:
-            return json.load(file)[key]
+            return json.load(file)
 
 
 def recreate_config():
@@ -33,17 +29,11 @@ def recreate_config():
 
 
 def save_config(key, value):
-    try:
-        with open(CONFIG, 'r') as file:
-            config_file = json.load(file)
-    except (FileNotFoundError, TypeError):
-        recreate_config()
-        raise ValueError('config_file loading failed.')
-
-    config_file[key] = value
+    config = open_config()
+    config[key] = value
 
     with open(CONFIG, 'w') as file:
-        json.dump(config_file, file, indent=4)
+        json.dump(config, file, indent=4)
 
 
 class ControlPanel(ttk.Frame):
@@ -51,8 +41,8 @@ class ControlPanel(ttk.Frame):
         ttk.Frame.__init__(self, parent, **kwargs)
 
         self.translate_callback = translate_callback
-        language = open_config('language')
-        api_access = open_config('api_access')
+        language = open_config()['language']
+        api_access = open_config()['api_access']
 
         self.language_label = ttk.Label(self, text='Language: ')
         self.language = ttk.Combobox(
@@ -63,23 +53,24 @@ class ControlPanel(ttk.Frame):
         )
         self.language.set(language)
         self.language.bind(
-            '<<ComboboxSelected>>', self.combobox_updated
+            '<<ComboboxSelected>>',
+            lambda _: self.updated('language', self.language.get())
         )
 
-        self.var_api_access = tk.IntVar()
-        self.checkbutton_api_access = ttk.Checkbutton(
+        self.var_api = tk.IntVar()
+        self.api = ttk.Checkbutton(
             self, text='Use TF Wiki connection to improve translations',
-            variable=self.var_api_access,
-            command=lambda: save_config('api_access', self.var_api_access.get())
+            variable=self.var_api,
+            command=lambda: self.updated('api_access', self.var_api.get())
         )
-        self.var_api_access.set(api_access)
+        self.var_api.set(api_access)
 
         self.language_label.grid(column=0, row=0, sticky='nwes')
         self.language.grid(column=1, row=0, sticky='nwes', padx=(0, 15))
-        self.checkbutton_api_access.grid(column=2, row=0, sticky='nwes')
+        self.api.grid(column=2, row=0, sticky='nwes')
 
-    def combobox_updated(self, _):
-        save_config('language', self.language.get())
+    def updated(self, key, value):
+        save_config(key, value)
         self.translate_callback()
 
 
@@ -155,29 +146,17 @@ class GUI(tk.Tk):
         if current_input != self.last_input:
             self.last_input = current_input
             self.translate()
-        self.after(1500, self.input_tick)
+        self.after(1000, self.input_tick)
 
-    def save_file(self, selection=False, path=None):
-        if path is None:
-            path = AUTOSAVE
-        if selection is True:
-            path = tk.filedialog.asksaveasfilename(
-                defaultextension='.txt',
-                filetypes=[('text file', '.txt')]
-            )
-            if not path:
-                return
-        with open(path, 'ab') as file:
+    def save_file(self):
+        with open(AUTOSAVE, 'ab') as file:
             file.write(bytes(self.text_output.get('1.0', 'end'), 'utf-8'))
 
     def translate(self):
-        language = open_config('language')
-
-        self.context.scan_all()
-        self.context.retrieve_all()
-
         translated = self.context.translate(
-            language, self.control_panel.var_api_access.get(), self.last_input
+            self.control_panel.language.get(),
+            self.control_panel.var_api.get(),
+            self.last_input
         )
 
         self.text_output.configure(state=tk.NORMAL)

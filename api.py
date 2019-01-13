@@ -2,6 +2,8 @@ from sys import stderr
 from time import sleep
 from traceback import format_exc
 
+import requests
+
 from helpers import chunker, show_progress
 
 
@@ -25,16 +27,9 @@ def safe_request(request, api_location, **kwargs):
 
 
 class API:
-    def __init__(self, api_location, session=None, language=None):
+    def __init__(self, api_location):
         self.api_location = api_location
-
-        self.language = language
-
-        if session is None:
-            import requests
-            self.session = requests.session()
-        else:
-            self.session = session
+        self.session = requests.session()
 
     def get(self, api_location, params):
         return safe_request(self.session.get, api_location, params=params)

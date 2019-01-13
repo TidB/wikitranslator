@@ -4,3 +4,6 @@ main.css
 serve.py
 autosave.txt
 config.json
+build/
+dist/
+*.spec

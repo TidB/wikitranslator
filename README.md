@@ -6,7 +6,8 @@ Simple GUI interface with real-time translation.
 
 Additional information is [available on the TF Wiki](https://wiki.teamfortress.com/wiki/User:TidB/wikitranslator), also detailing the process of adding new languages.
 
-
+Run `pyinstaller gui.py -n wikitranslator --onefile --add-data="lang;lang"` and
+`pyinstaller gui.py -n wikitranslator --onedir --add-data="lang;lang` to build everything
 
 To-Do
 -----
@@ -17,4 +18,3 @@ To-Do
 - Automatic translation of infobox classes
 - Tests (ahem)
 - Enable certain methods for unsupported languages
-- Make installation less of a pain

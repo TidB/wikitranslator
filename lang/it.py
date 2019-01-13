@@ -37,14 +37,14 @@ SENTENCE_1_SUB_SECONDARY = "[[Weapon/it#{class_name}Secondario|arma secondaria]]
 SENTENCE_1_SUB_MELEE = "[[Weapon/it#{class_name}Mischia|arma da mischia]]"
 
 # FLAGS
-DICTIONARY_FLAGS = {
+ITEM_FLAGS = {
     "not usable in crafting": "Non utilizzabile nella forgiatura",
     "not tradable": "Non scambiabile",
     "not tradable or usable in crafting": "Non scambiabile o utilizzabile nella forgiatura",
 }
 
 # ATTRIBUTES
-DICTIONARY_ATTS = {
+ATTRIBUTES = {
     "achievement item: not tradable": "Oggetto ottenuto tramite achievement: non scambiabile",
     "holiday restriction: tf birthday": "Uso consentito durante: Compleanno di TF",
     "holiday restriction: winter": "Uso consentito durante: Inverno",
@@ -54,7 +54,7 @@ DICTIONARY_ATTS = {
 }
 
 # CLASSES
-DICTIONARY_CLASSES = {
+CLASSES = {
     "Scout": "Esploratore",
     "Soldier": "Soldato",
     "Pyro": "Piro",
@@ -67,7 +67,7 @@ DICTIONARY_CLASSES = {
 }
 
 # HEADLINES
-DICTIONARY_HEADLINES = {
+HEADINGS = {
     'as a crafting ingredient': "Come ingrediente di forgiatura",
     'blueprint': "Progetto",
     'bugs': "Errori",
@@ -89,7 +89,7 @@ DICTIONARY_HEADLINES = {
 }
 
 # ITEM LEVELS
-DICTIONARY_LEVEL_C = {
+ITEM_LEVELS = {
     'Apparel': "Abbigliamento",
     'Armband': "Benda",
     'Aura of Incorruptibility': "Aura dell'incorruttibilità",

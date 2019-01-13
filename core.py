@@ -1,30 +1,35 @@
-from collections import defaultdict, OrderedDict
-import re
+from collections import defaultdict
+import itertools
 import sys
 import traceback
-
-import mwparserfromhell as mw
 
 from functions import *
 from helpers import clean_links, Wikilink
 from lang import *
 import vdfparser
 
-LANGUAGES = {
-    "da": "Danish",
-    "de": "German",
-    "fi": "Finnish",
-    "fr": "French",
-    "it": "Italian",
-    "ko": "Korean",
-    "nl": "Dutch",
-    "pt-br": "Brazilian",
-    "ru": "Russian",
-    "tr": "Turkish",
-}
 
 CHUNK_SIZE = 50
 DELAY = 0.5
+
+
+LANGUAGES = {
+    'da': 'Danish',
+    'de': 'German',
+    'fi': 'Finnish',
+    'fr': 'French',
+    'it': 'Italian',
+    'ko': 'Korean',
+    'nl': 'Dutch',
+    'pt-br': 'Brazilian',
+    'ru': 'Russian',
+    'tr': 'Turkish',
+}
+
+STANDARD_CONFIG = {
+    'language': 'de',
+    'api_access': True,
+}
 
 
 def merge_jsons(jsons):
@@ -76,9 +81,8 @@ def merge_jsons(jsons):
     return end_json
 
 
-class Stack(OrderedDict):
-    """An collections.OrderedDict with additional attributes, used for storing
-    multiple wikitexts.
+class Context:
+    """An object for caching purposes.
 
     Atrributes:
         tf2_api (api.API or None): Used for API calls at the TF2 Wiki. Defaults
@@ -87,7 +91,7 @@ class Stack(OrderedDict):
             Defaults to 'None'.
         wikilinks (dict[set]): Stores all wikilinks sorted by language.
     """
-    def __init__(self, args, tf2_api=None, wikipedia_api=None):
+    def __init__(self, tf2_api=None, wikipedia_api=None):
         """Input:
           List of dictionaries of the form:
             key: wikitext (Wikitext)
@@ -97,12 +101,10 @@ class Stack(OrderedDict):
             key: wikitext (Wikitext)
             value: methods (list of str)"""
 
-        if args:
-            self.update(args)
-            self.update_methods()
-
         self.tf2_api = tf2_api
         self.wikipedia_api = wikipedia_api
+
+        self.strings = None
 
         self.wikilinks = defaultdict(set)  # Format: {language: {link,},}
         self.wikipedia_links = defaultdict(set)  # Format: {language: {link,},}
@@ -157,54 +159,45 @@ class Stack(OrderedDict):
 
         self.prefixes = []
 
-        super().__init__()
-
         self.cache_methods = set()  # Methods in the texts requiring the cache
         self.file_languages = set()  # Languages needed for localization files
 
-    def update_methods(self):
-        for wikitext, methods in self.items():
-            for method, flags in methods:
-                if "cache" in flags:
-                    self.cache_methods.add(method)
-                if method == translate_description:
-                    self.file_languages.add(wikitext.language)
+    def translate(self, language, api_access, *texts):
+        if api_access and (self.tf2_api is None or self.wikipedia_api is None):
+            raise ValueError('API access invalid without API locations')
 
-    def translate(self):
-        for wikitext, methods in self.items():
-            wikitext.translate(methods, self)
+        self.strings = globals()[language.lower()]
+
+        wikitexts = []
+        for text in texts:
+            wikitext = Wikitext(text, language)
+            if api_access:
+                if wikitext.uses_description():
+                    self.file_languages.add(language)
+
+                self.wikilinks[language] |= wikitext.wikilinks
+                self.wikipedia_links[language] |= wikitext.wikipedia_links
+                self.sound_files[language] |= wikitext.sound_files
+            wikitexts.append(wikitext)
+
+        self.scan_all()
+        self.retrieve_all()
+
+        return [str(wikitext.translate(self, api_access)) for wikitext in wikitexts]
 
     def scan_all(self):
-        if translate_main_seealso in self.cache_methods or \
-                        translate_wikilinks in self.cache_methods:
-            self.wikilinks = defaultdict(set)
-        if translate_quotes in self.cache_methods:
-            self.get_used_sound_files()
-        if translate_main_seealso in self.cache_methods:
-            self.get_template_links()
-        if translate_wikilinks in self.cache_methods:
-            self.get_wikilinks()
-        if translate_wikipedia_links in self.cache_methods:
-            self.get_wikipedia_links()
-
-        if translate_main_seealso in self.cache_methods or \
-                translate_wikilinks in self.cache_methods:
+        if self.wikilinks:
             self.prefixes = self.get_prefixes()
             for language, wikilinks in self.wikilinks.items():
                 self.wikilinks[language] = clean_links(wikilinks, language, prefixes=self.prefixes)
 
     def retrieve_all(self):
-        if translate_quotes in self.cache_methods:
-            self.update_english_sound_file_cache()
-            self.update_localized_sound_file_cache()
-        if translate_description in self.cache_methods:
-            self.update_localization_file_cache()
-        if translate_main_seealso in self.cache_methods or \
-                translate_wikilinks in self.cache_methods:
-            self.update_english_wikilink_cache()
-            self.update_localized_wikilink_cache()
-        if translate_wikipedia_links in self.cache_methods:
-            self.update_wikipedia_links_cache()
+        self.update_english_sound_file_cache()
+        self.update_localized_sound_file_cache()
+        self.update_localization_file_cache()
+        self.update_english_wikilink_cache()
+        self.update_localized_wikilink_cache()
+        self.update_wikipedia_links_cache()
 
     def get_prefixes(self):
         """Get the used prefixes for interwiki links which have to be ignored.
@@ -222,32 +215,6 @@ class Stack(OrderedDict):
 
         prefixes = [i["prefix"] for i in response["query"]["interwikimap"]]
         return prefixes
-
-    # --------
-    # Scanning
-    # --------
-
-    def get_used_sound_files(self):
-        self.sound_files = defaultdict(set)
-        for text in self:
-            text.get_used_sound_files()
-            self.sound_files[text.language] |= text.sound_files
-
-    def get_template_links(self):
-        for text in self:
-            text.get_template_links()
-            self.wikilinks[text.language] |= text.template_links
-
-    def get_wikilinks(self):
-        for text in self:
-            text.get_wikilinks()
-            self.wikilinks[text.language] |= text.wikilinks
-
-    def get_wikipedia_links(self):
-        self.wikipedia_links = defaultdict(set)
-        for text in self:
-            text.get_wikipedia_links()
-            self.wikipedia_links[text.language] |= text.wikipedia_links
 
     # ----------
     # Retrieving
@@ -554,24 +521,6 @@ class Stack(OrderedDict):
                                 if link.title == existing_link or link.title in value["aliases"]:
                                     self.wikipedia_links_cache[existing_link]["anchors"].add(link.anchor)
 
-    # --------------
-    # Clearing cache
-    # --------------
-
-    def clear_all(self):
-        self.clear_wikilink_cache()
-        self.clear_localization_file_cache()
-        self.clear_sound_file_cache()
-
-    def clear_wikilink_cache(self):
-        self.wikilink_cache = dict()
-
-    def clear_localization_file_cache(self):
-        self.localization_file_cache = dict()
-
-    def clear_sound_file_cache(self):
-        self.sound_file_cache = dict()
-
 
 class Wikitext:
     """
@@ -599,10 +548,6 @@ class Wikitext:
         wikilinks (set[Wikilink]): List of all wikilinks in the wikitext.
             Defaults to an empty set.
             Determined by method 'get_wikilinks'.
-        template_links (set[Wikilink]): List of all links found in {{Main}} and
-            {{See also}} templates in the wikitext.
-            Defaults to an empty set.
-            Determined by method 'get_template_links'.
         wikipedia_links (set[Wikilink]): List of all Wikipedia links found in
             the wikitext. Defaults to an empty set.
             Determined by method 'get_wikipedia_links'.
@@ -618,13 +563,13 @@ class Wikitext:
             wikitext: The wikitext. Type can be anything that can be parsed by
                 'mwparserfromhell.utils.parse_anything'.
             language (str): ISO code of the language the wikitext should be
-                translate to.
+                translated to.
         """
-        self.language = language
-        self.wikitext = mw.parse(wikitext)
-
         if language.lower() not in LANGUAGES:
             print("Language '{}' not supported.".format(language), file=sys.stderr)
+
+        self.language = language
+        self.wikitext = mw.parse(wikitext)
 
         self.wikitext_type = self.get_wikitext_type()
         self.item_name = self.get_item_name()
@@ -635,40 +580,27 @@ class Wikitext:
             self.restricted = False
             self.class_links = self.get_using_classes()
 
-        self.wikilinks = set()
-        self.template_links = set()
-        self.wikipedia_links = set()
-        self.sound_files = set()
+        self.wikilinks = self.get_wikilinks() | self.get_template_links()
+        self.wikipedia_links = self.get_wikipedia_links()
+        self.sound_files = self.get_sound_files()
 
     def __str__(self):
         """Returns:
              String representation of the stored wikitext."""
         return str(self.wikitext)
 
-    # =========
-    # Translate
-    # =========
-
-    def translate(self, methods, stack):
-        for method, flags in methods:
-            if self.restricted and "extended" in flags:
+    def translate(self, context, api_access):
+        for function, flags in FUNCTIONS.values():
+            if self.restricted and Function.EXTENDED in flags:
                 continue
-            print("trying method:", method.__name__)
+            elif not api_access and Function.CACHE in flags:
+                continue
             try:
-                if "strings" in flags:
-                    self.wikitext = method(self, globals()[self.language.lower()])
-                elif "cache" in flags:
-                    self.wikitext = method(self, stack)
-                else:
-                    self.wikitext = method(self)
+                self.wikitext = function(self, context)
             except Exception:
                 print(traceback.format_exc(), file=sys.stderr)
 
         return self.wikitext
-
-    # =======
-    # Analyze
-    # =======
 
     def get_item_name(self):
         itemname = self.wikitext.filter_tags(
@@ -685,7 +617,7 @@ class Wikitext:
             return [
                 str(link.title)
                 for link in infobox.get("used-by").value.filter_wikilinks()
-                    ]
+            ]
         elif self.wikitext_type == "set":
             infobox = self.wikitext.filter_templates(matches="item set infobox")[0]
             return [str(infobox.get("used-by").value).strip()]
@@ -694,7 +626,7 @@ class Wikitext:
         infobox = self.wikitext.filter_templates(matches="item infobox")
         if infobox:
             wikitext_type = infobox[0].get("type").value.strip().lower()
-            if wikitext_type in ["misc", "hat"]:  # Legacy shit
+            if wikitext_type in ["misc", "hat"]:  # Old cosmetics system
                 wikitext_type = "cosmetic"
         elif self.wikitext.filter_templates(matches="item set infobox"):
             wikitext_type = "set"
@@ -703,42 +635,50 @@ class Wikitext:
 
         return wikitext_type
 
-    # -------------
-    # Used by Stack
-    # -------------
-
-    def get_used_sound_files(self):
+    def get_sound_files(self):
         """Get the files mentioned in the "sound" parameter of Quotation
         templates."""
-        self.sound_files = set()
+        sound_files = set()
         for template in self.wikitext.ifilter_templates(matches="Quotation"):
             if template.has("sound"):
-                self.sound_files.add(str(template.get("sound").value))
+                sound_files.add(str(template.get("sound").value))
+        return sound_files
 
     def get_template_links(self):
-        self.template_links = set()
+        template_links = set()
         for template in self.wikitext.ifilter_templates(
             matches=lambda x: str(x.name).lower() in ("see also", "main")
         ):
             for link in template.params:
                 if not link.showkey:
-                    self.template_links.add(Wikilink(link))
+                    template_links.add(Wikilink(link))
+        return template_links
 
     def get_wikilinks(self):
-        self.wikilinks = set()
-        for wikilink in self.wikitext.ifilter_wikilinks():
+        wikilinks = set()
+
+        # mwparserfromhell doesn't parse inside tags so we do that manually
+        tag_wikilinks = [
+            wikilink
+            for tag in self.wikitext.ifilter_tags()
+            if tag.contents is not None
+            for wikilink in mw.parse(str(tag.contents)).ifilter_wikilinks()
+        ]
+
+        for wikilink in itertools.chain(self.wikitext.ifilter_wikilinks(), tag_wikilinks):
             title = str(wikilink.title)
             label = wikilink.text if wikilink.text else ""
             # We don't need to check the links, clean_links() does that
             link, anchor = title.rsplit("#", maxsplit=1) if "#" in title else (title, "")
-            self.wikilinks.add(Wikilink(
+            wikilinks.add(Wikilink(
                 link,
                 anchor=anchor,
                 label=label,
             ))
+        return wikilinks
 
     def get_wikipedia_links(self):
-        self.wikipedia_links = set()
+        wikipedia_links = set()
         for wikipedia_link in self.wikitext.filter_wikilinks():
             title = str(wikipedia_link.title)
             if not re.match("^(w|wikipedia):", title, flags=re.I):
@@ -746,9 +686,17 @@ class Wikitext:
             label = wikipedia_link.text if wikipedia_link.text else ""
             link, anchor = title.rsplit("#", maxsplit=1) if "#" in title else (title, "")
             interwiki, link = link.split(":", maxsplit=1)
-            self.wikipedia_links.add(Wikilink(
+            wikipedia_links.add(Wikilink(
                 link,
                 anchor=anchor,
                 label=label,
                 interwiki=interwiki
             ))
+        return wikipedia_links
+
+    def uses_description(self):
+        infobox = self.wikitext.filter_templates(matches="Item infobox")
+        if not infobox:
+            return False
+
+        return infobox[0].has("item-description")

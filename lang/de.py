@@ -37,14 +37,14 @@ SENTENCE_1_SECONDARY = "[[Weapon/de#{class_name}secondary|Sekundärwaffe]]"
 SENTENCE_1_MELEE = "[[Weapon/de#{class_name}melee|Nahkampfwaffe]]"
 
 # FLAGS
-DICTIONARY_FLAGS = {
+ITEM_FLAGS = {
     "not usable in crafting": "Nicht zum Herstellen verwendbar",
     "not tradable": "Nicht handelbar",
     "not tradable or usable in crafting": "Nicht handelbar oder zum Herstellen verwendbar"
 }
 
 # ATTRIBUTES
-DICTIONARY_ATTS = {
+ATTRIBUTES = {
     "achievement item: not tradable": "Errungenschaftsgegenstand: Nicht handelbar",
     "holiday restriction: tf birthday": "Feiertagsbeschränkung: TF Geburtstag",
     "holiday restriction: winter": "Feiertagsbeschränkung: Winter",
@@ -54,7 +54,7 @@ DICTIONARY_ATTS = {
 }
 
 # CLASSES
-DICTIONARY_CLASSES = {
+CLASSES = {
     "Scout": "Scout",
     "Soldier": "Soldier",
     "Pyro": "Pyro",
@@ -67,7 +67,7 @@ DICTIONARY_CLASSES = {
 }
 
 # HEADLINES
-DICTIONARY_HEADLINES = {
+HEADINGS = {
     "as a crafting ingredient": "Als Handwerkszutat",
     "blueprint": "Blaupause",
     "bugs": "Fehler",
@@ -89,7 +89,7 @@ DICTIONARY_HEADLINES = {
 }
 
 # ITEM LEVELS
-DICTIONARY_LEVEL_C = {
+ITEM_LEVELS = {
     'Apparel': 'Bekleidung',
     'Armband': 'Armband',
     'Aura of Incorruptibility': 'Unbestechlichkeitsnimbus',

@@ -36,15 +36,13 @@ SENTENCE_1_SUB_PRIMARY = "[[Weapon/da#{class_name}primary|primære våben]]"
 SENTENCE_1_SUB_SECONDARY = "[[Weapon/da#{class_name}secondary|sekundære våben]]"
 SENTENCE_1_SUB_MELEE = "[[Weapon/da#{class_name}melee|nærkampsvåben]]"
 
-# FLAGS
-DICTIONARY_FLAGS = {
+ITEM_FLAGS = {
     "not usable in crafting": "kan ikke bruges i smedearbejde",
     "not tradable": "Kan ikke byttes",
     "not tradable or usable in crafting": "Kan ikke byttes eller bruges I smedearbejde",
 }
 
-# ATTRIBUTES
-DICTIONARY_ATTS = {
+ATTRIBUTES = {
     "achievement item: not tradable": "Præstationsgenstand: Kan ikke byttes",
     "holiday restriction: tf birthday": "Højtidsbegrænsning: TF-fødselsdag",
     "holiday restriction: winter": "Højtidsbegræsning: Vinter",
@@ -53,13 +51,11 @@ DICTIONARY_ATTS = {
     "holiday restriction: halloween / full moon / valentine's day": "Højtidsbegræsning: Halloween/Fuldmåne/Valentinsdag",
 }
 
-# CLASSES
-DICTIONARY_CLASSES = {
+CLASSES = {
 
 }
 
-# HEADLINES
-DICTIONARY_HEADLINES = {
+HEADINGS = {
     'as a crafting ingredient': "Som en ingrediens til smedearbejde",
     'blueprint': "Arbejdstegning",
     'bugs': "Fejl",
@@ -80,8 +76,7 @@ DICTIONARY_HEADLINES = {
     'update history': "Opdateringshistorik",
 }
 
-# ITEM LEVELS
-DICTIONARY_LEVEL_C = {
+ITEM_LEVELS = {
     'Apparel': "Beklædning",
     'Apron': "Forklæde",
     'Armband': "Armbånd",

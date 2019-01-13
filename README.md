@@ -1,27 +1,20 @@
-WikiTranslator
+wikitranslator
 ==============
+Semi-automated translation of articles at the Team Fortress Wiki. Can be used with any kind of article and has extended functionality for item and set articles, possibly halfing translation time.
 
-A Python script for the semi-automated translation of articles at the Team Fortress Wiki. Currently, it supports translating articles about cosmetic items, weapons and item sets.
+Simple GUI interface with real-time translation.
 
-With this script, it's possible to half the time of translation.
+Additional information is [available on the TF Wiki](https://wiki.teamfortress.com/wiki/User:TidB/wikitranslator), also detailing the process of adding new languages.
 
-Comes with a GUI.
+
 
 To-Do
 -----
 - Cleaning up the code
-- Improved user guidance
 - Fixing various problems with Mac OS X (copying/selecting text)
-- Adding a status bar to the GUI
-- Saving cache as files
 - {{w}} to [[w]] transformation
+- Automatic {{update name}}
+- Automatic translation of infobox classes
 - Tests (ahem)
-- Improving the selection-specific translation
 - Enable certain methods for unsupported languages
-- Show size of cache
-
-
-Wanna learn more?
------------------
-Basic information is stored at the TF Wiki. The page also explains how to add your own language to this.
-http://wiki.teamfortress.com/wiki/User:TidB/WikiTranslator
+- Make installation less of a pain

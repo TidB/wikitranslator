@@ -37,14 +37,14 @@ SENTENCE_1_SUB_SECONDARY = ""
 SENTENCE_1_SUB_MELEE = ""
 
 # FLAGS
-DICTIONARY_FLAGS = {
+ITEM_FLAGS = {
     "not usable in crafting": "Ei käytettävissä luomisessa",
     "not tradable": "Ei vaihdettavissa",
     "not tradable or usable in crafting": "Ei vaihdettava tai luomisessa käytettävä",
 }
 
 # ATTRIBUTES
-DICTIONARY_ATTS = {
+ATTRIBUTES = {
     "achievement item: not tradable": "Saavutusesine: ei vaihdettavissa",
     "holiday restriction: tf birthday": "Juhlapäivärajoitus: TF-syntymäpäivä",
     "holiday restriction: winter": "Juhlapäivärajoitus: Talvi",
@@ -54,7 +54,7 @@ DICTIONARY_ATTS = {
 }
 
 # CLASSES
-DICTIONARY_CLASSES = {
+CLASSES = {
     "Scout": "Scoutille",
     "Soldier": "Soldierille",
     "Pyro": "Pyrolle",
@@ -67,7 +67,7 @@ DICTIONARY_CLASSES = {
 }
 
 # HEADLINES
-DICTIONARY_HEADLINES = {
+HEADINGS = {
     'as a crafting ingredient': "",
     'blueprint': "",
     'bugs': "",
@@ -89,7 +89,7 @@ DICTIONARY_HEADLINES = {
 }
 
 # ITEM LEVELS
-DICTIONARY_LEVEL_C = {
+ITEM_LEVELS = {
     'Apparel': "vaatetus",
     'Armband': "käsivarsinauha",
     'Aura of Incorruptibility': "lahjomattoman aura",

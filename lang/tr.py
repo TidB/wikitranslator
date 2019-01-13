@@ -38,14 +38,14 @@ SENTENCE_1_SUB_SECONDARY = "[[Weapon/tr#{class_name}İkincil|ikincil silahtır]]
 SENTENCE_1_SUB_MELEE = "[[Weapon/tr#{class_name}Yakın_Dövüş|yakın dövüş silahıdır]]"
 
 # FLAGS
-DICTIONARY_FLAGS = {
+ITEM_FLAGS = {
     "not usable in crafting": "İşleme için Kullanılamaz",
     "not tradable": "Takas Edilemez",
     "not tradable or usable in crafting": "Takas Edilemez veya İşlenemez",
 }
 
 # ATTRIBUTES
-DICTIONARY_ATTS = {
+ATTRIBUTES = {
     "achievement item: not tradable": "Başarım Eşyası: Takas Edilemez",
     "holiday restriction: tf birthday": "Bayram Kısıtlaması: TF Doğum Günü",
     "holiday restriction: winter": "Tatil Kısıtlaması: Kış",
@@ -55,7 +55,7 @@ DICTIONARY_ATTS = {
 }
 
 # CLASSES
-DICTIONARY_CLASSES = {
+CLASSES = {
     "Scout": "Scout",
     "Soldier": "Soldier",
     "Pyro": "Pyro",
@@ -68,7 +68,7 @@ DICTIONARY_CLASSES = {
 }
 
 # HEADLINES
-DICTIONARY_HEADLINES = {
+HEADINGS = {
     'as a crafting ingredient': "İşleme içeriği olarak",
     'blueprint': "Formül",
     'bugs': "Hatalar",
@@ -90,7 +90,7 @@ DICTIONARY_HEADLINES = {
 }
 
 # ITEM LEVELS
-DICTIONARY_LEVEL_C = {
+ITEM_LEVELS = {
     'Apparel': "Kıyafet",
     'Armband': "Kolluk",
     'Aura of Incorruptibility': "Dürüstlük Aurası",

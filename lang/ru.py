@@ -37,14 +37,14 @@ SENTENCE_1_SUB_SECONDARY = "[[Weapon/ru#{0}secondary|дополнительно�
 SENTENCE_1_SUB_MELEE = "оружие [[Weapon/ru#{0}melee|ближнего боя]]"
 
 # FLAGS
-DICTIONARY_FLAGS = {
+ITEM_FLAGS = {
     "not usable in crafting": "Нельзя перековывать",
     "not tradable": "Нельзя передавать",
     "not tradable or usable in crafting": "Нельзя передавать или перековывать",
 }
 
 # ATTRIBUTES
-DICTIONARY_ATTS = {
+ATTRIBUTES = {
     "achievement item: not tradable": "За выполненное достижение: нельзя передавать",
     "holiday restriction: tf birthday": "Можно использовать только на День рождения TF",
     "holiday restriction: winter": "Можно использовать только зимой",
@@ -54,7 +54,7 @@ DICTIONARY_ATTS = {
 }
 
 # CLASSES
-DICTIONARY_CLASSES = {
+CLASSES = {
     "Scout": "разведчика",
     "Soldier": "солдата",
     "Pyro": "поджигателя",
@@ -67,7 +67,7 @@ DICTIONARY_CLASSES = {
 }
 
 # HEADLINES
-DICTIONARY_HEADLINES = {
+HEADINGS = {
     'as a crafting ingredient': "Как компонент при ковке",
     'blueprint': "Чертеж",
     'bugs': "Ошибки",
@@ -89,7 +89,7 @@ DICTIONARY_HEADLINES = {
 }
 
 # ITEM LEVELS
-DICTIONARY_LEVEL_C = {
+ITEM_LEVELS = {
     'Apparel': "Одежда",
     'Armband': "Повязка на руку",
     'Aura of Incorruptibility': "Аура неподкупности",

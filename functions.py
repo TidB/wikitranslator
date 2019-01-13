@@ -318,7 +318,7 @@ def create_sentence_community(wikitext, context):
             workshop_link=link
         )
         wikitext.wikitext.replace(sentence_community[0], sct)
-        return wikitext.wikitext
+    return wikitext.wikitext
 
 
 @register(Function.EXTENDED)
@@ -394,14 +394,14 @@ def translate_description(wikitext, context):
     infobox = infobox[0]
     if infobox.has("item-description"):
         description = infobox.get("item-description")
-        description_text = str(description.value).strip()
+        description_text = re.sub('<br/?>', '\n', str(description.value).strip())
         key_english = [
             key
             for key, value in context.localization_file_cache[wikitext.language]["lang"]["Tokens"].items()
             if value == description_text
             ][0]
         value_german = context.localization_file_cache[wikitext.language]["lang"]["Tokens"][key_english[9:]]
-        description.value = str(description.value).replace(description_text, value_german)
+        description.value = value_german.replace('\n', '<br>')
     return wikitext.wikitext
 
 

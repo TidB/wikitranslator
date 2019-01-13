@@ -182,7 +182,7 @@ class Context:
         self.scan_all()
         self.retrieve_all()
 
-        return [wikitext.translate(self, api_access) for wikitext in wikitexts]
+        return [str(wikitext.translate(self, api_access)) for wikitext in wikitexts]
 
     def scan_all(self):
         if self.wikilinks:

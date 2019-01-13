@@ -11,9 +11,10 @@ Additional information is [available on the TF Wiki](https://wiki.teamfortress.c
 To-Do
 -----
 - Cleaning up the code
-- Improved user guidance
 - Fixing various problems with Mac OS X (copying/selecting text)
 - {{w}} to [[w]] transformation
+- Automatic {{update name}}
+- Automatic translation of infobox classes
 - Tests (ahem)
 - Enable certain methods for unsupported languages
 - Make installation less of a pain

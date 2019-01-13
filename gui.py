@@ -161,7 +161,7 @@ class GUI(tk.Tk):
 
         self.text_output.configure(state=tk.NORMAL)
         self.text_output.delete('1.0', 'end')
-        self.text_output.insert('1.0', translated)
+        self.text_output.insert('1.0', '\n\n'.join(translated))
         self.text_output.configure(state=tk.DISABLED)
 
 

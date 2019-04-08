@@ -1,6 +1,6 @@
 # STANDARD
 ADDEDTOGAME = "{{{{item name|{item_name}}}}}이/가 게임에 추가되었습니다."
-ALLCLASSESBOX = "[[Classes/ko|모든 클래스]]"
+ALLCLASSESBOX = "[[Classes/ko|모든 병과]]"
 ITEMLOOK = "이 아이템은"
 NOUNMARKER_INDEFINITE_COSMETIC = ""
 NOUNMARKER_INDEFINITE_SET = ""
@@ -11,9 +11,9 @@ SENTENCE_1_COMMUNITY_COSMETIC = "[[Steam Workshop/ko|커뮤니티 제작]]"
 SENTENCE_1_COMMUNITY_WEAPON = "[[Steam Workshop/ko|커뮤니티 제작]]"
 SENTENCE_1_PROMO_COSMETIC = "[[Promotional items/ko|홍보용]]"
 SENTENCE_1_PROMO_WEAPON = "[[Promotional items/ko|홍보용]]"
-SENTENCE_1_COSMETIC = "[[Cosmetic items/ko|치장 아이템]]"
+SENTENCE_1_COSMETIC = "[[Cosmetic items/ko|장식 아이템]]"
 SENTENCE_1_SET = "[[Item set/ko|아이템 세트]]"
-SENTENCE_1_CLASSES_ALL = "모든 [[Classes/ko|클래스]]"
+SENTENCE_1_CLASSES_ALL = "모든 [[Classes/ko|병과]]"
 SENTENCE_1_CLASSES_ONE = "[[{class_name}/ko|{loc_class_name}]]"
 SENTENCE_1_CLASSES_MORE = "와/과 [[{class_name}/ko|{loc_class_name]]."
 SENTENCE_1_CLASSES_AND = ", "
@@ -76,16 +76,16 @@ HEADINGS = {
     'external links': "외부 링크",
     'gallery': "갤러리",
     'item set': "아이템 세트",
-    'notes': "노트",
-    'painted variants': "페인트칠 모형",
-    'references': "참고",
-    'related achievements': "관련 도전과제",
+    'notes': "주석",
+    'painted variants': "페인트칠 적용",
+    'references': "각주",
+    'related achievements': "관련있는 도전 과제",
     'see also': "같이 보기",
     'strange variant': "이상한 품질",
     'styles': "양식",
     'trivia': "상식",
-    'unused content': "사용되지 않은 요소",
-    'update history': "업데이트 기록",
+    'unused content': "미사용 콘덴츠",
+    'update history': "업데이트 내역",
 }
 
 # ITEM LEVELS

@@ -84,7 +84,7 @@ HEADINGS = {
     'strange variant': "이상한 품질",
     'styles': "양식",
     'trivia': "상식",
-    'unused content': "미사용 콘덴츠",
+    'unused content': "미사용 콘텐츠",
     'update history': "업데이트 내역",
 }
 

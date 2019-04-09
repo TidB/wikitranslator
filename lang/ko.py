@@ -45,7 +45,7 @@ ITEM_FLAGS = {
 
 # ATTRIBUTES
 ATTRIBUTES = {
-    "achievement item: not tradable": "도전과제 아이템 :　거래 불가",
+    "achievement item: not tradable": "도전과제 아이템 : 거래 불가",
     "holiday restriction: tf birthday": "축제일 제한: TF 생일",
     "holiday restriction: winter": "축제일 제한: 겨울",
     "holiday restriction: halloween": "축제일 제한: 핼러윈",
@@ -77,9 +77,9 @@ HEADINGS = {
     'gallery': "갤러리",
     'item set': "아이템 세트",
     'notes': "주석",
-    'painted variants': "페인트칠 적용",
-    'references': "각주",
-    'related achievements': "관련있는 도전 과제",
+    'painted variants': "페인트 적용",
+    'references': "참고",
+    'related achievements': "관련된 도전 과제",
     'see also': "같이 보기",
     'strange variant': "이상한 품질",
     'styles': "양식",

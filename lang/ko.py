@@ -68,8 +68,8 @@ CLASSES = {
 
 # HEADLINES
 HEADINGS = {
-    'as a crafting ingredient': "사용되는 제작식",
-    'blueprint': "제작식",
+    'as a crafting ingredient': "사용되는 청사진",
+    'blueprint': "",
     'bugs': "버그",
     'crafting': "제작",
     'damage and function times': "피해량과 작동 시간",

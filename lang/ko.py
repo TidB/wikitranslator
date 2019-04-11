@@ -68,7 +68,7 @@ CLASSES = {
 
 # HEADLINES
 HEADINGS = {
-    'as a crafting ingredient': "사용되는 청사진",
+    'as a crafting ingredient': "사용되는 제작식",
     'blueprint': "",
     'bugs': "버그",
     'crafting': "제작",

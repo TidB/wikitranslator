@@ -20,13 +20,13 @@ SENTENCE_1_CLASSES_MORE = " ve [[{class_name}/tr|{loc_class_name}]]."
 SENTENCE_1_CLASSES_AND = " ve "
 SENTENCE_1_CLASSES_COMMA = ", "
 
-SENTENCE_COMMUNITY = "Bu eşya [[Steam Workshop/tr|Steam Workshop]]'ta{custom_name} {workshop_link} adı altında yayınlanmıştır."
-SENTENCE_COMMUNITY_LINK = "[{link} yayınlandı]"
+SENTENCE_COMMUNITY = "Bu eşya [[Steam Workshop/tr|Steam Atölyesi]]'nde{custom_name} {workshop_link}."
+SENTENCE_COMMUNITY_LINK = "[{link} yayınlanmıştır]"
 SENTENCE_COMMUNITY_NAME = " {name} adı altında"
 
 SENTENCE_PROMOTIONAL = "Bu eşya {date}{steam}[[{game_name}/tr|{game_name}]] alan oyunculara [[Genuine/tr|Hakiki]] kalitede verilmiştir."
 SENTENCE_PROMOTIONAL_STEAM = " [[Steam/tr|Steam]] üzerinden"
-SENTENCE_PROMOTIONAL_DATE = "{date} tarihinden önce"
+SENTENCE_PROMOTIONAL_DATE = "{date} tarihinden önce "
 
 SENTENCE_SET = " Bu set {{{{Update link|{update}}}}} ile oyuna eklenmiştir."
 SENTENCE_SET_INCLUDES = "Set şu eşyaları içermektedir:"
@@ -84,7 +84,7 @@ HEADINGS = {
     'see also': "Ayrıca Bakınız",
     'strange variant': "Garip Türleri",
     'styles': "Stiller",
-    'trivia': "Diğer",
+    'trivia': "Ek Bilgiler",
     'unused content': "Kullanılmayan İçerik",
     'update history': "Güncelleme Geçmişi",
 }

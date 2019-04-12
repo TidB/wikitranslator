@@ -7,7 +7,7 @@ Simple GUI interface with real-time translation.
 Additional information is [available on the TF Wiki](https://wiki.teamfortress.com/wiki/User:TidB/wikitranslator), also detailing the process of adding new languages.
 
 Run `pyinstaller gui.py -n wikitranslator --onefile --add-data="lang;lang"` and
-`pyinstaller gui.py -n wikitranslator --onedir --add-data="lang;lang` to build everything
+`pyinstaller gui.py -n wikitranslator --onedir --add-data="lang;lang"` to build everything
 
 To-Do
 -----

@@ -1,5 +1,5 @@
 # STANDARD
-ADDEDTOGAME = "Dit voorwerp is toegevoegd aan het spel."
+ADDEDTOGAME = "Dit voorwerp is aan het spel toegevoegd."
 ALLCLASSESBOX = "[[Classes/nl|Alle klassen]]"
 ITEMLOOK = " Het ziet er uit als"
 NOUNMARKER_INDEFINITE_COSMETIC = "een"
@@ -19,8 +19,8 @@ SENTENCE_1_CLASSES_MORE = "en (Article) [[{class_name}/nl|{loc_class_name}]]."
 SENTENCE_1_CLASSES_AND = ","
 SENTENCE_1_CLASSES_COMMA = " en "
 
-SENTENCE_COMMUNITY = "Dit voorwerp is {workshop_link} aan de [[Steam Workshop/nl|Steam Workshop]]{custom_name}."
-SENTENCE_COMMUNITY_LINK = " [{link} toegevoegd]"
+SENTENCE_COMMUNITY = "Dit voorwerp is {workshop_link} aan de Steam Workshop."
+SENTENCE_COMMUNITY_LINK = " [{link} bijgedragen]"
 SENTENCE_COMMUNITY_NAME = 'onder de naam "{name}"'
 
 SENTENCE_PROMOTIONAL = "Dit voorwerp is gegeven in [[Genuine/nl|Authentieke]] kwaliteit aan de spelers die (article) ''[[{game_name}/nl|{game_name}]]'' kochten {date}{steam}."
@@ -30,11 +30,11 @@ SENTENCE_PROMOTIONAL_DATE = " voor {date}"
 SENTENCE_SET = "Het was toegevoegd aan het spel in (article) {{{{Update link|{update}}}}}."
 SENTENCE_SET_INCLUDES = "De set bevat volgende voorwerpen:"
 
-SENTENCE_THUMBNAIL = "|Steam workshop afbeelding voor dit voorwerp"
+SENTENCE_THUMBNAIL = "|Steam Workshop-afbeelding voor dit voorwerp"
 
 SENTENCE_1_SUB_PRIMARY = "[[Weapon/nl#{class_name}primary|primair wapen]]"
-SENTENCE_1_SUB_SECONDARY = "[[Weapon/nl#{class_name}secondary|secondair wapen]]"
-SENTENCE_1_SUB_MELEE = "[[Weapon/nl#{class_name}melee|melee wapen]]"
+SENTENCE_1_SUB_SECONDARY = "[[Weapon/nl#{class_name}secondary|secundaire wapen]]"
+SENTENCE_1_SUB_MELEE = "[[Weapon/nl#{class_name}melee|slagwapen]]"
 
 # FLAGS
 ITEM_FLAGS = {
@@ -68,24 +68,24 @@ CLASSES = {
 
 # HEADLINES
 HEADINGS = {
-    'as a crafting ingredient': "Als een ingredient voor ontwerpen",
+    'as a crafting ingredient': "Als een ingrediënt voor ontwerpen",
     'blueprint': "Blauwdruk",
     'bugs': "Bugs",
     'crafting': "Ontwerpen",
-    'damage and function times': "Schade en functie tijden",
+    'damage and function times': "Schade en functietijden",
     'external links': "Externe links",
     'gallery': "Galerij",
-    'item set': "Voorwerp set",
-    'notes': "nota's",
+    'item set': "Voorwerpset",
+    'notes': "Notities",
     'painted variants': "Geverfde varianten",
     'references': "Verwijzingen",
     'related achievements': "Gerelateerde prestaties",
     'see also': "Zie ook",
-    'strange variant': "vVeemde variant",
+    'strange variant': "Vreemde variant",
     'styles': "Stijlen",
     'trivia': "Trivia",
     'unused content': "Ongebruikte inhoud",
-    'update history': "Update verleden",
+    'update history': "Updateverleden",
 }
 
 # ITEM LEVELS
@@ -106,7 +106,7 @@ ITEM_LEVELS = {
     'Blueprints': "Blauwdrukken",
     'Bones': "Beenderen",
     'Bongos': "Bongo's",
-    'Boots': "Botten",
+    'Boots': "Laarzen",
     'Botkiller': "Botkiller",
     'Cape': "Cape",
     'Championship Belt': "Kampioenschaps Gordel",

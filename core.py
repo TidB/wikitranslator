@@ -19,6 +19,7 @@ LANGUAGES = {
     'fi': 'Finnish',
     'fr': 'French',
     'it': 'Italian',
+    'ja': 'Japanese',
     'ko': 'Korean',
     'nl': 'Dutch',
     'pt-br': 'Brazilian',
@@ -342,10 +343,7 @@ class Context:
         if not new_files:
             return
 
-        new_files = {
-            "File:{}.wav".format(re.sub("\.wav$", "", file))
-            for file in new_files
-        }
+        new_files = {"File:{}".format(file) for file in new_files}
 
         items = merge_jsons(self.tf2_api.retrieve_pages(
             list(new_files),
@@ -612,24 +610,24 @@ class Wikitext:
         return str(itemname[0].contents) if itemname else None
 
     def get_using_classes(self):
-        if self.wikitext_type in ("cosmetic", "weapon"):
-            infobox = self.wikitext.filter_templates(matches="item infobox")[0]
+        if self.wikitext_type in ('cosmetic', 'weapon'):
+            infobox = self.wikitext.filter_templates(matches='item infobox')[0]
             return [
                 str(link.title)
-                for link in infobox.get("used-by").value.filter_wikilinks()
+                for link in infobox.get('used-by').value.filter_wikilinks()
             ]
-        elif self.wikitext_type == "set":
-            infobox = self.wikitext.filter_templates(matches="item set infobox")[0]
-            return [str(infobox.get("used-by").value).strip()]
+        elif self.wikitext_type == 'set':
+            infobox = self.wikitext.filter_templates(matches='item set infobox')[0]
+            return [str(infobox.get('used-by').value).strip()]
 
     def get_wikitext_type(self):
-        infobox = self.wikitext.filter_templates(matches="item infobox")
+        infobox = self.wikitext.filter_templates(matches='item infobox')
         if infobox:
-            wikitext_type = infobox[0].get("type").value.strip().lower()
-            if wikitext_type in ["misc", "hat"]:  # Old cosmetics system
-                wikitext_type = "cosmetic"
-        elif self.wikitext.filter_templates(matches="item set infobox"):
-            wikitext_type = "set"
+            wikitext_type = infobox[0].get('type').value.strip().lower()
+            if wikitext_type in ['misc', 'hat']:  # Old cosmetics system
+                wikitext_type = 'cosmetic'
+        elif self.wikitext.filter_templates(matches='item set infobox'):
+            wikitext_type = 'set'
         else:
             wikitext_type = None
 
@@ -639,15 +637,15 @@ class Wikitext:
         """Get the files mentioned in the "sound" parameter of Quotation
         templates."""
         sound_files = set()
-        for template in self.wikitext.ifilter_templates(matches="Quotation"):
-            if template.has("sound"):
+        for template in self.wikitext.ifilter_templates(matches='Quotation'):
+            if template.has('sound'):
                 sound_files.add(str(template.get("sound").value))
         return sound_files
 
     def get_template_links(self):
         template_links = set()
         for template in self.wikitext.ifilter_templates(
-            matches=lambda x: str(x.name).lower() in ("see also", "main")
+            matches=lambda x: str(x.name).lower() in ('see also', 'main')
         ):
             for link in template.params:
                 if not link.showkey:

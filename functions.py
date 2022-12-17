@@ -134,6 +134,20 @@ def translate_image_thumbnail(wikitext, context):
 
 
 @register()
+def translate_infobox_update(wikitext, context):
+    infobox = wikitext.wikitext.filter_templates(matches='Item infobox')
+    if not infobox:
+        return wikitext.wikitext
+
+    infobox = infobox[0]
+    update_links = infobox.get('released').value.filter_wikilinks()
+    for link in update_links:
+        wikitext.wikitext.replace(link, f'{{{{update link|{link.title}}}}}')
+
+    return wikitext.wikitext
+
+
+@register()
 def translate_item_flags(wikitext, context):
     infobox = wikitext.wikitext.filter_templates(matches="Item infobox")
     if not infobox:
